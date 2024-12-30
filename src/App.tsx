@@ -1,11 +1,31 @@
 import './index.css';
 
+import { useState } from 'react';
+import { Navigate, Route, Routes } from 'react-router-dom';
+
+import ExplorePage from './pages/ExplorePage';
+import HomePage from './pages/HomePage';
+import LoginPage from './pages/LoginPage';
+
 export const App = () => {
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
   return (
-    <div>
-      <h1 className="bg-gradient-to-r from-red-500 via-yellow-500 to-blue-500 bg-clip-text text-transparent font-bold text-4xl">
-        Instagram Clone Project
-      </h1>
-    </div>
+    <Routes>
+      <Route
+        path="/"
+        element={
+          isLoggedIn ? (
+            <HomePage />
+          ) : (
+            <LoginPage setIsLoggedIn={setIsLoggedIn} />
+          )
+        }
+      ></Route>
+      <Route
+        path="/explore"
+        element={isLoggedIn ? <ExplorePage /> : <Navigate to="/" />}
+      ></Route>
+    </Routes>
   );
 };
