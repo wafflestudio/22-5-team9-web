@@ -12,8 +12,20 @@ export const App = () => {
 
   return (
     <Routes>
-      <Route path='/' element={isLoggedIn ? <HomePage /> : <LoginPage setIsLoggedIn={setIsLoggedIn} />}></Route>
-      <Route path='/explore' element={isLoggedIn ? <ExplorePage /> : <Navigate to="/" />}></Route>
+      <Route
+        path="/"
+        element={
+          isLoggedIn ? (
+            <HomePage />
+          ) : (
+            <LoginPage setIsLoggedIn={setIsLoggedIn} />
+          )
+        }
+      ></Route>
+      <Route
+        path="/explore"
+        element={isLoggedIn ? <ExplorePage /> : <Navigate to="/" />}
+      ></Route>
     </Routes>
   );
 };
