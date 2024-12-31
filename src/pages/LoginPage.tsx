@@ -1,16 +1,16 @@
 import React, { useState } from 'react';
 
-type Props = {
-  setIsLoggedIn: (isLoggedIn: boolean) => void;
+type LoginPageProps = {
+  handleIsLoggedIn: (value: boolean) => void;
 };
 
-const LoginPage = ({ setIsLoggedIn }: Props) => {
+const LoginPage = ({ handleIsLoggedIn }: LoginPageProps) => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setIsLoggedIn(true);
+    handleIsLoggedIn(true);
     //TODO : 로그인 로직
   };
 
