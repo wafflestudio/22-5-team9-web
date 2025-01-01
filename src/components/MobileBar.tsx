@@ -1,5 +1,6 @@
 import { Heart, Home, PlusSquare, Search, User } from 'lucide-react';
 import React from 'react';
+import { Link } from 'react-router-dom';
 
 interface NavItemProps {
   icon: React.ReactNode;
@@ -14,11 +15,15 @@ const NavItem = ({ icon }: NavItemProps) => (
 const BottomBar = () => {
   return (
     <nav className="flex md:hidden justify-around py-2 bg-white border-t">
-      <NavItem icon={<Home />} />
+      <Link to="/">
+        <NavItem icon={<Home />} />
+      </Link>
       <NavItem icon={<Search />} />
       <NavItem icon={<PlusSquare />} />
       <NavItem icon={<Heart />} />
-      <NavItem icon={<User />} />
+      <Link to="/username">
+        <NavItem icon={<User />} />
+      </Link>
     </nav>
   );
 };

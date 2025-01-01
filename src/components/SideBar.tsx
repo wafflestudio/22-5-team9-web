@@ -8,6 +8,7 @@ import {
   User,
 } from 'lucide-react';
 import React, { useContext } from 'react';
+import { Link } from 'react-router-dom';
 
 import { LoginContext, type LoginContextType } from '../App';
 
@@ -43,12 +44,16 @@ const Sidebar = () => {
         <img src="/instagram-logo.png" alt="Instagram" className="w-24" />
       </div>
       <div className="flex flex-col flex-1 space-y-2">
-        <NavItem icon={<Home />} label="Home" active />
+        <Link to="/" className="no-underline">
+          <NavItem icon={<Home />} label="Home" active />
+        </Link>
         <NavItem icon={<Search />} label="Search" active={false} />
         <NavItem icon={<Compass />} label="Explore" active={false} />
         <NavItem icon={<Heart />} label="Notifications" active={false} />
         <NavItem icon={<PlusSquare />} label="Create" active={false} />
-        <NavItem icon={<User />} label="Profile" active={false} />
+        <Link to="/username" className="no-underline">
+          <NavItem icon={<User />} label="Profile" active={false} />
+        </Link>
       </div>
       <div className="relative mt-auto">
         <button
