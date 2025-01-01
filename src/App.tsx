@@ -6,6 +6,7 @@ import { Navigate, Route, Routes } from 'react-router-dom';
 import ExplorePage from './pages/ExplorePage';
 import LoginPage from './pages/LoginPage';
 import MainPage from './pages/MainPage';
+import ProfilePage from './pages/ProfilePage';
 
 export type LoginContextType = {
   isLoggedIn: boolean;
@@ -39,11 +40,15 @@ export const App = () => {
               <LoginPage handleIsLoggedIn={handleIsLoggedIn} />
             )
           }
-        ></Route>
+        />
         <Route
           path="/explore"
           element={isLoggedIn ? <ExplorePage /> : <Navigate to="/" />}
-        ></Route>
+        />
+        <Route
+          path="/:username"
+          element={isLoggedIn ? <ProfilePage /> : <Navigate to="/" />}
+        />
       </Routes>
     </LoginContext.Provider>
   );
