@@ -28,7 +28,7 @@ const NavItem = ({ icon, label, active }: NavItemProps) => (
   </a>
 );
 
-const Sidebar = () => {
+const SideBar = () => {
   const [isMenuOpen, setIsMenuOpen] = React.useState(false);
 
   const toggleMenu = () => {
@@ -44,14 +44,16 @@ const Sidebar = () => {
         <img src="/instagram-logo.png" alt="Instagram" className="w-24" />
       </div>
       <div className="flex flex-col flex-1 space-y-2">
-        <Link to="/" className="no-underline">
+        <Link to="/">
           <NavItem icon={<Home />} label="Home" active />
         </Link>
         <NavItem icon={<Search />} label="Search" active={false} />
-        <NavItem icon={<Compass />} label="Explore" active={false} />
+        <Link to="/explore">
+          <NavItem icon={<Compass />} label="Explore" active={false} />
+        </Link>
         <NavItem icon={<Heart />} label="Notifications" active={false} />
         <NavItem icon={<PlusSquare />} label="Create" active={false} />
-        <Link to="/username" className="no-underline">
+        <Link to="/username">
           <NavItem icon={<User />} label="Profile" active={false} />
         </Link>
       </div>
@@ -83,4 +85,4 @@ const Sidebar = () => {
   );
 };
 
-export default Sidebar;
+export default SideBar;

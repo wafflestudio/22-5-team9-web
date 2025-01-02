@@ -1,6 +1,6 @@
 import { useParams } from 'react-router-dom';
 
-import Highlights from '../components/Hilghlights';
+import Highlights from '../components/Highlights';
 import MobileBar from '../components/MobileBar';
 import MobileHeader from '../components/MobileHeader';
 import ProfileInfo from '../components/ProfileInfo';
