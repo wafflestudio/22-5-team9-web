@@ -1,4 +1,4 @@
-import { Heart, Home, PlusSquare, Search, User } from 'lucide-react';
+import { Compass, Heart, Home, PlusSquare, User } from 'lucide-react';
 import React from 'react';
 import { Link } from 'react-router-dom';
 
@@ -12,13 +12,15 @@ const NavItem = ({ icon }: NavItemProps) => (
   </a>
 );
 
-const BottomBar = () => {
+const MobileBar = () => {
   return (
     <nav className="flex md:hidden justify-around py-2 bg-white border-t">
       <Link to="/">
         <NavItem icon={<Home />} />
       </Link>
-      <NavItem icon={<Search />} />
+      <Link to="/explore">
+        <NavItem icon={<Compass />} />
+      </Link>
       <NavItem icon={<PlusSquare />} />
       <NavItem icon={<Heart />} />
       <Link to="/username">
@@ -28,4 +30,4 @@ const BottomBar = () => {
   );
 };
 
-export default BottomBar;
+export default MobileBar;
