@@ -7,9 +7,17 @@ import ExplorePage from './pages/ExplorePage';
 import LoginPage from './pages/LoginPage';
 import MainPage from './pages/MainPage';
 import ProfilePage from './pages/ProfilePage';
+import RegisterPage from './pages/RegisterPage';
+
+export type User = {
+  username: string;
+  email: string;
+  password: string;
+} | null;
 
 export type LoginContextType = {
   isLoggedIn: boolean;
+  user: User;
   handleIsLoggedIn: (value: boolean) => void;
 };
 
@@ -23,13 +31,22 @@ export const App = () => {
     return saved === 'true';
   });
 
+  const [user, setUser] = useState<User>(() => {
+    const savedUser = localStorage.getItem('user');
+    return (savedUser != null) ? JSON.parse(savedUser) as User : null;
+  });
+
   const handleIsLoggedIn = (value: boolean) => {
     setIsLoggedIn(value);
     localStorage.setItem('isLoggedIn', String(value));
+    if (!value) {
+      localStorage.removeItem('user');
+      setUser(null);
+    }
   };
 
   return (
-    <LoginContext.Provider value={{ isLoggedIn, handleIsLoggedIn }}>
+    <LoginContext.Provider value={{ isLoggedIn, user, handleIsLoggedIn }}>
       <Routes>
         <Route
           path="/"
@@ -38,6 +55,16 @@ export const App = () => {
               <MainPage />
             ) : (
               <LoginPage handleIsLoggedIn={handleIsLoggedIn} />
+            )
+          }
+        />
+        <Route
+          path="/register"
+          element={
+            isLoggedIn ? (
+              <Navigate to="/" />
+            ) : (
+              <RegisterPage handleIsLoggedIn={handleIsLoggedIn} />
             )
           }
         />
