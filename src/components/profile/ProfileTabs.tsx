@@ -1,7 +1,7 @@
 import { Bookmark, Grid } from 'lucide-react';
 import { useState } from 'react';
 
-import PostGrid from './PostGrid';
+import PostGrid from '../shared/PostGrid';
 
 const ProfileTabs = () => {
   const [activeTab, setActiveTab] = useState('posts');

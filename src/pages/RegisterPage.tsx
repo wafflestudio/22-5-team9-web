@@ -68,7 +68,7 @@ const RegisterPage = ({ handleIsLoggedIn }: RegisterPageProps) => {
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    
+
     if (!validateForm()) {
       return;
     }
@@ -76,12 +76,15 @@ const RegisterPage = ({ handleIsLoggedIn }: RegisterPageProps) => {
     try {
       // TODO: Implement actual registration API call
       // For now, we'll simulate a successful registration
-      localStorage.setItem('user', JSON.stringify({
-        username: formData.username,
-        email: formData.email,
-        fullName: formData.fullName,
-      }));
-      
+      localStorage.setItem(
+        'user',
+        JSON.stringify({
+          username: formData.username,
+          email: formData.email,
+          fullName: formData.fullName,
+        }),
+      );
+
       handleIsLoggedIn(true);
       navigate('/');
     } catch (error) {
@@ -91,13 +94,13 @@ const RegisterPage = ({ handleIsLoggedIn }: RegisterPageProps) => {
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
       [name]: value,
     }));
     // Clear error when user starts typing
     if (errors[name as keyof typeof errors]) {
-      setErrors(prev => ({
+      setErrors((prev) => ({
         ...prev,
         [name]: '',
       }));
@@ -119,7 +122,10 @@ const RegisterPage = ({ handleIsLoggedIn }: RegisterPageProps) => {
         <div className="bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10">
           <form className="space-y-6" onSubmit={handleSubmit}>
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700">
+              <label
+                htmlFor="email"
+                className="block text-sm font-medium text-gray-700"
+              >
                 이메일
               </label>
               <div className="mt-1">
@@ -140,7 +146,10 @@ const RegisterPage = ({ handleIsLoggedIn }: RegisterPageProps) => {
             </div>
 
             <div>
-              <label htmlFor="fullName" className="block text-sm font-medium text-gray-700">
+              <label
+                htmlFor="fullName"
+                className="block text-sm font-medium text-gray-700"
+              >
                 성명
               </label>
               <div className="mt-1">
@@ -160,7 +169,10 @@ const RegisterPage = ({ handleIsLoggedIn }: RegisterPageProps) => {
             </div>
 
             <div>
-              <label htmlFor="username" className="block text-sm font-medium text-gray-700">
+              <label
+                htmlFor="username"
+                className="block text-sm font-medium text-gray-700"
+              >
                 사용자 이름
               </label>
               <div className="mt-1">
@@ -180,7 +192,10 @@ const RegisterPage = ({ handleIsLoggedIn }: RegisterPageProps) => {
             </div>
 
             <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700">
+              <label
+                htmlFor="password"
+                className="block text-sm font-medium text-gray-700"
+              >
                 비밀번호
               </label>
               <div className="mt-1">

@@ -12,14 +12,17 @@ const LoginPage = ({ handleIsLoggedIn }: LoginPageProps) => {
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if ((username.length === 0) || (password.length === 0)) {
+    if (username.length === 0 || password.length === 0) {
       setError('아이디와 비밀번호를 입력해주세요.');
       return;
     }
     //TODO : Replace with actual login API call
     const savedUser = localStorage.getItem('user');
     if (savedUser != null) {
-      const user = JSON.parse(savedUser) as { username: string; password: string };
+      const user = JSON.parse(savedUser) as {
+        username: string;
+        password: string;
+      };
       if (user.username === username && user.password === password) {
         handleIsLoggedIn(true);
       } else {
@@ -44,7 +47,7 @@ const LoginPage = ({ handleIsLoggedIn }: LoginPageProps) => {
       <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
         <div className="bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10">
           <form className="space-y-6" onSubmit={handleSubmit}>
-            {(error.length > 0) && (
+            {error.length > 0 && (
               <div className="text-red-500 text-sm text-center">{error}</div>
             )}
             <div>

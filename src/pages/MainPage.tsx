@@ -1,8 +1,8 @@
-import BottomBar from '../components/MobileBar';
-import MobileHeader from '../components/MobileHeader';
-import Posts from '../components/Posts';
-import SideBar from '../components/SideBar';
-import Stories from '../components/Stories';
+import Posts from '../components/feed/Posts';
+import Stories from '../components/feed/Stories';
+import BottomBar from '../components/layout/MobileBar';
+import MobileHeader from '../components/layout/MobileHeader';
+import SideBar from '../components/layout/SideBar';
 
 const dummyPosts = [
   {
