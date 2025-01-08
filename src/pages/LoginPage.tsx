@@ -10,26 +10,38 @@ const LoginPage = ({ handleIsLoggedIn }: LoginPageProps) => {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (username.length === 0 || password.length === 0) {
       setError('아이디와 비밀번호를 입력해주세요.');
       return;
     }
-    //TODO : Replace with actual login API call
-    const savedUser = localStorage.getItem('user');
-    if (savedUser != null) {
-      const user = JSON.parse(savedUser) as {
-        username: string;
-        password: string;
-      };
-      if (user.username === username && user.password === password) {
+    try {
+      const response = await fetch('http://3.34.185.81:8000/api/user/signin', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          username,
+          password,
+        }),
+      });
+  
+      if (response.ok) {
+        const data = await response.json() as { access_token: string; refresh_token: string };
+        // Store tokens if needed
+        localStorage.setItem('access_token', data.access_token);
+        localStorage.setItem('refresh_token', data.refresh_token);
         handleIsLoggedIn(true);
-      } else {
+      } else if (response.status === 401) {
         setError('아이디 또는 비밀번호가 일치하지 않습니다.');
+      } else {
+        setError('로그인 중 오류가 발생했습니다.');
       }
-    } else {
-      setError('계정을 찾을 수 없습니다.');
+    } catch (err) {
+      console.error('Login error:', err);
+      setError('로그인 중 오류가 발생했습니다.');
     }
   };
 
@@ -46,7 +58,7 @@ const LoginPage = ({ handleIsLoggedIn }: LoginPageProps) => {
 
       <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
         <div className="bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10">
-          <form className="space-y-6" onSubmit={handleSubmit}>
+          <form className="space-y-6" onSubmit={e => void handleSubmit(e)}>
             {error.length > 0 && (
               <div className="text-red-500 text-sm text-center">{error}</div>
             )}

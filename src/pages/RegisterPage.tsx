@@ -12,12 +12,15 @@ const RegisterPage = ({ handleIsLoggedIn }: RegisterPageProps) => {
     fullName: '',
     username: '',
     password: '',
+    phoneNumber: ''
   });
+  
   const [errors, setErrors] = useState({
     email: '',
     fullName: '',
     username: '',
     password: '',
+    phoneNumber: ''
   });
 
   const validateForm = () => {
@@ -27,10 +30,11 @@ const RegisterPage = ({ handleIsLoggedIn }: RegisterPageProps) => {
       fullName: '',
       username: '',
       password: '',
+      phoneNumber: ''
     };
 
     // Email validation
-    if (!formData.email) {
+    if (formData.email.length === 0) {
       newErrors.email = '이메일을 입력해주세요';
       isValid = false;
     } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
@@ -39,13 +43,13 @@ const RegisterPage = ({ handleIsLoggedIn }: RegisterPageProps) => {
     }
 
     // Full name validation
-    if (!formData.fullName) {
+    if (formData.fullName.length === 0) {
       newErrors.fullName = '성명을 입력해주세요';
       isValid = false;
     }
 
     // Username validation
-    if (!formData.username) {
+    if (formData.username.length === 0) {
       newErrors.username = '사용자 이름을 입력해주세요';
       isValid = false;
     } else if (formData.username.length < 3) {
@@ -54,11 +58,20 @@ const RegisterPage = ({ handleIsLoggedIn }: RegisterPageProps) => {
     }
 
     // Password validation
-    if (!formData.password) {
+    if (formData.password.length === 0) {
       newErrors.password = '비밀번호를 입력해주세요';
       isValid = false;
     } else if (formData.password.length < 6) {
       newErrors.password = '비밀번호는 6자 이상이어야 합니다';
+      isValid = false;
+    }
+
+    // Phone number validation
+    if (formData.phoneNumber.length === 0) {
+      newErrors.phoneNumber = '전화번호를 입력해주세요';
+      isValid = false;
+    } else if (!/^010\d{8}$/.test(formData.phoneNumber)) {
+      newErrors.phoneNumber = '유효한 전화번호를 입력해주세요 (010XXXXXXXX)';
       isValid = false;
     }
 
@@ -74,21 +87,49 @@ const RegisterPage = ({ handleIsLoggedIn }: RegisterPageProps) => {
     }
 
     try {
-      // TODO: Implement actual registration API call
-      // For now, we'll simulate a successful registration
-      localStorage.setItem(
-        'user',
-        JSON.stringify({
+      const response = await fetch('http://3.34.185.81:8000/api/user/signup', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
           username: formData.username,
+          password: formData.password,
+          full_name: formData.fullName,
           email: formData.email,
-          fullName: formData.fullName,
+          phone_number: formData.phoneNumber
         }),
-      );
+      });
 
-      handleIsLoggedIn(true);
-      navigate('/');
+      if (response.ok) {
+        // After successful signup, attempt to login
+        const loginResponse = await fetch('YOUR_API_URL/api/user/signin', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            username: formData.username,
+            password: formData.password,
+          }),
+        });
+
+        if (loginResponse.ok) {
+          const data = await loginResponse.json() as { access_token: string; refresh_token: string };
+          localStorage.setItem('access_token', data.access_token);
+          localStorage.setItem('refresh_token', data.refresh_token);
+          handleIsLoggedIn(true);
+          await navigate('/');
+        } else {
+          throw new Error('Login failed after signup');
+        }
+      } else {
+        const errorData = await response.json() as { detail?: string };
+        throw new Error(errorData.detail != null ? errorData.detail : 'Registration failed');
+      }
     } catch (error) {
-      console.error('Registration failed:', error);
+      console.error('Registration/Login failed:', error);
+      // Handle specific error messages here
     }
   };
 
@@ -99,7 +140,7 @@ const RegisterPage = ({ handleIsLoggedIn }: RegisterPageProps) => {
       [name]: value,
     }));
     // Clear error when user starts typing
-    if (errors[name as keyof typeof errors]) {
+    if (errors[name as keyof typeof errors].length > 0) {
       setErrors((prev) => ({
         ...prev,
         [name]: '',
@@ -120,7 +161,7 @@ const RegisterPage = ({ handleIsLoggedIn }: RegisterPageProps) => {
 
       <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
         <div className="bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10">
-          <form className="space-y-6" onSubmit={handleSubmit}>
+          <form className="space-y-6" onSubmit={e => void handleSubmit(e)}>
             <div>
               <label
                 htmlFor="email"
@@ -139,7 +180,7 @@ const RegisterPage = ({ handleIsLoggedIn }: RegisterPageProps) => {
                   onChange={handleChange}
                   className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                 />
-                {errors.email && (
+                {(errors.email.length > 0) && (
                   <p className="mt-1 text-xs text-red-600">{errors.email}</p>
                 )}
               </div>
@@ -162,7 +203,7 @@ const RegisterPage = ({ handleIsLoggedIn }: RegisterPageProps) => {
                   onChange={handleChange}
                   className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                 />
-                {errors.fullName && (
+                {(errors.fullName.length > 0) && (
                   <p className="mt-1 text-xs text-red-600">{errors.fullName}</p>
                 )}
               </div>
@@ -185,8 +226,32 @@ const RegisterPage = ({ handleIsLoggedIn }: RegisterPageProps) => {
                   onChange={handleChange}
                   className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                 />
-                {errors.username && (
+                {(errors.username.length > 0) && (
                   <p className="mt-1 text-xs text-red-600">{errors.username}</p>
+                )}
+              </div>
+            </div>
+
+            <div>
+              <label
+                htmlFor="phoneNumber"
+                className="block text-sm font-medium text-gray-700"
+              >
+                전화번호
+              </label>
+              <div className="mt-1">
+                <input
+                  id="phoneNumber"
+                  name="phoneNumber"
+                  type="tel"
+                  required
+                  placeholder="010XXXXXXXX"
+                  value={formData.phoneNumber}
+                  onChange={handleChange}
+                  className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                />
+                {(errors.phoneNumber.length > 0) && (
+                  <p className="mt-1 text-xs text-red-600">{errors.phoneNumber}</p>
                 )}
               </div>
             </div>
@@ -209,7 +274,7 @@ const RegisterPage = ({ handleIsLoggedIn }: RegisterPageProps) => {
                   onChange={handleChange}
                   className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                 />
-                {errors.password && (
+                {(errors.password.length > 0) && (
                   <p className="mt-1 text-xs text-red-600">{errors.password}</p>
                 )}
               </div>
