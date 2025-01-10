@@ -1,5 +1,5 @@
 import Posts from '../components/feed/Posts';
-import Stories from '../components/feed/Stories';
+import { Stories } from '../components/feed/Stories';
 import BottomBar from '../components/layout/MobileBar';
 import MobileHeader from '../components/layout/MobileHeader';
 import SideBar from '../components/layout/SideBar';

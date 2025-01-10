@@ -27,9 +27,12 @@ const LoginPage = ({ handleIsLoggedIn }: LoginPageProps) => {
           password,
         }),
       });
-  
+
       if (response.ok) {
-        const data = await response.json() as { access_token: string; refresh_token: string };
+        const data = (await response.json()) as {
+          access_token: string;
+          refresh_token: string;
+        };
         // Store tokens if needed
         localStorage.setItem('access_token', data.access_token);
         localStorage.setItem('refresh_token', data.refresh_token);
@@ -58,7 +61,7 @@ const LoginPage = ({ handleIsLoggedIn }: LoginPageProps) => {
 
       <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
         <div className="bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10">
-          <form className="space-y-6" onSubmit={e => void handleSubmit(e)}>
+          <form className="space-y-6" onSubmit={(e) => void handleSubmit(e)}>
             {error.length > 0 && (
               <div className="text-red-500 text-sm text-center">{error}</div>
             )}
