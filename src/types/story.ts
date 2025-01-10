@@ -6,7 +6,7 @@ export interface Story {
   file_url: string[];
 }
 
-export interface StoryUser {
+/* export interface StoryUser {
   user_id: number;
   username: string;
   profile_image: string;
@@ -21,3 +21,5 @@ export interface StoryUploadResponse {
 export interface StoryError {
   detail: string;
 }
+
+*/
