@@ -16,25 +16,32 @@ export function StoryList() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const { stories, error: storiesError, deleteStory } = useStories(currentUserId ?? 0);
+  const {
+    stories,
+    error: storiesError,
+    deleteStory,
+  } = useStories(currentUserId ?? 0);
 
   useEffect(() => {
     const fetchUserInfo = async () => {
       try {
         setLoading(true);
         const token = localStorage.getItem('access_token');
-        
+
         if (token == null) {
           localStorage.removeItem('isLoggedIn'); // Clear login state
           void navigate('/'); // Redirect to login
           throw new Error('No access token found');
         }
 
-        const response = await fetch('http://3.34.185.81:8000/api/user/profile', {
-          headers: {
-            Authorization: `Bearer ${token}`,
+        const response = await fetch(
+          'http://3.34.185.81:8000/api/user/profile',
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
           },
-        });
+        );
 
         if (!response.ok) {
           if (response.status === 401) {
@@ -91,13 +98,16 @@ export function StoryList() {
   }
 
   // Group stories by user
-  const storiesByUser = stories.reduce<Record<number, Story[]>>((acc, story) => {
-    if (acc[story.user_id] == null) {
-      acc[story.user_id] = [];
-    }
-    acc[story.user_id]?.push(story);
-    return acc;
-  }, {});
+  const storiesByUser = stories.reduce<Record<number, Story[]>>(
+    (acc, story) => {
+      if (acc[story.user_id] == null) {
+        acc[story.user_id] = [];
+      }
+      acc[story.user_id]?.push(story);
+      return acc;
+    },
+    {},
+  );
 
   return (
     <div className="flex space-x-4 overflow-x-auto pb-4 mb-8">
@@ -107,7 +117,9 @@ export function StoryList() {
           key={userId}
           username={`user${userId}`}
           stories={userStories}
-          onView={() => { handleViewStory(Number(userId), userStories); }}
+          onView={() => {
+            handleViewStory(Number(userId), userStories);
+          }}
         />
       ))}
       {viewingStories.length > 0 && (

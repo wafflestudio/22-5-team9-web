@@ -73,7 +73,11 @@ export function StoryViewer({
         <StoryProgress duration={STORY_DURATION} currentTime={progress} />
         <div className="relative">
           <img
-            src={(currentStory.file_url[0] != null) ? getFullImageUrl(currentStory.file_url[0]) : ''}
+            src={
+              currentStory.file_url[0] != null
+                ? getFullImageUrl(currentStory.file_url[0])
+                : ''
+            }
             alt={`Story ${currentStory.story_id}`}
             className="w-full h-full object-contain"
             onError={(e) => {

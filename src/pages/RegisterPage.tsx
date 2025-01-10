@@ -103,16 +103,19 @@ const RegisterPage = ({ handleIsLoggedIn }: RegisterPageProps) => {
 
       if (response.ok) {
         // After successful signup, attempt to login
-        const loginResponse = await fetch('http://3.34.185.81:8000/api/user/signin', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
+        const loginResponse = await fetch(
+          'http://3.34.185.81:8000/api/user/signin',
+          {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              username: formData.username,
+              password: formData.password,
+            }),
           },
-          body: JSON.stringify({
-            username: formData.username,
-            password: formData.password,
-          }),
-        });
+        );
 
         if (loginResponse.ok) {
           const data = (await loginResponse.json()) as {
