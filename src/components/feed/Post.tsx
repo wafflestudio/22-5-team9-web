@@ -26,7 +26,18 @@ const Post = ({
       />
       <span className="ml-3 font-semibold">{username}</span>
     </div>
-    <img src={imageUrl} alt="Post" className="w-full" />
+    <img
+      src={
+        imageUrl.startsWith('http')
+          ? imageUrl
+          : `http://3.34.185.81:8000/${imageUrl}`
+      }
+      alt="Post"
+      className="w-full"
+      onError={(e) => {
+        e.currentTarget.src = '/placeholder.svg';
+      }}
+    />
     <div className="p-4">
       <div className="flex space-x-4 mb-4">
         <Heart className="w-6 h-6" />
