@@ -103,7 +103,7 @@ const RegisterPage = ({ handleIsLoggedIn }: RegisterPageProps) => {
 
       if (response.ok) {
         // After successful signup, attempt to login
-        const loginResponse = await fetch('YOUR_API_URL/api/user/signin', {
+        const loginResponse = await fetch('http://3.34.185.81:8000/api/user/signin', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',

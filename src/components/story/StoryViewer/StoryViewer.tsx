@@ -11,6 +11,8 @@ interface StoryViewerProps {
   isOwner?: boolean;
 }
 
+const API_BASE_URL = 'http://3.34.185.81:8000';
+
 export function StoryViewer({
   stories,
   onClose,
@@ -59,15 +61,26 @@ export function StoryViewer({
     }
   };
 
+  // Convert relative URL to absolute URL
+  const getFullImageUrl = (url: string) => {
+    if (url.startsWith('http')) return url;
+    return `${API_BASE_URL}/${url.replace(/^\/+/, '')}`;
+  };
+
   return (
     <div className="fixed inset-0 bg-black z-50 flex items-center justify-center">
       <div className="relative w-full max-w-lg">
         <StoryProgress duration={STORY_DURATION} currentTime={progress} />
         <div className="relative">
           <img
-            src={currentStory.file_url[0]}
-            alt="Story"
+            src={(currentStory.file_url[0] != null) ? getFullImageUrl(currentStory.file_url[0]) : ''}
+            alt={`Story ${currentStory.story_id}`}
             className="w-full h-full object-contain"
+            onError={(e) => {
+              console.error('Image failed to load:', e);
+              const img = e.target as HTMLImageElement;
+              img.alt = 'Failed to load story image';
+            }}
           />
           <StoryControls
             onNext={handleNext}
