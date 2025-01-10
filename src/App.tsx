@@ -1,53 +1,51 @@
 import './index.css';
 
-import { createContext, useState } from 'react';
+import { createContext } from 'react';
 import { Navigate, Route, Routes } from 'react-router-dom';
 
+import { useAuth } from './hooks/useAuth';
 import ExplorePage from './pages/ExplorePage';
 import LoginPage from './pages/LoginPage';
 import MainPage from './pages/MainPage';
 import ProfilePage from './pages/ProfilePage';
-
-export type LoginContextType = {
-  isLoggedIn: boolean;
-  handleIsLoggedIn: (value: boolean) => void;
-};
+import RegisterPage from './pages/RegisterPage';
+import type { LoginContextType } from './types/auth';
 
 export const LoginContext = createContext<LoginContextType | null>(null);
 
 export const App = () => {
-  // 임시 로그인 상태
-  // TODO: 로그인 API 관리 로직 구현
-  const [isLoggedIn, setIsLoggedIn] = useState(() => {
-    const saved = localStorage.getItem('isLoggedIn');
-    return saved === 'true';
-  });
-
-  const handleIsLoggedIn = (value: boolean) => {
-    setIsLoggedIn(value);
-    localStorage.setItem('isLoggedIn', String(value));
-  };
+  const auth = useAuth();
 
   return (
-    <LoginContext.Provider value={{ isLoggedIn, handleIsLoggedIn }}>
+    <LoginContext.Provider value={auth}>
       <Routes>
         <Route
           path="/"
           element={
-            isLoggedIn ? (
+            auth.isLoggedIn ? (
               <MainPage />
             ) : (
-              <LoginPage handleIsLoggedIn={handleIsLoggedIn} />
+              <LoginPage handleIsLoggedIn={auth.handleIsLoggedIn} />
+            )
+          }
+        />
+        <Route
+          path="/register"
+          element={
+            auth.isLoggedIn ? (
+              <Navigate to="/" />
+            ) : (
+              <RegisterPage handleIsLoggedIn={auth.handleIsLoggedIn} />
             )
           }
         />
         <Route
           path="/explore"
-          element={isLoggedIn ? <ExplorePage /> : <Navigate to="/" />}
+          element={auth.isLoggedIn ? <ExplorePage /> : <Navigate to="/" />}
         />
         <Route
           path="/:username"
-          element={isLoggedIn ? <ProfilePage /> : <Navigate to="/" />}
+          element={auth.isLoggedIn ? <ProfilePage /> : <Navigate to="/" />}
         />
       </Routes>
     </LoginContext.Provider>

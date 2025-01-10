@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
 
 type LoginPageProps = {
   handleIsLoggedIn: (value: boolean) => void;
@@ -7,11 +8,44 @@ type LoginPageProps = {
 const LoginPage = ({ handleIsLoggedIn }: LoginPageProps) => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    handleIsLoggedIn(true);
-    //TODO : 로그인 로직
+    if (username.length === 0 || password.length === 0) {
+      setError('아이디와 비밀번호를 입력해주세요.');
+      return;
+    }
+    try {
+      const response = await fetch('http://3.34.185.81:8000/api/user/signin', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          username,
+          password,
+        }),
+      });
+
+      if (response.ok) {
+        const data = (await response.json()) as {
+          access_token: string;
+          refresh_token: string;
+        };
+        // Store tokens if needed
+        localStorage.setItem('access_token', data.access_token);
+        localStorage.setItem('refresh_token', data.refresh_token);
+        handleIsLoggedIn(true);
+      } else if (response.status === 401) {
+        setError('아이디 또는 비밀번호가 일치하지 않습니다.');
+      } else {
+        setError('로그인 중 오류가 발생했습니다.');
+      }
+    } catch (err) {
+      console.error('Login error:', err);
+      setError('로그인 중 오류가 발생했습니다.');
+    }
   };
 
   return (
@@ -27,7 +61,10 @@ const LoginPage = ({ handleIsLoggedIn }: LoginPageProps) => {
 
       <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
         <div className="bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10">
-          <form className="space-y-6" onSubmit={handleSubmit}>
+          <form className="space-y-6" onSubmit={(e) => void handleSubmit(e)}>
+            {error.length > 0 && (
+              <div className="text-red-500 text-sm text-center">{error}</div>
+            )}
             <div>
               <label
                 htmlFor="username"
@@ -45,6 +82,7 @@ const LoginPage = ({ handleIsLoggedIn }: LoginPageProps) => {
                   value={username}
                   onChange={(e) => {
                     setUsername(e.target.value);
+                    setError('');
                   }}
                   className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                 />
@@ -68,6 +106,7 @@ const LoginPage = ({ handleIsLoggedIn }: LoginPageProps) => {
                   value={password}
                   onChange={(e) => {
                     setPassword(e.target.value);
+                    setError('');
                   }}
                   className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                 />
@@ -86,12 +125,12 @@ const LoginPage = ({ handleIsLoggedIn }: LoginPageProps) => {
 
           <div className="mt-6">
             <div className="text-sm text-center">
-              <a
-                href="#"
+              <Link
+                to="/register"
                 className="font-medium text-blue-600 hover:text-blue-500"
               >
                 계정이 없으신가요? 가입하기
-              </a>
+              </Link>
             </div>
           </div>
         </div>

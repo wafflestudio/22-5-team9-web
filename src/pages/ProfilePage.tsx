@@ -1,11 +1,11 @@
 import { useParams } from 'react-router-dom';
 
-import Highlights from '../components/Highlights';
-import MobileBar from '../components/MobileBar';
-import MobileHeader from '../components/MobileHeader';
-import ProfileInfo from '../components/ProfileInfo';
-import ProfileTabs from '../components/ProfileTabs';
-import SideBar from '../components/SideBar';
+import MobileBar from '../components/layout/MobileBar';
+import MobileHeader from '../components/layout/MobileHeader';
+import SideBar from '../components/layout/SideBar';
+import Highlights from '../components/profile/Highlights';
+import ProfileInfo from '../components/profile/ProfileInfo';
+import ProfileTabs from '../components/profile/ProfileTabs';
 
 const ProfilePage = () => {
   const { username } = useParams();

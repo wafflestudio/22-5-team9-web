@@ -1,30 +1,10 @@
-import { useState } from 'react';
-
+import { usePosts } from '../../hooks/usePosts';
+import type { PostsProps } from '../../types/post';
 import Post from './Post';
 
-interface PostData {
-  id: number;
-  username: string;
-  imageUrl: string;
-  caption: string;
-  likes: number;
-  comments: number;
-  timestamp: string;
-}
-
-type PostsProps = {
-  posts: PostData[];
-  postsPerPage: number;
-};
-
 const Posts = ({ posts, postsPerPage }: PostsProps) => {
-  const [currentPage, setCurrentPage] = useState(1);
-
-  const indexOfLastPost = currentPage * postsPerPage;
-  const indexOfFirstPost = indexOfLastPost - postsPerPage;
-  const currentPosts = posts.slice(indexOfFirstPost, indexOfLastPost);
-
-  const totalPages = Math.ceil(posts.length / postsPerPage);
+  const { currentPosts, currentPage, totalPages, nextPage, prevPage } =
+    usePosts(posts, postsPerPage);
 
   return (
     <div className="space-y-8">
@@ -33,9 +13,7 @@ const Posts = ({ posts, postsPerPage }: PostsProps) => {
       ))}
       <div className="flex justify-center mt-8 mb-16 md:mb-8">
         <button
-          onClick={() => {
-            setCurrentPage((prev) => Math.max(prev - 1, 1));
-          }}
+          onClick={prevPage}
           disabled={currentPage === 1}
           className="px-4 py-2 bg-blue-500 text-white rounded disabled:bg-gray-300"
         >
@@ -45,9 +23,7 @@ const Posts = ({ posts, postsPerPage }: PostsProps) => {
           Page {currentPage} of {totalPages}
         </span>
         <button
-          onClick={() => {
-            setCurrentPage((prev) => Math.min(prev + 1, totalPages));
-          }}
+          onClick={nextPage}
           disabled={currentPage === totalPages}
           className="px-4 py-2 bg-blue-500 text-white rounded disabled:bg-gray-300"
         >

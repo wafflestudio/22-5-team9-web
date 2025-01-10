@@ -1,6 +1,6 @@
-import MobileBar from '../components/MobileBar';
-import PostGrid from '../components/PostGrid';
-import SideBar from '../components/SideBar';
+import MobileBar from '../components/layout/MobileBar';
+import SideBar from '../components/layout/SideBar';
+import PostGrid from '../components/shared/PostGrid';
 
 const ExplorePage = () => {
   return (
