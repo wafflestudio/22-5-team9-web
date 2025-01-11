@@ -30,7 +30,7 @@ export function StoryItem({
       >
         <div className="w-full h-full rounded-full bg-white p-0.5">
           <img
-            src={profileImage ?? '/placeholder.svg'}
+            src={profileImage ?? 'https://placehold.co/32x32'}
             alt={username}
             className="w-full h-full rounded-full object-cover"
           />

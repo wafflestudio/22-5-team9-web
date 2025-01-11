@@ -112,7 +112,7 @@ export function StoryList() {
               return {
                 userId: Number(userId),
                 username: `user${userId}`,
-                profileImage: '/placeholder.svg',
+                profileImage: 'https://placehold.co/32x32',
                 stories: userStories,
               };
             }

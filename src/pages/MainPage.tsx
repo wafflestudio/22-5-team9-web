@@ -8,7 +8,7 @@ const dummyPosts = [
   {
     id: 1,
     username: 'user1',
-    imageUrl: '/placeholder.svg',
+    imageUrl: 'https://placehold.co/32x32',
     caption: 'This is a sample post',
     likes: 1000,
     comments: 100,
@@ -17,7 +17,7 @@ const dummyPosts = [
   {
     id: 2,
     username: 'user2',
-    imageUrl: '/placeholder.svg',
+    imageUrl: 'https://placehold.co/32x32',
     caption: 'Another sample post',
     likes: 1500,
     comments: 150,
@@ -26,7 +26,7 @@ const dummyPosts = [
   {
     id: 3,
     username: 'user3',
-    imageUrl: '/placeholder.svg',
+    imageUrl: 'https://placehold.co/32x32',
     caption: 'Yet another sample post',
     likes: 2000,
     comments: 200,
@@ -35,7 +35,7 @@ const dummyPosts = [
   {
     id: 4,
     username: 'user4',
-    imageUrl: '/placeholder.svg',
+    imageUrl: 'https://placehold.co/32x32',
     caption: 'Fourth sample post',
     likes: 2500,
     comments: 250,
@@ -44,7 +44,7 @@ const dummyPosts = [
   {
     id: 5,
     username: 'user5',
-    imageUrl: '/placeholder.svg',
+    imageUrl: 'https://placehold.co/32x32',
     caption: 'Fifth sample post',
     likes: 3000,
     comments: 300,
@@ -53,7 +53,7 @@ const dummyPosts = [
   {
     id: 6,
     username: 'user6',
-    imageUrl: '/placeholder.svg',
+    imageUrl: 'https://placehold.co/32x32',
     caption: 'Sixth sample post',
     likes: 3500,
     comments: 350,

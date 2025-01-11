@@ -1,9 +1,10 @@
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link,useNavigate } from 'react-router-dom';
 
 import { useAuth } from '../hooks/useAuth';
 
 const LoginPage = () => {
+  const navigate = useNavigate();
   const auth = useAuth();
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
@@ -33,6 +34,8 @@ const LoginPage = () => {
           refresh_token: string;
         };
         auth.handleLogin(data.access_token, data.refresh_token);
+        void navigate('/');
+        window.location.reload();
       } else if (response.status === 401) {
         setError('아이디 또는 비밀번호가 일치하지 않습니다.');
       } else if (response.status === 500) {

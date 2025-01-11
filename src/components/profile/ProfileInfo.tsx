@@ -21,7 +21,7 @@ const ProfileInfo = ({
     <div className="mb-8">
       <div className="flex items-center mb-4">
         <img
-          src="/placeholder.svg"
+          src="https://placehold.co/32x32"
           alt={username}
           className="w-20 h-20 rounded-full mr-4"
         />

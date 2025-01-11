@@ -20,7 +20,7 @@ const Post = ({
   <div className="bg-white border rounded-md">
     <div className="flex items-center p-4">
       <img
-        src="/placeholder.svg"
+        src="https://placehold.co/32x32"
         alt={username}
         className="w-8 h-8 rounded-full"
       />
