@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 export type User = {
   username: string;
@@ -9,24 +10,35 @@ export type User = {
 export function useAuth() {
   // 임시 로그인 상태
   // TODO: 로그인 API 관리 로직 구현
+  const navigate = useNavigate();
   const [isLoggedIn, setIsLoggedIn] = useState(() => {
     const saved = localStorage.getItem('isLoggedIn');
     return saved === 'true';
   });
 
-  const [user, setUser] = useState<User>(() => {
-    const savedUser = localStorage.getItem('user');
-    return savedUser != null ? (JSON.parse(savedUser) as User) : null;
-  });
+  const setAuthTokens = (access_token: string, refresh_token: string) => {
+    localStorage.setItem('access_token', access_token);
+    localStorage.setItem('refresh_token', refresh_token);
+  }
 
-  const handleIsLoggedIn = (value: boolean) => {
-    setIsLoggedIn(value);
-    localStorage.setItem('isLoggedIn', String(value));
-    if (!value) {
-      localStorage.removeItem('user');
-      setUser(null);
-    }
-  };
+  const getAccessToken = () => {
+    return localStorage.getItem('access_token');
+  }
 
-  return { isLoggedIn, user, handleIsLoggedIn };
+  const handleLogin = (accessToken: string, refreshToken: string) => {
+    setAuthTokens(accessToken, refreshToken);
+    setIsLoggedIn(true);
+  }
+
+  const handleLogout = () => {
+    localStorage.clear();
+    setIsLoggedIn(false);
+    void navigate('/');
+  }
+  
+  const handleAuthError = () => {
+    handleLogout();
+  }
+
+  return { isLoggedIn, handleLogin, handleLogout, handleAuthError, getAccessToken };
 }

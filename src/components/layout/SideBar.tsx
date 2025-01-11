@@ -7,19 +7,20 @@ import {
   Search,
   User,
 } from 'lucide-react';
-import { useContext, useState } from 'react';
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
 
-import { LoginContext } from '../../App';
+import { useAuth } from '../../hooks/useAuth';
 import { NavItem } from './NavItem';
 
 const SideBar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
-  const context = useContext(LoginContext);
+  const auth = useAuth();
 
-  if (context === null) {
-    throw new Error('LoginContext is not provided');
+  const handleLogoutClick = () => {
+    auth.handleLogout();
+    setIsMenuOpen(false);
   }
 
   return (
@@ -56,11 +57,7 @@ const SideBar = () => {
             <div className="py-1">
               <button
                 className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left"
-                onClick={() => {
-                  // TODO: 로그아웃 로직 구현
-                  context.handleIsLoggedIn(false);
-                  setIsMenuOpen(false);
-                }}
+                onClick={handleLogoutClick}
               >
                 Log Out
               </button>

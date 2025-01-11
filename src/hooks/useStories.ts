@@ -22,7 +22,7 @@ export function useStories(userId: number | null) {
         }
 
         const response = await fetch(
-          `http://3.34.185.81:8000/api/story/list/39`,
+          `http://3.34.185.81:8000/api/story/list/${userId}`,
           {
             headers: {
               Authorization: `Bearer ${token}`,

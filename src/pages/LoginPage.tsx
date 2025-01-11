@@ -1,11 +1,10 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
 
-type LoginPageProps = {
-  handleIsLoggedIn: (value: boolean) => void;
-};
+import { useAuth } from '../hooks/useAuth';
 
-const LoginPage = ({ handleIsLoggedIn }: LoginPageProps) => {
+const LoginPage = () => {
+  const auth = useAuth();
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -33,12 +32,11 @@ const LoginPage = ({ handleIsLoggedIn }: LoginPageProps) => {
           access_token: string;
           refresh_token: string;
         };
-        // Store tokens if needed
-        localStorage.setItem('access_token', data.access_token);
-        localStorage.setItem('refresh_token', data.refresh_token);
-        handleIsLoggedIn(true);
+        auth.handleLogin(data.access_token, data.refresh_token);
       } else if (response.status === 401) {
         setError('아이디 또는 비밀번호가 일치하지 않습니다.');
+      } else if (response.status === 500) {
+        setError('서버 오류가 발생했습니다.');
       } else {
         setError('로그인 중 오류가 발생했습니다.');
       }
