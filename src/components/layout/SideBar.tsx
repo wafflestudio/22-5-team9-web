@@ -7,8 +7,8 @@ import {
   Search,
   User,
 } from 'lucide-react';
-import { useContext, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { useContext, useEffect, useState } from 'react';
+import { Link, useLocation } from 'react-router-dom';
 
 import { LoginContext } from '../../App';
 import CreatePostModal from '../modals/CreatePostModal';
@@ -18,12 +18,24 @@ const SideBar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [activeItem, setActiveItem] = useState('home');
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  const location = useLocation();
 
   const context = useContext(LoginContext);
 
   if (context === null) {
     throw new Error('LoginContext is not provided');
   }
+
+  useEffect(() => {
+    const path = location.pathname;
+    if (path === '/') {
+      setActiveItem('home');
+    } else if (path === '/explore') {
+      setActiveItem('explore');
+    } else if (path.startsWith('/username')) {
+      setActiveItem('profile');
+    }
+  }, [location.pathname]);
 
   const handleNavItemClick = (itemName: string) => {
     setActiveItem(itemName);
@@ -45,14 +57,14 @@ const SideBar = () => {
       <div className="flex flex-col flex-1 space-y-2">
         <Link
           to="/"
-          onClick={() => {
-            handleNavItemClick('home');
-          }}
         >
           <NavItem
             icon={<Home />}
             label="Home"
             active={activeItem === 'home'}
+            onClick={() => {
+              handleNavItemClick('home');
+            }}
           />
         </Link>
         <NavItem
@@ -65,14 +77,14 @@ const SideBar = () => {
         />
         <Link
           to="/explore"
-          onClick={() => {
-            handleNavItemClick('explore');
-          }}
         >
           <NavItem
             icon={<Compass />}
             label="Explore"
             active={activeItem === 'explore'}
+            onClick={() => {
+              handleNavItemClick('explore');
+            }}
           />
         </Link>
         <NavItem
@@ -101,14 +113,14 @@ const SideBar = () => {
         )}
         <Link
           to="/username"
-          onClick={() => {
-            handleNavItemClick('profile');
-          }}
         >
           <NavItem
             icon={<User />}
             label="Profile"
             active={activeItem === 'profile'}
+            onClick={() => {
+              handleNavItemClick('profile');
+            }}
           />
         </Link>
       </div>
