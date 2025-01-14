@@ -1,8 +1,11 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 
+import { signin } from '../api/singin';
+import type { User } from '../hooks/useAuth';
+
 type LoginPageProps = {
-  handleIsLoggedIn: (value: boolean) => void;
+  handleIsLoggedIn: (value: boolean, userData: User) => void;
 };
 
 const LoginPage = ({ handleIsLoggedIn }: LoginPageProps) => {
@@ -17,34 +20,11 @@ const LoginPage = ({ handleIsLoggedIn }: LoginPageProps) => {
       return;
     }
     try {
-      const response = await fetch('http://3.34.185.81:8000/api/user/signin', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          username,
-          password,
-        }),
-      });
-
-      if (response.ok) {
-        const data = (await response.json()) as {
-          access_token: string;
-          refresh_token: string;
-        };
-        // Store tokens if needed
-        localStorage.setItem('access_token', data.access_token);
-        localStorage.setItem('refresh_token', data.refresh_token);
-        handleIsLoggedIn(true);
-      } else if (response.status === 401) {
-        setError('아이디 또는 비밀번호가 일치하지 않습니다.');
-      } else {
-        setError('로그인 중 오류가 발생했습니다.');
-      }
+      const user = await signin(username, password);
+      handleIsLoggedIn(true, user);
     } catch (err) {
       console.error('Login error:', err);
-      setError('로그인 중 오류가 발생했습니다.');
+      setError(err instanceof Error ? err.message : '로그인 중 오류가 발생했습니다.');
     }
   };
 

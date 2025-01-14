@@ -2,8 +2,6 @@ import { useState } from 'react';
 
 export type User = {
   username: string;
-  email: string;
-  password: string;
 } | null;
 
 export function useAuth() {
@@ -19,12 +17,16 @@ export function useAuth() {
     return savedUser != null ? (JSON.parse(savedUser) as User) : null;
   });
 
-  const handleIsLoggedIn = (value: boolean) => {
+  const handleIsLoggedIn = (value: boolean, userData: User) => {
     setIsLoggedIn(value);
     localStorage.setItem('isLoggedIn', String(value));
-    if (!value) {
-      localStorage.removeItem('user');
+    
+    if (value && (userData != null)) {
+      setUser(userData);
+      localStorage.setItem('user', JSON.stringify(userData));
+    } else if (!value) {
       setUser(null);
+      localStorage.removeItem('user');
     }
   };
 

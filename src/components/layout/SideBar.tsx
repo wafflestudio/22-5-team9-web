@@ -37,11 +37,9 @@ const SideBar = () => {
     }
   }, [location.pathname]);
 
-  const handleNavItemClick = (itemName: string) => {
+  const handleCreateClick = (itemName: string) => {
     setActiveItem(itemName);
-    if (itemName === 'create') {
-      setIsCreateModalOpen(true);
-    }
+    setIsCreateModalOpen(true);
   };
 
   return (
@@ -62,18 +60,12 @@ const SideBar = () => {
             icon={<Home />}
             label="Home"
             active={activeItem === 'home'}
-            onClick={() => {
-              handleNavItemClick('home');
-            }}
           />
         </Link>
         <NavItem
           icon={<Search />}
           label="Search"
           active={activeItem === 'search'}
-          onClick={() => {
-            handleNavItemClick('search');
-          }}
         />
         <Link
           to="/explore"
@@ -82,25 +74,19 @@ const SideBar = () => {
             icon={<Compass />}
             label="Explore"
             active={activeItem === 'explore'}
-            onClick={() => {
-              handleNavItemClick('explore');
-            }}
           />
         </Link>
         <NavItem
           icon={<Heart />}
           label="Notifications"
           active={activeItem === 'notifications'}
-          onClick={() => {
-            handleNavItemClick('notifications');
-          }}
         />
         <NavItem
           icon={<PlusSquare />}
           label="Create"
           active={activeItem === 'create'}
           onClick={() => {
-            handleNavItemClick('create');
+            handleCreateClick('create');
           }}
         />
         {isCreateModalOpen && (
@@ -112,15 +98,12 @@ const SideBar = () => {
           />
         )}
         <Link
-          to="/username"
+          to="/:username"
         >
           <NavItem
             icon={<User />}
             label="Profile"
             active={activeItem === 'profile'}
-            onClick={() => {
-              handleNavItemClick('profile');
-            }}
           />
         </Link>
       </div>
@@ -139,7 +122,7 @@ const SideBar = () => {
               <button
                 className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left"
                 onClick={() => {
-                  context.handleIsLoggedIn(false);
+                  context.handleIsLoggedIn(false, context.user);
                   setIsMenuOpen(false);
                 }}
               >
