@@ -16,8 +16,8 @@ const Posts = ({ posts, postsPerPage }: PostsProps) => {
           caption={post.post_text}
           likes={0}
           location={post.location}
-          creation_date={post.creation_date} 
-          comments={0}        
+          creation_date={post.creation_date}
+          comments={0}
         />
       ))}
       <div className="flex justify-center mt-8 mb-16 md:mb-8">

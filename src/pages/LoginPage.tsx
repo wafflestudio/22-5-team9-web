@@ -24,7 +24,9 @@ const LoginPage = ({ handleIsLoggedIn }: LoginPageProps) => {
       handleIsLoggedIn(true, user);
     } catch (err) {
       console.error('Login error:', err);
-      setError(err instanceof Error ? err.message : '로그인 중 오류가 발생했습니다.');
+      setError(
+        err instanceof Error ? err.message : '로그인 중 오류가 발생했습니다.',
+      );
     }
   };
 

@@ -19,7 +19,7 @@ const ProfilePage = () => {
   useEffect(() => {
     const loadUserProfile = async () => {
       if (username == null) return;
-      
+
       try {
         setLoading(true);
         const userData = await fetchUserData(username);
@@ -36,11 +36,19 @@ const ProfilePage = () => {
   }, [username]);
 
   if (loading) {
-    return <div className="flex justify-center items-center min-h-screen">Loading...</div>;
+    return (
+      <div className="flex justify-center items-center min-h-screen">
+        Loading...
+      </div>
+    );
   }
 
   if (error != null || profileData == null) {
-    return <div className="flex justify-center items-center min-h-screen">Failed to load profile</div>;
+    return (
+      <div className="flex justify-center items-center min-h-screen">
+        Failed to load profile
+      </div>
+    );
   }
 
   return (

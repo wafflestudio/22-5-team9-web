@@ -7,23 +7,26 @@ interface SignInResponse {
 }
 
 export const signin = async (username: string, password: string) => {
-  const response = await fetch('https://waffle-instaclone.kro.kr/api/user/signin', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
+  const response = await fetch(
+    'https://waffle-instaclone.kro.kr/api/user/signin',
+    {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        username,
+        password,
+      }),
     },
-    body: JSON.stringify({
-      username,
-      password,
-    }),
-  });
+  );
 
   if (response.ok) {
     const data = (await response.json()) as SignInResponse;
     localStorage.setItem('access_token', data.access_token);
     localStorage.setItem('refresh_token', data.refresh_token);
 
-    return await myProfile(data.access_token) as User;
+    return (await myProfile(data.access_token)) as User;
   }
 
   if (response.status === 401) {

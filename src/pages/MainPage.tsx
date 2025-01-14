@@ -7,7 +7,6 @@ import MobileHeader from '../components/layout/MobileHeader';
 import SideBar from '../components/layout/SideBar';
 import type { Post } from '../types/post';
 
-
 const MainPage = () => {
   const [posts, setPosts] = useState<Post[]>([]);
   const [loading, setLoading] = useState(true);

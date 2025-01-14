@@ -18,8 +18,8 @@ export function useAuth() {
   const handleIsLoggedIn = (value: boolean, userData: User) => {
     setIsLoggedIn(value);
     localStorage.setItem('isLoggedIn', String(value));
-    
-    if (value && (userData != null)) {
+
+    if (value && userData != null) {
       setUser(userData);
       localStorage.setItem('user', JSON.stringify(userData));
     } else if (!value) {

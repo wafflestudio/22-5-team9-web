@@ -1,5 +1,5 @@
 import { Bookmark, Grid } from 'lucide-react';
-import { useEffect,useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import type { Post } from '../../types/post';
 import PostGrid from '../shared/PostGrid';
@@ -15,17 +15,17 @@ const ProfileTabs = ({ postIds }: ProfileTabsProps) => {
 
   useEffect(() => {
     const fetchPosts = async () => {
-      if (postIds.length===0) return;
-      
+      if (postIds.length === 0) return;
+
       setIsLoading(true);
       try {
-        const promises = postIds.map(id => 
+        const promises = postIds.map((id) =>
           fetch(`https://waffle-instaclone.kro.kr/api/post/${id}`, {
-            headers: { 'accept': 'application/json' }
-          }).then(res => res.json())
+            headers: { accept: 'application/json' },
+          }).then((res) => res.json()),
         );
-        
-        const results = await Promise.all(promises) as Post[];
+
+        const results = (await Promise.all(promises)) as Post[];
         setPosts(results);
       } catch (error) {
         console.error('Failed to fetch posts:', error);
@@ -42,24 +42,27 @@ const ProfileTabs = ({ postIds }: ProfileTabsProps) => {
       <div className="flex justify-around border-t">
         <button
           className={`flex-1 py-2 ${activeTab === 'posts' ? 'border-t-2 border-black' : ''}`}
-          onClick={() => { setActiveTab('posts'); }}
+          onClick={() => {
+            setActiveTab('posts');
+          }}
         >
           <Grid className="w-6 h-6 mx-auto" />
         </button>
         <button
           className={`flex-1 py-2 ${activeTab === 'saved' ? 'border-t-2 border-black' : ''}`}
-          onClick={() => { setActiveTab('saved'); }}
+          onClick={() => {
+            setActiveTab('saved');
+          }}
         >
           <Bookmark className="w-6 h-6 mx-auto" />
         </button>
       </div>
-      {activeTab === 'posts' && (
-        isLoading ? (
+      {activeTab === 'posts' &&
+        (isLoading ? (
           <div className="text-center py-8">Loading...</div>
         ) : (
           <PostGrid posts={posts} />
-        )
-      )}
+        ))}
       {activeTab === 'saved' && <div className="text-center py-8">저장됨</div>}
     </div>
   );

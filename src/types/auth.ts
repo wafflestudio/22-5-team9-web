@@ -1,4 +1,4 @@
-import type { User } from "../hooks/useAuth";
+import type { User } from '../hooks/useAuth';
 
 export type LoginContextType = {
   isLoggedIn: boolean;

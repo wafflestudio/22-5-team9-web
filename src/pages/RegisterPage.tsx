@@ -80,11 +80,11 @@ const RegisterPage = ({ handleIsLoggedIn }: RegisterPageProps) => {
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-  
+
     if (!validateForm()) {
       return;
     }
-  
+
     try {
       await signup({
         username: formData.username,
@@ -93,7 +93,7 @@ const RegisterPage = ({ handleIsLoggedIn }: RegisterPageProps) => {
         email: formData.email,
         phone_number: formData.phoneNumber,
       });
-  
+
       const user = await signin(formData.username, formData.password);
       handleIsLoggedIn(true, user);
       await navigate('/');
@@ -101,7 +101,8 @@ const RegisterPage = ({ handleIsLoggedIn }: RegisterPageProps) => {
       console.error('Registration/Login failed:', error);
       setErrors((prev) => ({
         ...prev,
-        username: error instanceof Error ? error.message : '회원가입에 실패했습니다.',
+        username:
+          error instanceof Error ? error.message : '회원가입에 실패했습니다.',
       }));
     }
   };

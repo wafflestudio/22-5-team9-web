@@ -1,4 +1,4 @@
-import type { Post } from "../../types/post";
+import type { Post } from '../../types/post';
 
 interface PostGridProps {
   posts: Post[];
@@ -7,7 +7,7 @@ interface PostGridProps {
 const PostGrid = ({ posts }: PostGridProps) => {
   return (
     <div className="grid grid-cols-3 gap-1">
-      {posts.map(post => (
+      {posts.map((post) => (
         <div key={post.post_id} className="aspect-square relative">
           <img
             src={`https://waffle-instaclone.kro.kr/${post.file_url[0] as string}`}

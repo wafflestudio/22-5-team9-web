@@ -53,9 +53,7 @@ const SideBar = () => {
       </div>
 
       <div className="flex flex-col flex-1 space-y-2">
-        <Link
-          to="/"
-        >
+        <Link to="/">
           <NavItem
             icon={<Home />}
             label="Home"
@@ -67,9 +65,7 @@ const SideBar = () => {
           label="Search"
           active={activeItem === 'search'}
         />
-        <Link
-          to="/explore"
-        >
+        <Link to="/explore">
           <NavItem
             icon={<Compass />}
             label="Explore"
@@ -97,9 +93,7 @@ const SideBar = () => {
             }}
           />
         )}
-        <Link
-          to={`/${String(context.user)}`}
-        >
+        <Link to={`/${String(context.user)}`}>
           <NavItem
             icon={<User />}
             label="Profile"
