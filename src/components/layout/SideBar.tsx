@@ -32,10 +32,10 @@ const SideBar = () => {
       setActiveItem('home');
     } else if (path === '/explore') {
       setActiveItem('explore');
-    } else if (path.startsWith('/username')) {
+    } else if (path === `/${String(context.user)}`) {
       setActiveItem('profile');
     }
-  }, [location.pathname]);
+  }, [location.pathname, context.user]);
 
   const handleCreateClick = (itemName: string) => {
     setActiveItem(itemName);
@@ -98,7 +98,7 @@ const SideBar = () => {
           />
         )}
         <Link
-          to="/:username"
+          to={`/${String(context.user)}`}
         >
           <NavItem
             icon={<User />}

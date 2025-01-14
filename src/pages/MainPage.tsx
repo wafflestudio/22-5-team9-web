@@ -7,14 +7,6 @@ import MobileHeader from '../components/layout/MobileHeader';
 import SideBar from '../components/layout/SideBar';
 import type { Post } from '../types/post';
 
-interface ApiPost {
-  post_id: number;
-  user_id: number;
-  location: string;
-  post_text: string;
-  creation_date: string;
-  file_url: string[];
-}
 
 const MainPage = () => {
   const [posts, setPosts] = useState<Post[]>([]);
@@ -26,7 +18,7 @@ const MainPage = () => {
     const fetchPosts = async () => {
       try {
         const postsPromises = friendIds.map((id) =>
-          fetch(`http://3.34.185.81:8000/api/post/user/${id}`, {
+          fetch(`https://waffle-instaclone.kro.kr/api/post/user/${id}`, {
             headers: {
               Authorization: `Bearer ${localStorage.getItem('access_token') as string}`,
             },
@@ -36,23 +28,7 @@ const MainPage = () => {
         const postsArrays = await Promise.all(postsPromises);
         const allPosts = postsArrays.flat();
 
-        const transformedPosts = allPosts.map((post: ApiPost) => ({
-          id: post.post_id,
-          username: `user${post.user_id}`,
-          imageUrl: `http://3.34.185.81:8000/${post.file_url[0] as string}`,
-          caption: post.post_text,
-          likes: 0,
-          comments: 0,
-          timestamp: new Date(post.creation_date).toLocaleString(),
-        }));
-
-        const sortedPosts = transformedPosts.sort((a, b) => {
-          const dateA = new Date(a.timestamp.replace(/\./g, '/')).getTime();
-          const dateB = new Date(b.timestamp.replace(/\./g, '/')).getTime();
-          return dateB - dateA;
-        });
-
-        setPosts(sortedPosts);
+        setPosts(allPosts);
       } catch (error) {
         console.error('Error fetching posts:', error);
       } finally {

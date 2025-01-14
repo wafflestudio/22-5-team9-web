@@ -1,12 +1,12 @@
 import type { User } from '../hooks/useAuth';
-import { fetchProfile } from './fetchProfile';
+import { myProfile } from './myProfile';
 
 interface SignInResponse {
   access_token: string;
   refresh_token: string;
 }
 
-export const signin = async (username: string, password: string): Promise<User> => {
+export const signin = async (username: string, password: string) => {
   const response = await fetch('https://waffle-instaclone.kro.kr/api/user/signin', {
     method: 'POST',
     headers: {
@@ -23,7 +23,7 @@ export const signin = async (username: string, password: string): Promise<User> 
     localStorage.setItem('access_token', data.access_token);
     localStorage.setItem('refresh_token', data.refresh_token);
 
-    return await fetchProfile(data.access_token) as User;
+    return await myProfile(data.access_token) as User;
   }
 
   if (response.status === 401) {

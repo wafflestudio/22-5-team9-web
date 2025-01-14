@@ -1,6 +1,6 @@
 import type { UserProfile } from "../types/user";
 
-export const fetchProfile = async (token: string) => {
+export const myProfile = async (token: string) => {
   try {
     const response = await fetch('https://waffle-instaclone.kro.kr/api/user/profile', {
       headers: {

@@ -5,8 +5,6 @@ export type User = {
 } | null;
 
 export function useAuth() {
-  // 임시 로그인 상태
-  // TODO: 로그인 API 관리 로직 구현
   const [isLoggedIn, setIsLoggedIn] = useState(() => {
     const saved = localStorage.getItem('isLoggedIn');
     return saved === 'true';

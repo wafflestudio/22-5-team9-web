@@ -2,6 +2,7 @@ import { Settings } from 'lucide-react';
 
 type ProfileInfoProps = {
   username: string;
+  profileImage: string;
   posts: number;
   followers: number;
   following: number;
@@ -11,6 +12,7 @@ type ProfileInfoProps = {
 
 const ProfileInfo = ({
   username,
+  profileImage,
   posts,
   followers,
   following,
@@ -21,7 +23,7 @@ const ProfileInfo = ({
     <div className="mb-8">
       <div className="flex items-center mb-4">
         <img
-          src="/placeholder.svg"
+          src={`http://3.34.185.81:8000/${profileImage}`}
           alt={username}
           className="w-20 h-20 rounded-full mr-4"
         />
