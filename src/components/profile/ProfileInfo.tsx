@@ -1,22 +1,36 @@
 import { Settings } from 'lucide-react';
+import { useEffect } from 'react';
+
+import { useFollow } from '../../hooks/useFollow';
+import FollowButton from '../shared/FollowButton';
 
 type ProfileInfoProps = {
+  userId: number;
   username: string;
   posts: number;
   followers: number;
   following: number;
   fullName: string;
   bio: string;
+  isOwner: boolean;
 };
 
 const ProfileInfo = ({
+  userId,
   username,
   posts,
-  followers,
-  following,
   fullName,
   bio,
+  isOwner
 }: ProfileInfoProps) => {
+  const { isFollowing, followerStats, toggleFollow, fetchFollowerStats } = useFollow();
+
+  useEffect(() => {
+    if (userId !== 0) {
+      void fetchFollowerStats(userId);
+    }
+  }, [userId, fetchFollowerStats]);
+
   return (
     <div className="mb-8">
       <div className="flex items-center mb-4">
@@ -28,20 +42,24 @@ const ProfileInfo = ({
         <div className="flex-1">
           <div className="flex items-center mb-2">
             <h1 className="text-xl font-semibold mr-4">{username}</h1>
-            <button className="bg-blue-500 text-white px-4 py-1 rounded-md text-sm font-semibold mr-2">
-              Follow
-            </button>
-            <Settings className="w-6 h-6" />
+            {!isOwner && (
+              <FollowButton 
+                userId={userId}
+                isFollowing={isFollowing}
+                onFollowChange={() => { void toggleFollow(userId); }}
+              />
+            )}
+            {isOwner && <Settings className="w-6 h-6" />}
           </div>
           <div className="flex space-x-4 text-sm">
             <span>
               <strong>{posts}</strong> posts
             </span>
             <span>
-              <strong>{followers}</strong> followers
+              <strong>{followerStats.follower_count}</strong> followers
             </span>
             <span>
-              <strong>{following}</strong> following
+              <strong>{followerStats.following_count}</strong> following
             </span>
           </div>
         </div>

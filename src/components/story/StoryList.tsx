@@ -3,9 +3,9 @@ import { useNavigate } from 'react-router-dom';
 
 import type { Story } from '../../types/story';
 import type { UserProfile } from '../../types/user';
-import { StoryCreator } from './StoryCreator';
+import StoryCreator from './StoryCreator';
 import { StoryItem } from './StoryItem';
-import { StoryViewer } from './StoryViewer/StoryViewer';
+import StoryViewer from './StoryViewer/StoryViewer';
 
 type UserStoryGroup = {
   userId: number;
@@ -203,7 +203,11 @@ export function StoryList() {
       ))}
       {viewingStories.length > 0 && (
         <StoryViewer
-          stories={viewingStories}
+          stories={viewingStories.map(story => ({
+            ...story,
+            username: userStoryGroups.find(group => group.userId === story.user_id)?.username ?? '',
+            profileImage: userStoryGroups.find(group => group.userId === story.user_id)?.profileImage ?? '',
+          }))}
           onClose={handleCloseViewer}
           onDelete={selectedUserId === currentUserId ? handleDeleteStory : undefined}
           isOwner={selectedUserId === currentUserId}

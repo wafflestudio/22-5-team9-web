@@ -1,6 +1,7 @@
 import { useState } from 'react';
-import { Link,useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
+import SocialLogin from '../components/shared/SocialLogin';
 import { useAuth } from '../hooks/useAuth';
 
 const LoginPage = () => {
@@ -29,13 +30,12 @@ const LoginPage = () => {
       });
 
       if (response.ok) {
-        const data = (await response.json()) as {
+        const data = await response.json() as {
           access_token: string;
           refresh_token: string;
         };
         auth.handleLogin(data.access_token, data.refresh_token);
         void navigate('/');
-        window.location.reload();
       } else if (response.status === 401) {
         setError('아이디 또는 비밀번호가 일치하지 않습니다.');
       } else if (response.status === 500) {
@@ -62,7 +62,7 @@ const LoginPage = () => {
 
       <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
         <div className="bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10">
-          <form className="space-y-6" onSubmit={(e) => void handleSubmit(e)}>
+          <form className="space-y-6" onSubmit={(e) => { void handleSubmit(e); }}>
             {error.length > 0 && (
               <div className="text-red-500 text-sm text-center">{error}</div>
             )}
@@ -133,6 +133,10 @@ const LoginPage = () => {
                 계정이 없으신가요? 가입하기
               </Link>
             </div>
+          </div>
+
+          <div className="mt-6">
+            <SocialLogin />
           </div>
         </div>
       </div>

@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 
+import SocialLogin from '../components/shared/SocialLogin';
+
 type RegisterPageProps = {
   handleIsLoggedIn: (value: boolean) => void;
 };
