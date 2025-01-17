@@ -40,11 +40,14 @@ const ProfileInfo = ({
           return;
         }
 
-        const response = await fetch('http://3.34.185.81:8000/api/user/profile', {
-          headers: {
-            Authorization: `Bearer ${token}`,
+        const response = await fetch(
+          'http://3.34.185.81:8000/api/user/profile',
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
           },
-        });
+        );
 
         if (!response.ok) {
           throw new Error('Failed to fetch user profile');
@@ -53,8 +56,8 @@ const ProfileInfo = ({
         interface UserProfile {
           user_id: number;
         }
-        
-        const data: UserProfile = await response.json() as UserProfile;
+
+        const data: UserProfile = (await response.json()) as UserProfile;
         setIsCurrentUser(data.user_id === userId);
       } catch (error) {
         console.error('Error checking current user:', error);
@@ -95,7 +98,10 @@ const ProfileInfo = ({
                   Edit Profile
                 </button>
               ) : (
-                <FollowButton userId={userId} onFollowChange={handleFollowChange} />
+                <FollowButton
+                  userId={userId}
+                  onFollowChange={handleFollowChange}
+                />
               )}
             </div>
           </div>

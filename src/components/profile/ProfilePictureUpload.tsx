@@ -7,11 +7,16 @@ interface ProfilePictureUploadProps {
   onSuccess: (newImageUrl: string) => void;
 }
 
-const ProfilePictureUpload = ({ currentImage, onSuccess }: ProfilePictureUploadProps) => {
+const ProfilePictureUpload = ({
+  currentImage,
+  onSuccess,
+}: ProfilePictureUploadProps) => {
   const [isUploading, setIsUploading] = useState(false);
   const navigate = useNavigate();
 
-  const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageUpload = async (
+    event: React.ChangeEvent<HTMLInputElement>,
+  ) => {
     const file = event.target.files?.[0];
     if (file == null) return;
 
@@ -26,13 +31,16 @@ const ProfilePictureUpload = ({ currentImage, onSuccess }: ProfilePictureUploadP
       const formData = new FormData();
       formData.append('profile_image', file);
 
-      const response = await fetch('http://3.34.185.81:8000/api/user/profile/edit', {
-        method: 'PATCH',
-        headers: {
-          'Authorization': `Bearer ${token}`,
+      const response = await fetch(
+        'http://3.34.185.81:8000/api/user/profile/edit',
+        {
+          method: 'PATCH',
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+          body: formData,
         },
-        body: formData,
-      });
+      );
 
       if (!response.ok) throw new Error('Failed to update profile picture');
 
@@ -60,7 +68,9 @@ const ProfilePictureUpload = ({ currentImage, onSuccess }: ProfilePictureUploadP
         <input
           type="file"
           accept="image/*"
-          onChange={(e) => { void handleImageUpload(e); }}
+          onChange={(e) => {
+            void handleImageUpload(e);
+          }}
           className="hidden"
           disabled={isUploading}
         />

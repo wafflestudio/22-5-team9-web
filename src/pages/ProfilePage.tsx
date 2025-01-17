@@ -23,22 +23,25 @@ const ProfilePage = () => {
       try {
         setIsLoading(true);
         const token = localStorage.getItem('access_token');
-        
+
         if (token === null) {
           throw new Error('No authentication token found');
         }
 
-        const response = await fetch(`http://3.34.185.81:8000/api/user/${username}`, {
-          headers: {
-            'Authorization': `Bearer ${token}`,
+        const response = await fetch(
+          `http://3.34.185.81:8000/api/user/${username}`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
           },
-        });
+        );
 
         if (!response.ok) {
           throw new Error('Failed to fetch profile');
         }
 
-        const data = await response.json() as UserProfile;
+        const data = (await response.json()) as UserProfile;
         setProfile(data);
         setError(null);
       } catch (err) {
@@ -63,7 +66,9 @@ const ProfilePage = () => {
   if (error !== null || profile === null) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="text-red-500">Error: {error ?? 'Profile not found'}</div>
+        <div className="text-red-500">
+          Error: {error ?? 'Profile not found'}
+        </div>
       </div>
     );
   }
@@ -78,7 +83,7 @@ const ProfilePage = () => {
               <Settings className="w-6 h-6" />
             </button>
           </div>
-          <ProfileInfo 
+          <ProfileInfo
             userId={profile.user_id}
             username={profile.username}
             posts={profile.post_count}

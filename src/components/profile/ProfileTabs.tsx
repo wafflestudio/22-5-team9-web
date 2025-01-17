@@ -23,13 +23,20 @@ const ProfileTabs = ({ postIds }: ProfileTabsProps) => {
         </div>
       </div>
 
-      <PostGrid 
-        postIds={postIds} 
-        onPostClick={(post: APIPost) => { setSelectedPost(post); }} 
+      <PostGrid
+        postIds={postIds}
+        onPostClick={(post: APIPost) => {
+          setSelectedPost(post);
+        }}
       />
 
       {selectedPost !== null && (
-        <PostModal post={selectedPost} onClose={() => { setSelectedPost(null); }} />
+        <PostModal
+          post={selectedPost}
+          onClose={() => {
+            setSelectedPost(null);
+          }}
+        />
       )}
     </div>
   );

@@ -28,7 +28,7 @@ const FollowButton = ({ userId, onFollowChange }: FollowButtonProps) => {
           headers: {
             Authorization: `Bearer ${token}`,
           },
-        }
+        },
       );
 
       if (!response.ok) {
@@ -46,7 +46,9 @@ const FollowButton = ({ userId, onFollowChange }: FollowButtonProps) => {
 
   return (
     <button
-      onClick={() => { void handleFollow(); }}
+      onClick={() => {
+        void handleFollow();
+      }}
       disabled={isLoading}
       className={`px-6 py-2 rounded font-semibold text-sm ${
         isFollowing
