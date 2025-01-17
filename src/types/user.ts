@@ -10,10 +10,8 @@ export interface UserProfile {
   birthday: string | null;
   introduce: string | null;
   website: string | null;
-  follower_count: number;
-  following_count: number;
-  followers: number[];
-  following: number[];
+  followers: number;
+  following: number;
   post_count: number;
   post_ids: number[];
 }

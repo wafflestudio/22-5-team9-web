@@ -1,36 +1,33 @@
-import { Grid } from 'lucide-react';
+import { Bookmark, Grid } from 'lucide-react';
 import { useState } from 'react';
 
-import type { APIPost } from '../../types/post';
 import PostGrid from '../shared/PostGrid';
-import PostModal from '../shared/PostModal';
 
-interface ProfileTabsProps {
-  postIds: number[];
-}
-
-const ProfileTabs = ({ postIds }: ProfileTabsProps) => {
-  const [selectedPost, setSelectedPost] = useState<APIPost | null>(null);
+const ProfileTabs = () => {
+  const [activeTab, setActiveTab] = useState('posts');
 
   return (
     <div>
-      <div className="border-t">
-        <div className="flex justify-center">
-          <button className="flex items-center py-4 space-x-1 text-sm font-semibold border-t border-black">
-            <Grid className="w-4 h-4" />
-            <span>POSTS</span>
-          </button>
-        </div>
+      <div className="flex justify-around border-t">
+        <button
+          className={`flex-1 py-2 ${activeTab === 'posts' ? 'border-t-2 border-black' : ''}`}
+          onClick={() => {
+            setActiveTab('posts');
+          }}
+        >
+          <Grid className="w-6 h-6 mx-auto" />
+        </button>
+        <button
+          className={`flex-1 py-2 ${activeTab === 'saved' ? 'border-t-2 border-black' : ''}`}
+          onClick={() => {
+            setActiveTab('saved');
+          }}
+        >
+          <Bookmark className="w-6 h-6 mx-auto" />
+        </button>
       </div>
-
-      <PostGrid 
-        postIds={postIds} 
-        onPostClick={(post: APIPost) => { setSelectedPost(post); }} 
-      />
-
-      {selectedPost !== null && (
-        <PostModal post={selectedPost} onClose={() => { setSelectedPost(null); }} />
-      )}
+      {activeTab === 'posts' && <PostGrid />}
+      {activeTab === 'saved' && <div className="text-center py-8">저장됨</div>}
     </div>
   );
 };
