@@ -34,6 +34,8 @@ const SideBar = () => {
       setActiveItem('explore');
     } else if (path === `/${String(context.myProfile?.username)}`) {
       setActiveItem('profile');
+    } else {
+      setActiveItem('');
     }
   }, [location.pathname, context.myProfile, context.myProfile?.username]);
 

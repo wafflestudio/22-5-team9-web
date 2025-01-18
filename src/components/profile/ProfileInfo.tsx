@@ -1,5 +1,6 @@
 import { Settings } from 'lucide-react';
 import { useContext, useState } from 'react';
+import { Link } from 'react-router-dom';
 
 import { followUser, unfollowUser } from '../../api/follow';
 import { myProfile } from '../../api/myProfile';
@@ -75,9 +76,13 @@ const ProfileInfo = ({
           <div className="flex items-center mb-2">
             <h1 className="text-xl font-semibold mr-4">{username}</h1>
             {username === context?.myProfile?.username ? (
-              <button className="border border-gray-300 px-4 py-1 rounded-md text-sm font-semibold mr-2">
-                Edit Profile
-              </button>
+              <Link to="/accounts/edit">
+                  <button 
+                  className="border border-gray-300 px-4 py-1 rounded-md text-sm font-semibold mr-2"
+                  >
+                  Edit Profile
+                  </button>
+              </Link>
             ) : (
               <>
                 {(context?.myProfile?.following.includes(userId) ?? false) ? (

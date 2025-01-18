@@ -3,7 +3,7 @@ import { useContext, useEffect, useState } from 'react';
 import { LoginContext } from '../App';
 import Posts from '../components/feed/Posts';
 import { Stories } from '../components/feed/Stories';
-import BottomBar from '../components/layout/MobileBar';
+import MobileBar from '../components/layout/MobileBar';
 import MobileHeader from '../components/layout/MobileHeader';
 import SideBar from '../components/layout/SideBar';
 import type { Post } from '../types/post';
@@ -60,7 +60,7 @@ const MainPage = () => {
 
       <div className="fixed bottom-0 left-0 right-0 md:left-0 md:top-0 md:right-auto md:w-64 bg-white border-t md:border-r md:border-t-0">
         <SideBar />
-        <BottomBar />
+        <MobileBar />
       </div>
     </div>
   );

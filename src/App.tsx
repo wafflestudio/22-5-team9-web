@@ -7,6 +7,7 @@ import { useAuth } from './hooks/useAuth';
 import ExplorePage from './pages/ExplorePage';
 import LoginPage from './pages/LoginPage';
 import MainPage from './pages/MainPage';
+import ProfileEditPage from './pages/ProfileEditPage';
 import ProfilePage from './pages/ProfilePage';
 import RegisterPage from './pages/RegisterPage';
 import type { LoginContextType } from './types/auth';
@@ -46,6 +47,10 @@ export const App = () => {
         <Route
           path="/:username"
           element={auth.isLoggedIn ? <ProfilePage /> : <Navigate to="/" />}
+        />
+        <Route
+          path="/accounts/edit"
+          element={auth.isLoggedIn ? <ProfileEditPage/> : <Navigate to="/" />}
         />
       </Routes>
     </LoginContext.Provider>
