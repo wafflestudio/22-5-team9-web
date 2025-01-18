@@ -1,5 +1,6 @@
-import { useEffect, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 
+import { LoginContext } from '../App';
 import Posts from '../components/feed/Posts';
 import { Stories } from '../components/feed/Stories';
 import BottomBar from '../components/layout/MobileBar';
@@ -10,13 +11,16 @@ import type { Post } from '../types/post';
 const MainPage = () => {
   const [posts, setPosts] = useState<Post[]>([]);
   const [loading, setLoading] = useState(true);
+  const context = useContext(LoginContext);
 
   useEffect(() => {
-    const friendIds = [25, 39, 42, 'user1234']; // 임시 친구 목록
-
+    const targetIds = [
+      ...(context?.myProfile?.following as number[]),
+      context?.myProfile?.user_id as number,
+    ];
     const fetchPosts = async () => {
       try {
-        const postsPromises = friendIds.map((id) =>
+        const postsPromises = targetIds.map((id) =>
           fetch(`https://waffle-instaclone.kro.kr/api/post/user/${id}`, {
             headers: {
               Authorization: `Bearer ${localStorage.getItem('access_token') as string}`,
@@ -26,7 +30,6 @@ const MainPage = () => {
 
         const postsArrays = await Promise.all(postsPromises);
         const allPosts = postsArrays.flat();
-
         setPosts(allPosts);
       } catch (error) {
         console.error('Error fetching posts:', error);
@@ -36,7 +39,7 @@ const MainPage = () => {
     };
 
     void fetchPosts();
-  }, []);
+  }, [context?.myProfile?.following, context?.myProfile?.user_id]);
 
   return (
     <div className="flex flex-col min-h-screen bg-gray-50">

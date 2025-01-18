@@ -8,18 +8,17 @@ export function useAuth() {
     return saved === 'true';
   });
 
-  const [myProfile, setMyProfile] = useState<UserProfile | null>(null);
+  const [myProfile, setMyProfile] = useState<UserProfile | null>(() => {
+    const saved = localStorage.getItem('userProfile');
+    return saved != null ? (JSON.parse(saved) as UserProfile) : null;
+  });
 
   const handleIsLoggedIn = (value: boolean, user: UserProfile) => {
     setIsLoggedIn(value);
+    setMyProfile(user);
     localStorage.setItem('isLoggedIn', String(value));
-
-    if (value) {
-      setMyProfile(user);
-    } else {
-      setMyProfile(null);
-    }
+    localStorage.setItem('userProfile', JSON.stringify(user));
   };
 
-  return { isLoggedIn, myProfile, handleIsLoggedIn };
+  return { isLoggedIn, myProfile, handleIsLoggedIn, setMyProfile };
 }
