@@ -1,4 +1,4 @@
-import type { User } from '../hooks/useAuth';
+import type { UserProfile } from '../types/user';
 import { myProfile } from './myProfile';
 
 interface SignInResponse {
@@ -26,7 +26,7 @@ export const signin = async (username: string, password: string) => {
     localStorage.setItem('access_token', data.access_token);
     localStorage.setItem('refresh_token', data.refresh_token);
 
-    return (await myProfile(data.access_token)) as User;
+    return (await myProfile(data.access_token)) as UserProfile;
   }
 
   if (response.status === 401) {

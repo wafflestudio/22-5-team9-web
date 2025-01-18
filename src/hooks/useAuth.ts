@@ -1,8 +1,6 @@
 import { useState } from 'react';
 
-export type User = {
-  username: string;
-} | null;
+import type { UserProfile } from '../types/user';
 
 export function useAuth() {
   const [isLoggedIn, setIsLoggedIn] = useState(() => {
@@ -10,23 +8,18 @@ export function useAuth() {
     return saved === 'true';
   });
 
-  const [user, setUser] = useState<User>(() => {
-    const savedUser = localStorage.getItem('user');
-    return savedUser != null ? (JSON.parse(savedUser) as User) : null;
-  });
+  const [myProfile, setMyProfile] = useState<UserProfile | null>(null);
 
-  const handleIsLoggedIn = (value: boolean, userData: User) => {
+  const handleIsLoggedIn = (value: boolean, user: UserProfile) => {
     setIsLoggedIn(value);
     localStorage.setItem('isLoggedIn', String(value));
 
-    if (value && userData != null) {
-      setUser(userData);
-      localStorage.setItem('user', JSON.stringify(userData));
-    } else if (!value) {
-      setUser(null);
-      localStorage.removeItem('user');
+    if (value) {
+      setMyProfile(user);
+    } else {
+      setMyProfile(null);
     }
   };
 
-  return { isLoggedIn, user, handleIsLoggedIn };
+  return { isLoggedIn, myProfile, handleIsLoggedIn };
 }

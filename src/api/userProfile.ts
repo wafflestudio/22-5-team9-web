@@ -1,6 +1,6 @@
 import type { UserProfile } from '../types/user';
 
-export async function fetchUserData(username: string): Promise<UserProfile> {
+export async function fetchUserProfile(username: string): Promise<UserProfile> {
   try {
     const response = await fetch(
       `https://waffle-instaclone.kro.kr/api/user/${username}`,

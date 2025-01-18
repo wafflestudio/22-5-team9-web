@@ -1,20 +1,23 @@
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 
-import { fetchUserData } from '../api/userData';
+import { fetchUserProfile } from '../api/userProfile';
 import MobileBar from '../components/layout/MobileBar';
 import MobileHeader from '../components/layout/MobileHeader';
 import SideBar from '../components/layout/SideBar';
 import Highlights from '../components/profile/Highlights';
 import ProfileInfo from '../components/profile/ProfileInfo';
 import ProfileTabs from '../components/profile/ProfileTabs';
+import { useAuth } from '../hooks/useAuth';
 import type { UserProfile } from '../types/user';
 
 const ProfilePage = () => {
   const { username } = useParams();
-  const [profileData, setProfileData] = useState<UserProfile | null>(null);
+  const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
+  const { myProfile } = useAuth();
 
   useEffect(() => {
     const loadUserProfile = async () => {
@@ -22,8 +25,12 @@ const ProfilePage = () => {
 
       try {
         setLoading(true);
-        const userData = await fetchUserData(username);
-        setProfileData(userData);
+        if (myProfile !== null && myProfile.username === username) {
+          setUserProfile(myProfile);
+        } else {
+          const userData = await fetchUserProfile(username);
+          setUserProfile(userData);
+        }
       } catch (err) {
         console.error('Error loading profile:', err);
         setError('Failed to load profile data');
@@ -33,7 +40,7 @@ const ProfilePage = () => {
     };
 
     void loadUserProfile();
-  }, [username]);
+  }, [username, myProfile]);
 
   if (loading) {
     return (
@@ -43,7 +50,7 @@ const ProfilePage = () => {
     );
   }
 
-  if (error != null || profileData == null) {
+  if (error != null || userProfile == null) {
     return (
       <div className="flex justify-center items-center min-h-screen">
         Failed to load profile
@@ -57,20 +64,20 @@ const ProfilePage = () => {
         <div className="max-w-3xl mx-auto">
           <MobileHeader />
           <ProfileInfo
-            username={profileData.username}
-            posts={profileData.post_count}
-            followers={profileData.follower_count}
-            following={profileData.following_count}
-            fullName={profileData.full_name}
-            bio={profileData.introduce}
-            profileImage={profileData.profile_image}
+            username={userProfile.username}
+            profileImage={userProfile.profile_image}
+            posts={userProfile.post_count}
+            followers={userProfile.follower_count}
+            following={userProfile.following_count}
+            fullName={userProfile.full_name}
+            bio={userProfile.introduce}
           />
           <div className="hidden md:block mb-4">
-            <h2 className="font-semibold">{profileData.full_name}</h2>
-            <p>{profileData.introduce}</p>
+            <h2 className="font-semibold">{userProfile.full_name}</h2>
+            <p>{userProfile.introduce}</p>
           </div>
           <Highlights />
-          <ProfileTabs postIds={profileData.post_ids} />
+          <ProfileTabs postIds={userProfile.post_ids} />
         </div>
       </div>
 

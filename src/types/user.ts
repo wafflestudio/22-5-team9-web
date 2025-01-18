@@ -1,4 +1,4 @@
-export interface UserProfile {
+export type UserProfile = {
   user_id: number;
   username: string;
   full_name: string;
@@ -16,4 +16,4 @@ export interface UserProfile {
   following: number[];
   post_count: number;
   post_ids: number[];
-}
+} | null;

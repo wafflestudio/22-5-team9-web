@@ -32,10 +32,10 @@ const SideBar = () => {
       setActiveItem('home');
     } else if (path === '/explore') {
       setActiveItem('explore');
-    } else if (path === `/${String(context.user)}`) {
+    } else if (path === `/${String(context.myProfile?.username)}`) {
       setActiveItem('profile');
     }
-  }, [location.pathname, context.user]);
+  }, [location.pathname, context.myProfile, context.myProfile?.username]);
 
   const handleCreateClick = (itemName: string) => {
     setActiveItem(itemName);
@@ -93,7 +93,7 @@ const SideBar = () => {
             }}
           />
         )}
-        <Link to={`/${String(context.user)}`}>
+        <Link to={`/${String(context.myProfile?.username)}`}>
           <NavItem
             icon={<User />}
             label="Profile"
@@ -116,7 +116,7 @@ const SideBar = () => {
               <button
                 className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left"
                 onClick={() => {
-                  context.handleIsLoggedIn(false, context.user);
+                  context.handleIsLoggedIn(false, context.myProfile);
                   setIsMenuOpen(false);
                 }}
               >

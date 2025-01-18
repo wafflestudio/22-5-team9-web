@@ -14,7 +14,7 @@ export const myProfile = async (token: string) => {
 
     if (response.ok) {
       const profileData = (await response.json()) as UserProfile;
-      return profileData.username;
+      return profileData;
     }
     throw new Error('Profile fetch failed');
   } catch (err) {

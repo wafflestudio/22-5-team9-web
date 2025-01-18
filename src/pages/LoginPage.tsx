@@ -2,10 +2,10 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 
 import { signin } from '../api/singin';
-import type { User } from '../hooks/useAuth';
+import type { UserProfile } from '../types/user';
 
 type LoginPageProps = {
-  handleIsLoggedIn: (value: boolean, userData: User) => void;
+  handleIsLoggedIn: (value: boolean, userData: UserProfile) => void;
 };
 
 const LoginPage = ({ handleIsLoggedIn }: LoginPageProps) => {

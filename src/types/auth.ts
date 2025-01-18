@@ -1,7 +1,7 @@
-import type { User } from '../hooks/useAuth';
+import type { UserProfile } from './user';
 
 export type LoginContextType = {
   isLoggedIn: boolean;
-  user: User;
-  handleIsLoggedIn: (value: boolean, userData: User) => void;
+  myProfile: UserProfile | null;
+  handleIsLoggedIn: (value: boolean, userData: UserProfile) => void;
 };
