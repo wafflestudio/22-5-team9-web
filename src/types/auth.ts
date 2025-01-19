@@ -1,3 +1,5 @@
+import type { UserProfile } from './user';
+
 export type User = {
   user_id: number;
   username: string;
@@ -10,17 +12,12 @@ export interface TokenResponse {
   access_token: string;
   refresh_token: string;
 }
-
-export interface LoginContextType {
+export type LoginContextType = {
   isLoggedIn: boolean;
-  user: User;
-  handleIsLoggedIn: (value: boolean) => void;
-  handleAuthError: () => void;
-  handleSocialLogin: (provider: string) => Promise<void>;
-  handleLogin: (accessToken: string, refreshToken: string) => void;
-  handleLogout: () => void;
-  getAccessToken: () => string | null;
-}
+  myProfile: UserProfile | null;
+  handleIsLoggedIn: (value: boolean, userData: UserProfile) => void;
+  setMyProfile: (profile: UserProfile) => void;
+};
 
 export interface LoginRequest {
   username: string;

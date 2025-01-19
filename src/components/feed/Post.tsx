@@ -3,10 +3,11 @@ import { Heart, MessageCircle, Send } from 'lucide-react';
 type PostProps = {
   username: string;
   imageUrl: string;
+  location: string;
   caption: string;
   likes: number;
   comments: number;
-  timestamp: string;
+  creation_date: string;
 };
 
 const Post = ({
@@ -15,7 +16,7 @@ const Post = ({
   caption,
   likes,
   comments,
-  timestamp,
+  creation_date,
 }: PostProps) => (
   <div className="bg-white border rounded-md">
     <div className="flex items-center p-4">
@@ -26,7 +27,18 @@ const Post = ({
       />
       <span className="ml-3 font-semibold">{username}</span>
     </div>
-    <img src={imageUrl} alt="Post" className="w-full" />
+    <img
+      src={
+        imageUrl.startsWith('http')
+          ? imageUrl
+          : `https://waffle-instaclone.kro.kr/${imageUrl}`
+      }
+      alt="Post"
+      className="w-full"
+      onError={(e) => {
+        e.currentTarget.src = '/placeholder.svg';
+      }}
+    />
     <div className="p-4">
       <div className="flex space-x-4 mb-4">
         <Heart className="w-6 h-6" />
@@ -38,7 +50,7 @@ const Post = ({
         <span className="font-semibold">{username}</span> {caption}
       </p>
       <p className="text-gray-500 text-sm mt-2">View all {comments} comments</p>
-      <p className="text-gray-400 text-xs mt-1">{timestamp}</p>
+      <p className="text-gray-400 text-xs mt-1">{creation_date}</p>
     </div>
   </div>
 );

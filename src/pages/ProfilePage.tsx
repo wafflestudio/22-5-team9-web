@@ -1,25 +1,61 @@
+import { useContext, useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 
+import { fetchUserProfile } from '../api/userProfile';
+import { LoginContext } from '../App';
 import MobileBar from '../components/layout/MobileBar';
 import MobileHeader from '../components/layout/MobileHeader';
 import SideBar from '../components/layout/SideBar';
 import Highlights from '../components/profile/Highlights';
 import ProfileInfo from '../components/profile/ProfileInfo';
 import ProfileTabs from '../components/profile/ProfileTabs';
-import { ErrorDisplay } from '../components/shared/ErrorDisplay';
-import { LoadingSpinner } from '../components/shared/LoadingSpinner';
-import { NotFound } from '../components/shared/NotFound';
-import { useProfile } from '../hooks/useProfile';
+import type { UserProfile } from '../types/user';
 
-const ProfilePage = ({ currentUserId }: { currentUserId: number | null }) => {
-  const { username } = useParams<{ username: string }>();
-  const { profile, isLoading, error } = useProfile(username ?? '');
+const ProfilePage = () => {
+  const { username } = useParams();
+  const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const context = useContext(LoginContext);
 
-  if (isLoading) return <LoadingSpinner />;
-  if (error !== null) return <ErrorDisplay message={error} />;
-  if (profile === null) return <NotFound />;
+  useEffect(() => {
+    const loadUserProfile = async () => {
+      if (username == null) return;
 
-  const isOwner = currentUserId === profile.user_id;
+      try {
+        setLoading(true);
+        if (context !== null && context.myProfile?.username === username) {
+          setUserProfile(context.myProfile);
+        } else {
+          const userData = await fetchUserProfile(username);
+          setUserProfile(userData);
+        }
+      } catch (err) {
+        console.error('Error loading profile:', err);
+        setError('Failed to load profile data');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    void loadUserProfile();
+  }, [username, context?.myProfile, context]);
+
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center min-h-screen">
+        Loading...
+      </div>
+    );
+  }
+
+  if (error != null || userProfile == null) {
+    return (
+      <div className="flex justify-center items-center min-h-screen">
+        Failed to load profile
+      </div>
+    );
+  }
 
   return (
     <div className="flex flex-col min-h-screen bg-gray-50">
@@ -27,19 +63,21 @@ const ProfilePage = ({ currentUserId }: { currentUserId: number | null }) => {
         <div className="max-w-3xl mx-auto">
           <MobileHeader />
           <ProfileInfo
-            userId={profile.user_id}
-            posts={profile.post_count}
-            fullName={profile.full_name}
-            bio={profile.introduce ?? ''}
-            isOwner={isOwner}
-            {...profile}
+            userId={userProfile.user_id}
+            username={userProfile.username}
+            profileImage={userProfile.profile_image}
+            posts={userProfile.post_count}
+            followers={userProfile.follower_count}
+            following={userProfile.following_count}
+            fullName={userProfile.full_name}
+            bio={userProfile.introduce}
           />
           <div className="hidden md:block mb-4">
-            <h2 className="font-semibold">{profile.full_name}</h2>
-            <p>{profile.introduce}</p>
+            <h2 className="font-semibold">{userProfile.full_name}</h2>
+            <p>{userProfile.introduce}</p>
           </div>
-          <Highlights userId={profile.user_id} isOwner={isOwner} />
-          <ProfileTabs />
+          <Highlights />
+          <ProfileTabs postIds={userProfile.post_ids} />
         </div>
       </div>
 

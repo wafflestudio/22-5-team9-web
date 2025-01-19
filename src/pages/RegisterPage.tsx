@@ -1,8 +1,12 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 
+import { signup } from '../api/signup';
+import { signin } from '../api/singin';
+import type { UserProfile } from '../types/user';
+
 type RegisterPageProps = {
-  handleIsLoggedIn: (value: boolean) => void;
+  handleIsLoggedIn: (value: boolean, userData: UserProfile) => void;
 };
 
 const RegisterPage = ({ handleIsLoggedIn }: RegisterPageProps) => {
@@ -33,7 +37,6 @@ const RegisterPage = ({ handleIsLoggedIn }: RegisterPageProps) => {
       phoneNumber: '',
     };
 
-    // Email validation
     if (formData.email.length === 0) {
       newErrors.email = '이메일을 입력해주세요';
       isValid = false;
@@ -42,13 +45,11 @@ const RegisterPage = ({ handleIsLoggedIn }: RegisterPageProps) => {
       isValid = false;
     }
 
-    // Full name validation
     if (formData.fullName.length === 0) {
       newErrors.fullName = '성명을 입력해주세요';
       isValid = false;
     }
 
-    // Username validation
     if (formData.username.length === 0) {
       newErrors.username = '사용자 이름을 입력해주세요';
       isValid = false;
@@ -57,7 +58,6 @@ const RegisterPage = ({ handleIsLoggedIn }: RegisterPageProps) => {
       isValid = false;
     }
 
-    // Password validation
     if (formData.password.length === 0) {
       newErrors.password = '비밀번호를 입력해주세요';
       isValid = false;
@@ -65,8 +65,7 @@ const RegisterPage = ({ handleIsLoggedIn }: RegisterPageProps) => {
       newErrors.password = '비밀번호는 6자 이상이어야 합니다';
       isValid = false;
     }
-
-    // Phone number validation
+    
     if (formData.phoneNumber.length === 0) {
       newErrors.phoneNumber = '전화번호를 입력해주세요';
       isValid = false;
@@ -87,60 +86,24 @@ const RegisterPage = ({ handleIsLoggedIn }: RegisterPageProps) => {
     }
 
     try {
-      const response = await fetch(
-        'https://waffle-instaclone.kro.kr/api/user/signup',
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            username: formData.username,
-            password: formData.password,
-            full_name: formData.fullName,
-            email: formData.email,
-            phone_number: formData.phoneNumber,
-          }),
-        },
-      );
+      await signup({
+        username: formData.username,
+        password: formData.password,
+        full_name: formData.fullName,
+        email: formData.email,
+        phone_number: formData.phoneNumber,
+      });
 
-      if (response.ok) {
-        // After successful signup, attempt to login
-        const loginResponse = await fetch(
-          'https://waffle-instaclone.kro.kr/api/user/signin',
-          {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-              username: formData.username,
-              password: formData.password,
-            }),
-          },
-        );
-
-        if (loginResponse.ok) {
-          const data = (await loginResponse.json()) as {
-            access_token: string;
-            refresh_token: string;
-          };
-          localStorage.setItem('access_token', data.access_token);
-          localStorage.setItem('refresh_token', data.refresh_token);
-          handleIsLoggedIn(true);
-          await navigate('/');
-        } else {
-          throw new Error('Login failed after signup');
-        }
-      } else {
-        const errorData = (await response.json()) as { detail?: string };
-        throw new Error(
-          errorData.detail != null ? errorData.detail : 'Registration failed',
-        );
-      }
+      const user = await signin(formData.username, formData.password);
+      handleIsLoggedIn(true, user);
+      await navigate('/');
     } catch (error) {
       console.error('Registration/Login failed:', error);
-      // Handle specific error messages here
+      setErrors((prev) => ({
+        ...prev,
+        username:
+          error instanceof Error ? error.message : '회원가입에 실패했습니다.',
+      }));
     }
   };
 
@@ -150,7 +113,6 @@ const RegisterPage = ({ handleIsLoggedIn }: RegisterPageProps) => {
       ...prev,
       [name]: value,
     }));
-    // Clear error when user starts typing
     if (errors[name as keyof typeof errors].length > 0) {
       setErrors((prev) => ({
         ...prev,

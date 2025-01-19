@@ -1,8 +1,12 @@
-import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
 
-import SocialLogin from '../components/shared/SocialLogin';
-import { useAuth } from '../hooks/useAuth';
+import { signin } from '../api/singin';
+import type { UserProfile } from '../types/user';
+
+type LoginPageProps = {
+  handleIsLoggedIn: (value: boolean, userData: UserProfile) => void;
+};
 
 const LoginPage = () => {
   const navigate = useNavigate();
@@ -18,41 +22,13 @@ const LoginPage = () => {
       return;
     }
     try {
-      const response = await fetch(
-        'https://waffle-instaclone.kro.kr/api/user/signin',
-        {
-          method: 'POST',
-          credentials: 'include',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            username,
-            password,
-          }),
-        },
-      );
-
-      const data = (await response.json()) as {
-        access_token: string;
-        refresh_token: string;
-      };
-
-      if (response.ok && (data.access_token.length > 0) && (data.refresh_token.length > 0)) {
-        auth.handleLogin(data.access_token, data.refresh_token);
-        setTimeout(() => {
-          void navigate('/', { replace: true });
-        }, 100);
-      } else if (response.status === 401) {
-        setError('아이디 또는 비밀번호가 일치하지 않습니다.');
-      } else if (response.status === 500) {
-        setError('서버 오류가 발생했습니다.');
-      } else {
-        setError('로그인 중 오류가 발생했습니다.');
-      }
+      const user = await signin(username, password);
+      handleIsLoggedIn(true, user);
     } catch (err) {
       console.error('Login error:', err);
-      setError('로그인 중 오류가 발생했습니다.');
+      setError(
+        err instanceof Error ? err.message : '로그인 중 오류가 발생했습니다.',
+      );
     }
   };
 
