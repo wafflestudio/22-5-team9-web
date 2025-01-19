@@ -1,24 +1,54 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
-import type { ProfileInfo } from '../types/profile';
+import type { UserProfile } from '../types/user';
+import { useAuth } from './useAuth';
 
-export function useProfile(username: string) {
-  const [profileData, setProfileData] = useState<ProfileInfo | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error] = useState<string | null>(null);
+export const useProfile = (username: string | undefined) => {
+  const [profile, setProfile] = useState<UserProfile | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const auth = useAuth();
+
+  const fetchProfile = useCallback(() => {
+    if (username == null) return () => {};
+
+    const controller = new AbortController();
+
+    void (async () => {
+      try {
+        const response = await fetch(
+          `https://waffle-instaclone.kro.kr/api/user/${username}`,
+          {
+            headers: { Authorization: `Bearer ${auth.getAccessToken() ?? ''}` },
+            signal: controller.signal,
+          },
+        );
+
+        if (!response.ok) {
+          throw new Error('Failed to fetch profile');
+        }
+
+        const data: UserProfile = (await response.json()) as UserProfile;
+        setProfile(data);
+      } catch (err: unknown) {
+        if (err instanceof Error && err.name === 'AbortError') return;
+        setError('Failed to load profile');
+      } finally {
+        setIsLoading(false);
+      }
+    })();
+
+    return () => {
+      controller.abort();
+    };
+  }, [username, auth]);
 
   useEffect(() => {
-    // Future API integration
-    setProfileData({
-      username,
-      posts: 4,
-      followers: 100,
-      following: 100,
-      fullName: 'User1',
-      bio: 'User1 Bio',
-    });
-    setLoading(false);
-  }, [username]);
+    const cleanup = fetchProfile();
+    return () => {
+      cleanup();
+    };
+  }, [fetchProfile]);
 
-  return { profileData, loading, error };
-}
+  return { profile, isLoading, error, refreshProfile: fetchProfile };
+};

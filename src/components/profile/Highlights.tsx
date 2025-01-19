@@ -9,21 +9,32 @@ interface HighlightItemProps {
   isOwner: boolean;
 }
 
-const HighlightItem = ({ name, coverImage, onClick, isOwner }: HighlightItemProps) => (
+const HighlightItem = ({
+  name,
+  coverImage,
+  onClick,
+  isOwner,
+}: HighlightItemProps) => (
   <button
     onClick={onClick}
     className="flex flex-col items-center space-y-1 cursor-pointer"
   >
     <div className="w-16 h-16 rounded-full border-2 border-gray-200 overflow-hidden flex items-center justify-center">
-      {(coverImage != null) ? (
-        <img src={coverImage} alt={name} className="w-full h-full object-cover" />
+      {coverImage != null ? (
+        <img
+          src={coverImage}
+          alt={name}
+          className="w-full h-full object-cover"
+        />
       ) : (
         <div className="w-full h-full bg-gray-100 flex items-center justify-center">
           {isOwner && <Plus className="w-6 h-6 text-gray-400" />}
         </div>
       )}
     </div>
-    <span className="text-xs text-gray-900 truncate w-20 text-center">{name}</span>
+    <span className="text-xs text-gray-900 truncate w-20 text-center">
+      {name}
+    </span>
   </button>
 );
 
@@ -39,14 +50,14 @@ const Highlights: React.FC<HighlightsProps> = ({ isOwner }) => {
     { id: '3', name: 'Pets', coverImage: 'https://placehold.co/32x32' },
   ]);
 
-  const handleHighlightClick = (id: string) => {
+  const handleHighlightClick = (/*id: string*/) => {
     // Here you would typically open a modal or navigate to the highlight viewer
-    console.log('Opening highlight:', id);
+    //console.log('Opening highlight:', id);
   };
 
   const handleAddHighlight = () => {
     // Here you would typically open a modal to create a new highlight
-    console.log('Adding new highlight');
+    //console.log('Adding new highlight');
   };
 
   return (
@@ -63,7 +74,9 @@ const Highlights: React.FC<HighlightsProps> = ({ isOwner }) => {
         <HighlightItem
           key={highlight.id}
           {...highlight}
-          onClick={() => { handleHighlightClick(highlight.id); }}
+          onClick={() => {
+            handleHighlightClick(/*highlight.id*/);
+          }}
           isOwner={isOwner}
         />
       ))}

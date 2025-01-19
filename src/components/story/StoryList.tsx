@@ -7,12 +7,12 @@ import StoryCreator from './StoryCreator';
 import { StoryItem } from './StoryItem';
 import StoryViewer from './StoryViewer/StoryViewer';
 
-type UserStoryGroup = {
+interface UserStoryGroup {
   userId: number;
   username: string;
   profileImage: string;
   stories: Story[];
-};
+}
 
 export function StoryList() {
   const navigate = useNavigate();
@@ -37,7 +37,7 @@ export function StoryList() {
 
         // First get current user info
         const userResponse = await fetch(
-          'http://3.34.185.81:8000/api/user/profile',
+          'https://waffle-instaclone.kro.kr/api/user/profile',
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -59,7 +59,7 @@ export function StoryList() {
 
         // Then get stories
         const storiesResponse = await fetch(
-          `http://3.34.185.81:8000/api/story/list/${userData.user_id}`,
+          `https://waffle-instaclone.kro.kr/api/story/list/${userData.user_id}`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -74,20 +74,23 @@ export function StoryList() {
         const stories = (await storiesResponse.json()) as Story[];
 
         // Group stories by user and fetch user details
-        const storiesByUser = stories.reduce<Record<number, Story[]>>((acc, story) => {
-          if (acc[story.user_id] == null) {
-            acc[story.user_id] = [];
-          }
-          acc[story.user_id]?.push(story);
-          return acc;
-        }, {});
+        const storiesByUser = stories.reduce<Record<number, Story[]>>(
+          (acc, story) => {
+            if (acc[story.user_id] == null) {
+              acc[story.user_id] = [];
+            }
+            acc[story.user_id]?.push(story);
+            return acc;
+          },
+          {},
+        );
 
         // For each user with stories, fetch their profile
         const storyGroups = await Promise.all(
           Object.entries(storiesByUser).map(async ([userId, userStories]) => {
             try {
               const userProfileResponse = await fetch(
-                `http://3.34.185.81:8000/api/user/profile`,
+                `https://waffle-instaclone.kro.kr/api/user/profile`,
                 {
                   headers: {
                     Authorization: `Bearer ${token}`,
@@ -99,7 +102,8 @@ export function StoryList() {
                 throw new Error('Failed to fetch user profile');
               }
 
-              const userProfile = (await userProfileResponse.json()) as UserProfile;
+              const userProfile =
+                (await userProfileResponse.json()) as UserProfile;
 
               return {
                 userId: Number(userId),
@@ -148,7 +152,7 @@ export function StoryList() {
       if (token == null) throw new Error('No access token');
 
       const response = await fetch(
-        `http://3.34.185.81:8000/api/story/${storyId}`,
+        `https://waffle-instaclone.kro.kr/api/story/${storyId}`,
         {
           method: 'DELETE',
           headers: {
@@ -161,10 +165,14 @@ export function StoryList() {
 
       // Update the UI after successful deletion
       setUserStoryGroups((prevGroups) =>
-        prevGroups.map((group) => ({
-          ...group,
-          stories: group.stories.filter((story) => story.story_id !== storyId),
-        })).filter((group) => group.stories.length > 0),
+        prevGroups
+          .map((group) => ({
+            ...group,
+            stories: group.stories.filter(
+              (story) => story.story_id !== storyId,
+            ),
+          }))
+          .filter((group) => group.stories.length > 0),
       );
 
       handleCloseViewer();
@@ -198,18 +206,26 @@ export function StoryList() {
           username={group.username}
           profileImage={group.profileImage}
           stories={group.stories}
-          onView={() => { handleViewStory(group.userId, group.stories); }}
+          onView={() => {
+            handleViewStory(group.userId, group.stories);
+          }}
         />
       ))}
       {viewingStories.length > 0 && (
         <StoryViewer
-          stories={viewingStories.map(story => ({
+          stories={viewingStories.map((story) => ({
             ...story,
-            username: userStoryGroups.find(group => group.userId === story.user_id)?.username ?? '',
-            profileImage: userStoryGroups.find(group => group.userId === story.user_id)?.profileImage ?? '',
+            username:
+              userStoryGroups.find((group) => group.userId === story.user_id)
+                ?.username ?? '',
+            profileImage:
+              userStoryGroups.find((group) => group.userId === story.user_id)
+                ?.profileImage ?? '',
           }))}
           onClose={handleCloseViewer}
-          onDelete={selectedUserId === currentUserId ? handleDeleteStory : undefined}
+          onDelete={
+            selectedUserId === currentUserId ? handleDeleteStory : undefined
+          }
           isOwner={selectedUserId === currentUserId}
         />
       )}

@@ -6,6 +6,11 @@ export interface Story {
   file_url: string[];
 }
 
+export interface StoryViewer {
+  user_id: number;
+  username: string;
+}
+
 /* export interface StoryUser {
   user_id: number;
   username: string;

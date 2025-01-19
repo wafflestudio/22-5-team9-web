@@ -1,5 +1,5 @@
-import { ChevronLeft, ChevronRight, MoreVertical,X } from 'lucide-react';
-import { useEffect,useState } from 'react';
+import { ChevronLeft, ChevronRight, MoreVertical, X } from 'lucide-react';
+import { useEffect, useState } from 'react';
 
 interface StoryViewerProps {
   stories: Array<{
@@ -15,7 +15,12 @@ interface StoryViewerProps {
   isOwner?: boolean;
 }
 
-const StoryViewer = ({ stories, onClose, onDelete, isOwner = false }: StoryViewerProps) => {
+const StoryViewer = ({
+  stories,
+  onClose,
+  onDelete,
+  isOwner = false,
+}: StoryViewerProps) => {
   const [currentStoryIndex, setCurrentStoryIndex] = useState(0);
   const [progress, setProgress] = useState(0);
   const STORY_DURATION = 5000;
@@ -39,7 +44,9 @@ const StoryViewer = ({ stories, onClose, onDelete, isOwner = false }: StoryViewe
       });
     }, 100);
 
-    return () => { clearInterval(timer); };
+    return () => {
+      clearInterval(timer);
+    };
   }, [currentStoryIndex, stories.length, onClose, isPaused]);
 
   const handleNext = () => {
@@ -61,7 +68,7 @@ const StoryViewer = ({ stories, onClose, onDelete, isOwner = false }: StoryViewe
 
   const getFullImageUrl = (url: string) => {
     if (url.startsWith('http')) return url;
-    return `http://3.34.185.81:8000/${url.replace(/^\/+/, '')}`;
+    return `https://waffle-instaclone.kro.kr/${url.replace(/^\/+/, '')}`;
   };
 
   return (
@@ -70,7 +77,10 @@ const StoryViewer = ({ stories, onClose, onDelete, isOwner = false }: StoryViewe
         {/* Progress bar */}
         <div className="absolute top-0 left-0 right-0 z-10 p-2 flex space-x-1">
           {stories.map((_, index) => (
-            <div key={index} className="flex-1 h-1 bg-gray-600 rounded-full overflow-hidden">
+            <div
+              key={index}
+              className="flex-1 h-1 bg-gray-600 rounded-full overflow-hidden"
+            >
               <div
                 className="h-full bg-white transition-all duration-100"
                 style={{
@@ -89,7 +99,9 @@ const StoryViewer = ({ stories, onClose, onDelete, isOwner = false }: StoryViewe
               alt={currentStory.username}
               className="w-8 h-8 rounded-full border-2 border-white"
             />
-            <span className="ml-2 text-white font-semibold">{currentStory.username}</span>
+            <span className="ml-2 text-white font-semibold">
+              {currentStory.username}
+            </span>
             <span className="ml-2 text-gray-300 text-sm">
               {new Date(currentStory.creation_date).toLocaleString()}
             </span>
@@ -118,14 +130,28 @@ const StoryViewer = ({ stories, onClose, onDelete, isOwner = false }: StoryViewe
         {/* Main content */}
         <div
           className="h-full"
-          onMouseDown={() => { setIsPaused(true); }}
-          onMouseUp={() => { setIsPaused(false); }}
-          onMouseLeave={() => { setIsPaused(false); }}
-          onTouchStart={() => { setIsPaused(true); }}
-          onTouchEnd={() => { setIsPaused(false); }}
+          onMouseDown={() => {
+            setIsPaused(true);
+          }}
+          onMouseUp={() => {
+            setIsPaused(false);
+          }}
+          onMouseLeave={() => {
+            setIsPaused(false);
+          }}
+          onTouchStart={() => {
+            setIsPaused(true);
+          }}
+          onTouchEnd={() => {
+            setIsPaused(false);
+          }}
         >
           <img
-            src={(currentStory.file_url[0] != null) ? getFullImageUrl(currentStory.file_url[0]) : ''}
+            src={
+              currentStory.file_url[0] != null
+                ? getFullImageUrl(currentStory.file_url[0])
+                : ''
+            }
             alt={`Story ${currentStory.story_id}`}
             className="w-full h-full object-contain"
           />

@@ -1,8 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 
-import SocialLogin from '../components/shared/SocialLogin';
-
 type RegisterPageProps = {
   handleIsLoggedIn: (value: boolean) => void;
 };
@@ -89,24 +87,27 @@ const RegisterPage = ({ handleIsLoggedIn }: RegisterPageProps) => {
     }
 
     try {
-      const response = await fetch('http://3.34.185.81:8000/api/user/signup', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
+      const response = await fetch(
+        'https://waffle-instaclone.kro.kr/api/user/signup',
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            username: formData.username,
+            password: formData.password,
+            full_name: formData.fullName,
+            email: formData.email,
+            phone_number: formData.phoneNumber,
+          }),
         },
-        body: JSON.stringify({
-          username: formData.username,
-          password: formData.password,
-          full_name: formData.fullName,
-          email: formData.email,
-          phone_number: formData.phoneNumber,
-        }),
-      });
+      );
 
       if (response.ok) {
         // After successful signup, attempt to login
         const loginResponse = await fetch(
-          'http://3.34.185.81:8000/api/user/signin',
+          'https://waffle-instaclone.kro.kr/api/user/signin',
           {
             method: 'POST',
             headers: {

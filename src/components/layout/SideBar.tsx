@@ -15,7 +15,7 @@ import { useAuth } from '../../hooks/useAuth';
 import { NavItem } from './NavItem';
 
 const SideBar = () => {
-//  const navigate = useNavigate();
+  //  const navigate = useNavigate();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   const auth = useAuth();
@@ -24,7 +24,7 @@ const SideBar = () => {
     localStorage.clear();
     setIsMenuOpen(false);
     auth.handleLogout();
-  }
+  };
 
   return (
     <div className="hidden md:flex md:flex-col h-full px-4 py-8">

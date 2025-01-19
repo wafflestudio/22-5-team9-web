@@ -13,13 +13,16 @@ export function useStoryUpload() {
     });
 
     try {
-      const response = await fetch('http://3.34.185.81:8000/api/story/', {
-        method: 'POST',
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem('access_token') ?? ''}`,
+      const response = await fetch(
+        'https://waffle-instaclone.kro.kr/api/story/',
+        {
+          method: 'POST',
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem('access_token') ?? ''}`,
+          },
+          body: formData,
         },
-        body: formData,
-      });
+      );
 
       if (!response.ok) throw new Error('Failed to upload story');
       return await (response.json() as Promise<Story>);

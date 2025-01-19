@@ -1,4 +1,4 @@
-import { createContext, useEffect,useState } from 'react';
+import { createContext, useCallback, useEffect, useState } from 'react';
 import { Navigate, Route, Routes } from 'react-router-dom';
 
 import { useAuth } from './hooks/useAuth';
@@ -17,36 +17,104 @@ export const App = () => {
   const [currentUserId, setCurrentUserId] = useState<number | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
+  const refreshToken = useCallback(async () => {
+    try {
+      const storedRefreshToken = localStorage.getItem('refresh_token');
+      if (storedRefreshToken == null) {
+        auth.handleLogout();
+        return;
+      }
+
+      const response = await fetch(
+        'https://waffle-instaclone.kro.kr/api/user/refresh',
+        {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${storedRefreshToken}`,
+            'Content-Type': 'application/json'
+          }
+        }
+      );
+
+      if (!response.ok) {
+        if (response.status === 401) {
+          auth.handleLogout();
+          return;
+        }
+        throw new Error(`Refresh failed: ${response.status}`);
+      }
+
+      const data = await response.json() as {
+        access_token: string;
+        refresh_token: string;
+      };
+
+      auth.handleLogin(data.access_token, data.refresh_token);
+    } catch (error) {
+      console.error('Token refresh failed:', error);
+      auth.handleLogout();
+    }
+  }, [auth]);
+
   useEffect(() => {
+    if (!auth.isLoggedIn) {
+      setIsLoading(false);
+      return;
+    }
+
     const fetchCurrentUserId = async () => {
       setIsLoading(true);
       const token = auth.getAccessToken();
-      if (token != null) {
-        try {
-          const response = await fetch('http://3.34.185.81:8000/api/user/profile', {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          });
-  
-          if (response.ok) {
-            const userData = await response.json() as UserProfile;
-            setCurrentUserId(userData.user_id);
-          } else {
-            console.error('Failed to fetch current user ID');
-          }
-        } catch (error) {
-          console.error('Error fetching current user ID:', error);
-        }
+      if (token == null) {
+        setIsLoading(false);
+        return;
       }
-      setIsLoading(false);
+
+      try {
+        const response = await fetch(
+          'https://waffle-instaclone.kro.kr/api/user/profile',
+          {
+            headers: {
+              'Authorization': `Bearer ${token}`,
+              'Content-Type': 'application/json'
+            }
+          }
+        );
+
+        if (response.ok) {
+          const userData = await response.json() as UserProfile;
+          setCurrentUserId(userData.user_id);
+        } else if (response.status === 401) {
+          // Token expired, try to refresh
+          await refreshToken();
+        } else {
+          console.error('Failed to fetch user profile');
+          auth.handleLogout();
+        }
+      } catch (error) {
+        console.error('Error fetching user profile:', error);
+        auth.handleLogout();
+      } finally {
+        setIsLoading(false);
+      }
     };
-  
+
+    // Set up token refresh interval
+    const refreshInterval = setInterval(() => {
+      void refreshToken();
+    }, 8 * 60 * 1000); // Refresh every 8 minutes
+
+    // Initial fetch and refresh
+    void refreshToken();
     void fetchCurrentUserId();
-  }, [auth]);
-  
+
+    return () => {
+      clearInterval(refreshInterval);
+    };
+  }, [auth, refreshToken]);
+
   if (isLoading) {
-    return <div>Loading...</div>; // Render a loading indicator
+    return <div>Loading...</div>;
   }
 
   return (
@@ -54,9 +122,7 @@ export const App = () => {
       <Routes>
         <Route
           path="/"
-          element={
-            auth.isLoggedIn ? <MainPage /> : <LoginPage />
-          }
+          element={auth.isLoggedIn ? <MainPage /> : <LoginPage />}
         />
         <Route
           path="/register"
@@ -74,11 +140,15 @@ export const App = () => {
         />
         <Route
           path="/:username"
-          element={auth.isLoggedIn ? <ProfilePage currentUserId={currentUserId} /> : <Navigate to="/" />}
+          element={
+            auth.isLoggedIn ? (
+              <ProfilePage currentUserId={currentUserId} />
+            ) : (
+              <Navigate to="/" />
+            )
+          }
         />
       </Routes>
     </LoginContext.Provider>
   );
 };
-
-export default App;
