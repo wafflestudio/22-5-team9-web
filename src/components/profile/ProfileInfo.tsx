@@ -68,7 +68,7 @@ const ProfileInfo = ({
     <div className="mb-8">
       <div className="flex items-center mb-4">
         <img
-          src={`http://3.34.185.81:8000/${profileImage}`}
+          src={`https://waffle-instaclone.kro.kr/${profileImage}`}
           alt={username}
           className="w-20 h-20 rounded-full mr-4"
         />
