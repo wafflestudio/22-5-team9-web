@@ -50,7 +50,7 @@ export const App = () => {
         />
         <Route
           path="/accounts/edit"
-          element={auth.isLoggedIn ? <ProfileEditPage/> : <Navigate to="/" />}
+          element={auth.isLoggedIn ? <ProfileEditPage /> : <Navigate to="/" />}
         />
       </Routes>
     </LoginContext.Provider>

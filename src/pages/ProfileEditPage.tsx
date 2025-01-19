@@ -3,7 +3,6 @@ import SideBar from '../components/layout/SideBar';
 import ProfileEditForm from '../components/profile/ProfileEditForm';
 
 const ProfileEditPage = () => {
-
   return (
     <div className="flex flex-col min-h-screen bg-gray-50">
       <div className="flex-1 p-4 md:ml-64 flex items-stretch justify-center">

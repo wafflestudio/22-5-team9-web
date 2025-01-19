@@ -77,11 +77,9 @@ const ProfileInfo = ({
             <h1 className="text-xl font-semibold mr-4">{username}</h1>
             {username === context?.myProfile?.username ? (
               <Link to="/accounts/edit">
-                  <button 
-                  className="border border-gray-300 px-4 py-1 rounded-md text-sm font-semibold mr-2"
-                  >
+                <button className="border border-gray-300 px-4 py-1 rounded-md text-sm font-semibold mr-2">
                   Edit Profile
-                  </button>
+                </button>
               </Link>
             ) : (
               <>
