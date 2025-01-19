@@ -31,7 +31,7 @@ const Post = ({
       src={
         imageUrl.startsWith('http')
           ? imageUrl
-          : `http://3.34.185.81:8000/${imageUrl}`
+          : `https://waffle-instaclone.kro.kr/${imageUrl}`
       }
       alt="Post"
       className="w-full"

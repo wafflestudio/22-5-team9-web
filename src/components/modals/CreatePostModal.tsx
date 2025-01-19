@@ -23,14 +23,13 @@ const CreatePostModal = ({ isOpen, onClose }: CreatePostModalProps) => {
     if (selectedImage == null) return;
 
     try {
-      // Build query parameters
       const queryParams = new URLSearchParams();
       if (content.length > 0) {
         queryParams.append('post_text', content);
       }
 
       const result = await fetch(
-        `http://3.34.185.81:8000/api/post/?${queryParams.toString()}`,
+        `https://waffle-instaclone.kro.kr/api/post/?${queryParams.toString()}`,
         {
           method: 'POST',
           headers: {

@@ -3,10 +3,10 @@ import { Link, useNavigate } from 'react-router-dom';
 
 import { signup } from '../api/signup';
 import { signin } from '../api/singin';
-import type { User } from '../hooks/useAuth';
+import type { UserProfile } from '../types/user';
 
 type RegisterPageProps = {
-  handleIsLoggedIn: (value: boolean, userData: User) => void;
+  handleIsLoggedIn: (value: boolean, userData: UserProfile) => void;
 };
 
 const RegisterPage = ({ handleIsLoggedIn }: RegisterPageProps) => {

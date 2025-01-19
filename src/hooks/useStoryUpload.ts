@@ -13,7 +13,7 @@ export function useStoryUpload() {
     });
 
     try {
-      const response = await fetch('http://3.34.185.81:8000/api/story/', {
+      const response = await fetch('https://waffle-instaclone.kro.kr/api/story/', {
         method: 'POST',
         headers: {
           Authorization: `Bearer ${localStorage.getItem('access_token') ?? ''}`,
