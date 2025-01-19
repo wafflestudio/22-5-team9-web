@@ -111,7 +111,8 @@ export function StoryList() {
               return {
                 userId: Number(userId),
                 username: userProfile?.username ?? `user${userId}`,
-                profileImage: userProfile?.profile_image ?? 'https://placehold.co/32x32',
+                profileImage:
+                  userProfile?.profile_image ?? 'https://placehold.co/32x32',
                 stories: userStories,
               };
             } catch (innerError) {

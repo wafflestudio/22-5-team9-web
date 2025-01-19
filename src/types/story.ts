@@ -10,4 +10,3 @@ export interface StoryViewer {
   user_id: number;
   username: string;
 }
-

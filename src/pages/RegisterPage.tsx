@@ -65,7 +65,7 @@ const RegisterPage = ({ handleIsLoggedIn }: RegisterPageProps) => {
       newErrors.password = '비밀번호는 6자 이상이어야 합니다';
       isValid = false;
     }
-    
+
     if (formData.phoneNumber.length === 0) {
       newErrors.phoneNumber = '전화번호를 입력해주세요';
       isValid = false;

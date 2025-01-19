@@ -5,7 +5,6 @@ import { signin } from '../api/singin';
 import SocialLogin from '../components/shared/SocialLogin';
 import { useAuth } from '../hooks/useAuth';
 
-
 const LoginPage = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');

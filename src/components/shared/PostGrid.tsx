@@ -15,7 +15,6 @@ const PostGrid = ({ posts }: PostGridProps) => {
             className="absolute inset-0 w-full h-full object-cover"
           />
         </div>
-
       ))}
     </div>
   );

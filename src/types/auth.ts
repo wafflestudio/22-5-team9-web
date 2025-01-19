@@ -17,6 +17,9 @@ export type LoginContextType = {
   myProfile: UserProfile | null;
   handleIsLoggedIn: (value: boolean, userData: UserProfile) => void;
   setMyProfile: (profile: UserProfile) => void;
+  handleLogout: () => void;
+  handleLogin: (accessToken: string, refreshToken: string) => void;
+  getAccessToken: () => string | null;
 };
 
 export interface LoginRequest {

@@ -1,4 +1,3 @@
-
 import { createContext, useCallback, useEffect, useState } from 'react';
 import { Navigate, Route, Routes } from 'react-router-dom';
 
@@ -11,7 +10,6 @@ import ProfilePage from './pages/ProfilePage';
 import RegisterPage from './pages/RegisterPage';
 import type { LoginContextType } from './types/auth';
 import type { UserProfile } from './types/user';
-
 
 export const LoginContext = createContext<LoginContextType | null>(null);
 
@@ -33,10 +31,10 @@ export const App = () => {
         {
           method: 'POST',
           headers: {
-            'Authorization': `Bearer ${storedRefreshToken}`,
-            'Content-Type': 'application/json'
-          }
-        }
+            Authorization: `Bearer ${storedRefreshToken}`,
+            'Content-Type': 'application/json',
+          },
+        },
       );
 
       if (!response.ok) {
@@ -47,7 +45,7 @@ export const App = () => {
         throw new Error(`Refresh failed: ${response.status}`);
       }
 
-      const data = await response.json() as {
+      const data = (await response.json()) as {
         access_token: string;
         refresh_token: string;
       };
@@ -78,14 +76,14 @@ export const App = () => {
           'https://waffle-instaclone.kro.kr/api/user/profile',
           {
             headers: {
-              'Authorization': `Bearer ${token}`,
-              'Content-Type': 'application/json'
-            }
-          }
+              Authorization: `Bearer ${token}`,
+              'Content-Type': 'application/json',
+            },
+          },
         );
 
         if (response.ok) {
-          const userData = await response.json() as UserProfile;
+          const userData = (await response.json()) as UserProfile;
           if (userData == null) {
             console.error('No user data found');
             auth.handleLogout();
@@ -93,7 +91,6 @@ export const App = () => {
           }
           setCurrentUserId(userData.user_id);
         } else if (response.status === 401) {
-      
           await refreshToken();
         } else {
           console.error('Failed to fetch user profile');
@@ -107,10 +104,12 @@ export const App = () => {
       }
     };
 
-
-    const refreshInterval = setInterval(() => {
-      void refreshToken();
-    }, 8 * 60 * 1000); 
+    const refreshInterval = setInterval(
+      () => {
+        void refreshToken();
+      },
+      8 * 60 * 1000,
+    );
 
     void refreshToken();
     void fetchCurrentUserId();
@@ -124,23 +123,12 @@ export const App = () => {
     return <div>Loading...</div>;
   }
 
-
   return (
     <LoginContext.Provider value={auth}>
       <Routes>
         <Route
           path="/"
           element={auth.isLoggedIn ? <MainPage /> : <LoginPage />}
-        />
-        <Route
-          path="/register"
-          element={
-            auth.isLoggedIn ? (
-              <MainPage />
-            ) : (
-              <LoginPage handleIsLoggedIn={auth.handleIsLoggedIn} />
-            )
-          }
         />
         <Route
           path="/register"

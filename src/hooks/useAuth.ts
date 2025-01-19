@@ -20,5 +20,26 @@ export function useAuth() {
     localStorage.setItem('userProfile', JSON.stringify(user));
   };
 
-  return { isLoggedIn, myProfile, handleIsLoggedIn, setMyProfile };
+  const handleLogout = () => {
+    setIsLoggedIn(false);
+    setMyProfile(null);
+    localStorage.clear();
+  };
+
+  const handleLogin = (accessToken: string, refreshToken: string) => {
+    localStorage.setItem('access_token', accessToken);
+    localStorage.setItem('refresh_token', refreshToken);
+  };
+
+  const getAccessToken = () => localStorage.getItem('access_token');
+
+  return {
+    isLoggedIn,
+    myProfile,
+    handleIsLoggedIn,
+    setMyProfile,
+    handleLogout,
+    handleLogin,
+    getAccessToken,
+  };
 }

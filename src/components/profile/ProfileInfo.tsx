@@ -6,7 +6,6 @@ import { followUser, unfollowUser } from '../../api/follow';
 import { myProfile } from '../../api/myProfile';
 import { LoginContext } from '../../App';
 
-
 type ProfileInfoProps = {
   userId: number;
   username: string;

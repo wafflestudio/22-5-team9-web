@@ -20,7 +20,6 @@ const StoryViewer = ({
   onClose,
   onDelete,
   isOwner = false,
-
 }: StoryViewerProps) => {
   const [currentStoryIndex, setCurrentStoryIndex] = useState(0);
   const [progress, setProgress] = useState(0);
