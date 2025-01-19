@@ -1,4 +1,5 @@
 import { useState } from 'react';
+
 import type { UserProfile } from '../types/user';
 
 export function useAuth() {

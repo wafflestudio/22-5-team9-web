@@ -76,7 +76,7 @@ const ProfilePage = () => {
             <h2 className="font-semibold">{userProfile.full_name}</h2>
             <p>{userProfile.introduce}</p>
           </div>
-          <Highlights />
+          <Highlights userId={userProfile.user_id} isOwner={context?.myProfile?.user_id === userProfile.user_id} />
           <ProfileTabs postIds={userProfile.post_ids} />
         </div>
       </div>

@@ -2,18 +2,15 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 
 import { signin } from '../api/singin';
-import type { UserProfile } from '../types/user';
+import SocialLogin from '../components/shared/SocialLogin';
+import { useAuth } from '../hooks/useAuth';
 
-type LoginPageProps = {
-  handleIsLoggedIn: (value: boolean, userData: UserProfile) => void;
-};
 
 const LoginPage = () => {
-  const navigate = useNavigate();
-  const auth = useAuth();
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const { handleIsLoggedIn } = useAuth();
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();

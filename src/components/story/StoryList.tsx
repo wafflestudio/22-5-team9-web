@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 
 import type { Story } from '../../types/story';
 import type { UserProfile } from '../../types/user';
-import StoryCreator from './StoryCreator';
+import { StoryCreator } from './StoryCreator';
 import { StoryItem } from './StoryItem';
 import StoryViewer from './StoryViewer/StoryViewer';
 
@@ -55,9 +55,12 @@ export function StoryList() {
         }
 
         const userData = (await userResponse.json()) as UserProfile;
-        setCurrentUserId(userData.user_id);
-
-        // Then get stories
+        if (userData != null) {
+          setCurrentUserId(userData.user_id);
+        }
+        if (userData == null) {
+          throw new Error('No user data found');
+        }
         const storiesResponse = await fetch(
           `https://waffle-instaclone.kro.kr/api/story/list/${userData.user_id}`,
           {
@@ -107,8 +110,8 @@ export function StoryList() {
 
               return {
                 userId: Number(userId),
-                username: userProfile.username,
-                profileImage: userProfile.profile_image,
+                username: userProfile?.username ?? `user${userId}`,
+                profileImage: userProfile?.profile_image ?? 'https://placehold.co/32x32',
                 stories: userStories,
               };
             } catch (innerError) {

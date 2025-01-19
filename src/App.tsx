@@ -17,7 +17,7 @@ export const LoginContext = createContext<LoginContextType | null>(null);
 
 export const App = () => {
   const auth = useAuth();
-  const [currentUserId, setCurrentUserId] = useState<number | null>(null);
+  const [, setCurrentUserId] = useState<number | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
   const refreshToken = useCallback(async () => {
@@ -86,6 +86,11 @@ export const App = () => {
 
         if (response.ok) {
           const userData = await response.json() as UserProfile;
+          if (userData == null) {
+            console.error('No user data found');
+            auth.handleLogout();
+            return;
+          }
           setCurrentUserId(userData.user_id);
         } else if (response.status === 401) {
       
