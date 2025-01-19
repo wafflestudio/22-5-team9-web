@@ -1,32 +1,24 @@
 import { useState } from 'react';
 
-export type User = {
-  username: string;
-  email: string;
-  password: string;
-} | null;
+import type { UserProfile } from '../types/user';
 
 export function useAuth() {
-  // 임시 로그인 상태
-  // TODO: 로그인 API 관리 로직 구현
   const [isLoggedIn, setIsLoggedIn] = useState(() => {
     const saved = localStorage.getItem('isLoggedIn');
     return saved === 'true';
   });
 
-  const [user, setUser] = useState<User>(() => {
-    const savedUser = localStorage.getItem('user');
-    return savedUser != null ? (JSON.parse(savedUser) as User) : null;
+  const [myProfile, setMyProfile] = useState<UserProfile | null>(() => {
+    const saved = localStorage.getItem('userProfile');
+    return saved != null ? (JSON.parse(saved) as UserProfile) : null;
   });
 
-  const handleIsLoggedIn = (value: boolean) => {
+  const handleIsLoggedIn = (value: boolean, user: UserProfile) => {
     setIsLoggedIn(value);
+    setMyProfile(user);
     localStorage.setItem('isLoggedIn', String(value));
-    if (!value) {
-      localStorage.removeItem('user');
-      setUser(null);
-    }
+    localStorage.setItem('userProfile', JSON.stringify(user));
   };
 
-  return { isLoggedIn, user, handleIsLoggedIn };
+  return { isLoggedIn, myProfile, handleIsLoggedIn, setMyProfile };
 }

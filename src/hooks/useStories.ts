@@ -22,7 +22,7 @@ export function useStories(userId: number | null) {
         }
 
         const response = await fetch(
-          `http://3.34.185.81:8000/api/story/list/39`,
+          `https://waffle-instaclone.kro.kr/api/story/list/39`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -58,7 +58,7 @@ export function useStories(userId: number | null) {
 
     try {
       const response = await fetch(
-        `http://3.34.185.81:8000/api/story/${storyId}`,
+        `https://waffle-instaclone.kro.kr/api/story/${storyId}`,
         {
           method: 'DELETE',
           headers: {

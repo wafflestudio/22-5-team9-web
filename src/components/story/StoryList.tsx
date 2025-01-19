@@ -54,8 +54,10 @@ export function StoryList() {
         }
 
         const userData = (await response.json()) as UserProfile;
-        setCurrentUserId(userData.user_id);
-        setError(null);
+        if (userData != null) {
+          setCurrentUserId(userData.user_id);
+          setError(null);
+        }
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Unknown error occurred');
         console.error('Error fetching user info:', err);

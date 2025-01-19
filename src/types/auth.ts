@@ -1,11 +1,8 @@
-export type User = {
-  username: string;
-  email: string;
-  password: string;
-} | null;
+import type { UserProfile } from './user';
 
 export type LoginContextType = {
   isLoggedIn: boolean;
-  user: User;
-  handleIsLoggedIn: (value: boolean) => void;
+  myProfile: UserProfile | null;
+  handleIsLoggedIn: (value: boolean, userData: UserProfile) => void;
+  setMyProfile: (profile: UserProfile) => void;
 };

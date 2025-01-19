@@ -1,11 +1,10 @@
 export interface Post {
-  id: number;
-  username: string;
-  imageUrl: string;
-  caption: string;
-  likes: number;
-  comments: number;
-  timestamp: string;
+  post_id: number;
+  user_id: number;
+  location: string;
+  post_text: string;
+  creation_date: string;
+  file_url: string[];
 }
 
 export interface PostsProps {
