@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 
-import type { Story } from '../types/story';
+import type { Story } from '../../types/story';
 
 export function useStories(userId: number | null) {
   const [stories, setStories] = useState<Story[]>([]);

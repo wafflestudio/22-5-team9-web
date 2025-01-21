@@ -1,4 +1,4 @@
-import type { Story } from '../../types/story';
+import type { Story } from '../../../types/story';
 
 interface StoryItemProps {
   username: string;

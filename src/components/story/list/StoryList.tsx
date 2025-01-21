@@ -1,17 +1,18 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-import { useStories } from '../../hooks/useStories';
-import type { Story } from '../../types/story';
-import type { UserProfile } from '../../types/user';
-import { StoryCreator } from './StoryCreator';
+import { useStories } from '../../../hooks/story/useStories';
+import type { Story } from '../../../types/story';
+import type { UserProfile } from '../../../types/user';
+import { StoryCreator } from '../creation/StoryCreator';
+import { StoryViewer } from '../viewer/StoryViewer/index';
 import { StoryItem } from './StoryItem';
-import { StoryViewer } from './StoryViewer/StoryViewer';
 
 export function StoryList() {
   const navigate = useNavigate();
   const [selectedUserId, setSelectedUserId] = useState<number | null>(null);
   const [viewingStories, setViewingStories] = useState<Story[]>([]);
+  const [currentStoryIndex, setCurrentStoryIndex] = useState(0);
   const [currentUserId, setCurrentUserId] = useState<number | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -72,11 +73,13 @@ export function StoryList() {
   const handleViewStory = (userId: number, userStories: Story[]) => {
     setSelectedUserId(userId);
     setViewingStories(userStories);
+    setCurrentStoryIndex(0);
   };
 
   const handleCloseViewer = () => {
     setSelectedUserId(null);
     setViewingStories([]);
+    setCurrentStoryIndex(0);
   };
 
   if (loading) {
@@ -101,7 +104,7 @@ export function StoryList() {
 
   // Group stories by user
   const storiesByUser = stories.reduce<Record<number, Story[]>>(
-    (acc, story) => {
+    (acc, story: Story) => {
       if (acc[story.user_id] == null) {
         acc[story.user_id] = [];
       }
@@ -127,6 +130,7 @@ export function StoryList() {
       {viewingStories.length > 0 && (
         <StoryViewer
           stories={viewingStories}
+          currentIndex={currentStoryIndex}
           onClose={handleCloseViewer}
           onDelete={selectedUserId === currentUserId ? deleteStory : undefined}
           isOwner={selectedUserId === currentUserId}

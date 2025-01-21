@@ -1,6 +1,6 @@
 import { CirclePlus } from 'lucide-react';
 
-import { useStoryUpload } from '../../hooks/useStoryUpload';
+import { useStoryUpload } from '../../../hooks/story/useStoryUpload';
 
 export function StoryCreator() {
   const { isUploading, uploadStory } = useStoryUpload();
