@@ -1,37 +1,35 @@
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 
+import { fetchComments, fetchPost } from '../api/getContents';
 import MobileBar from '../components/layout/MobileBar';
 import MobileHeader from '../components/layout/MobileHeader';
 import SideBar from '../components/layout/SideBar';
-import type { Post } from '../types/post';
+import type { Comment, Post } from '../types/post';
 
 const PostDetailPage = () => {
   const [post, setPost] = useState<Post | null>(null);
+  const [comments, setComments] = useState<Comment[]>([]);
   const [loading, setLoading] = useState(true);
   const { postId } = useParams();
 
   useEffect(() => {
-    const fetchPost = async () => {
+    const loadPostAndComments = async () => {
       try {
-        const response = await fetch(
-          `https://waffle-instaclone.kro.kr/api/post/${postId as string}`,
-          {
-            headers: {
-              Authorization: `Bearer ${localStorage.getItem('access_token') as string}`,
-            },
-          },
-        );
-        const data = (await response.json()) as Post;
-        setPost(data);
+        const [postData, commentsData] = await Promise.all([
+          fetchPost(postId as string),
+          fetchComments(postId as string),
+        ]);
+        setPost(postData);
+        setComments(commentsData);
       } catch (error) {
-        console.error('Error fetching post:', error);
+        console.error('Error fetching data:', error);
       } finally {
         setLoading(false);
       }
     };
 
-    void fetchPost();
+    void loadPostAndComments();
   }, [postId]);
 
   return (
@@ -46,7 +44,6 @@ const PostDetailPage = () => {
             post != null && (
               <div className="bg-white border rounded-lg overflow-hidden h-full">
                 <div className="flex flex-col md:flex-row h-full">
-                  {/* Left side - Image */}
                   <div className="md:w-[60%] bg-black flex items-center justify-center h-full">
                     <img
                       src={`https://waffle-instaclone.kro.kr/${post.file_url[0] as string}`}
@@ -54,10 +51,7 @@ const PostDetailPage = () => {
                       className="w-full h-full object-contain"
                     />
                   </div>
-
-                  {/* Right side - Post details and comments */}
                   <div className="md:w-[40%] border-l flex flex-col h-full">
-                    {/* Post header */}
                     <div className="p-4 border-b flex-shrink-0">
                       <div className="flex items-center space-x-2">
                         <img
@@ -69,10 +63,8 @@ const PostDetailPage = () => {
                       </div>
                     </div>
 
-                    {/* Comments section */}
                     <div className="flex-1 flex flex-col min-h-0">
                       <div className="flex-1 overflow-y-auto p-4">
-                        {/* Original post caption */}
                         <div className="flex space-x-2 mb-4">
                           <img
                             src={''}
@@ -87,23 +79,26 @@ const PostDetailPage = () => {
                           </div>
                         </div>
 
-                        {/* Comments */}
-                        {/* {post.comments?.map((comment) => (
-                        <div key={comment.id} className="flex space-x-2 mb-4">
-                          <img
-                            src={comment.user.profile_image}
-                            alt={comment.user.username}
-                            className="w-8 h-8 rounded-full"
-                          />
-                          <div>
-                            <span className="font-semibold mr-2">{comment.user.username}</span>
-                            <span>{comment.content}</span>
+                        {comments.map((comment) => (
+                          <div
+                            key={comment.comment_id}
+                            className="flex space-x-2 mb-4"
+                          >
+                            <img
+                              src={''}
+                              alt={comment.user_id.toString()}
+                              className="w-8 h-8 rounded-full"
+                            />
+                            <div>
+                              <span className="font-semibold mr-2">
+                                {comment.user_id}
+                              </span>
+                              <span>{comment.comment_text}</span>
+                            </div>
                           </div>
-                        </div>
-                      ))} */}
+                        ))}
                       </div>
 
-                      {/* Post actions */}
                       <div className="border-t p-4 flex-shrink-0">
                         <div className="flex items-center space-x-4 mb-4">
                           <button>
@@ -149,7 +144,11 @@ const PostDetailPage = () => {
       </div>
 
       <div className="fixed bottom-0 left-0 right-0 md:left-0 md:top-0 md:right-auto md:w-64 bg-white border-t md:border-r md:border-t-0">
-        <SideBar />
+        <SideBar
+          onSearchClick={function (): void {
+            throw new Error('Function not implemented.');
+          }}
+        />
         <MobileBar />
       </div>
     </div>

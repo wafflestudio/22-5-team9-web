@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 
-import { getExplorePosts } from '../api/getExplorePosts';
+import { getExplorePosts } from '../api/getContents';
 import MobileBar from '../components/layout/MobileBar';
 import SideBar from '../components/layout/SideBar';
 import PostGrid from '../components/shared/PostGrid';
@@ -31,7 +31,11 @@ const ExplorePage = () => {
       </div>
 
       <div className="fixed bottom-0 left-0 right-0 md:left-0 md:top-0 md:right-auto md:w-64 bg-white border-t md:border-r md:border-t-0">
-        <SideBar />
+        <SideBar
+          onSearchClick={function (): void {
+            throw new Error('Function not implemented.');
+          }}
+        />
         <MobileBar />
       </div>
     </div>

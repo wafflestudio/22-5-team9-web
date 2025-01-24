@@ -37,7 +37,6 @@ const ProfileEditForm = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
-
     try {
       const updatedProfile = await updateProfile({
         username: name,

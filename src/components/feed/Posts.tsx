@@ -2,7 +2,12 @@ import { usePosts } from '../../hooks/usePosts';
 import type { PostsProps } from '../../types/post';
 import Post from './Post';
 
-const Posts = ({ posts, postsPerPage }: PostsProps) => {
+const Posts = ({
+  posts,
+  postsPerPage,
+  currentUserId,
+  onLikeToggle,
+}: PostsProps) => {
   const { currentPosts, currentPage, totalPages, nextPage, prevPage } =
     usePosts(posts, postsPerPage);
 
@@ -11,13 +16,18 @@ const Posts = ({ posts, postsPerPage }: PostsProps) => {
       {currentPosts.map((post) => (
         <Post
           key={post.post_id}
+          post_id={post.post_id}
           username={post.user_id.toString()}
           imageUrl={post.file_url[0] as string}
           caption={post.post_text}
-          likes={0}
+          likes={post.likes.length}
           location={post.location}
           creation_date={post.creation_date}
-          comments={0}
+          comments={post.comments.length}
+          isLiked={
+            currentUserId != null ? post.likes.includes(currentUserId) : false
+          }
+          onLikeToggle={onLikeToggle}
         />
       ))}
       <div className="flex justify-center mt-8 mb-16 md:mb-8">

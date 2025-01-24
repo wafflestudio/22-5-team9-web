@@ -14,7 +14,11 @@ import { LoginContext } from '../../App';
 import CreatePostModal from '../modals/CreatePostModal';
 import { NavItem } from './NavItem';
 
-const SideBar = () => {
+interface SideBarProps {
+  onSearchClick: () => void;
+}
+
+const SideBar = ({ onSearchClick }: SideBarProps) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [activeItem, setActiveItem] = useState('home');
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
@@ -66,6 +70,9 @@ const SideBar = () => {
           icon={<Search />}
           label="Search"
           active={activeItem === 'search'}
+          onClick={() => {
+            onSearchClick();
+          }}
         />
         <Link to="/explore">
           <NavItem
