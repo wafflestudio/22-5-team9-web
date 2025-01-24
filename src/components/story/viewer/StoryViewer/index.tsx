@@ -47,7 +47,7 @@ export const StoryViewer: React.FC<StoryViewerProps> = ({
     }
   }, [currentIndex, stories.length, onClose, setIsVisible]);
 
-  const currentStory = stories[navigation.currentIndex];
+  const currentStory = stories[currentIndex];
   if (currentStory == null || !isVisible) return null;
 
   return (
@@ -76,6 +76,8 @@ export const StoryViewer: React.FC<StoryViewerProps> = ({
         />
 
         <Controls
+          storyId={String(currentStory.story_id)}
+          storyUrl={`https://waffle-instaclone.kro.kr/${currentStory.file_url[0] ?? ''}`}
           onNext={navigation.goToNext}
           onPrevious={navigation.goToPrevious}
           onClose={() => {

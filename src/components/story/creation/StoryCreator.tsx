@@ -9,10 +9,6 @@ interface StoryCreatorProps {
   onFileSelect: (file: File) => Promise<void>;
 }
 
-interface StoryCreatorProps {
-  onFileSelect: (file: File) => Promise<void>;
-}
-
 export function StoryCreator({ onFileSelect }: StoryCreatorProps) {
   const [showEditor, setShowEditor] = useState(false);
   const { isUploading, uploadStory } = useStoryUpload();
@@ -22,11 +18,10 @@ export function StoryCreator({ onFileSelect }: StoryCreatorProps) {
     try {
       // First process the media file
       await processMedia(file);
-      const processedMedia = file;
-
+      
       // Create a FileList-like object
       const dataTransfer = new DataTransfer();
-      dataTransfer.items.add(processedMedia);
+      dataTransfer.items.add(file);
       const fileList = dataTransfer.files;
 
       // Upload the processed story
@@ -34,7 +29,7 @@ export function StoryCreator({ onFileSelect }: StoryCreatorProps) {
       setShowEditor(false);
 
       // Trigger the file select callback
-      await onFileSelect(processedMedia);
+      await onFileSelect(file);
 
       window.location.reload();
     } catch (error) {

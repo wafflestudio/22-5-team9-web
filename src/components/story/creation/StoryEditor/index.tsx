@@ -20,10 +20,10 @@ interface MediaState {
 }
 
 interface TextStyle {
-	fontSize: number;
-	fontFamily: string;
-	color: string;
-	backgroundColor?: string;
+  fontSize: number;
+  fontFamily: string;
+  color: string;
+  backgroundColor?: string | null;
 }
 
 export const StoryEditor: React.FC<StoryEditorProps> = ({

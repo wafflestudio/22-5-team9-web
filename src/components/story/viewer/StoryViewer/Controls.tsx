@@ -20,6 +20,8 @@ interface ControlsProps {
   isOwner: boolean;
   username: string;
   timestamp: string;
+  storyId: string;
+  storyUrl: string;
 }
 
 export const Controls: React.FC<ControlsProps> = ({
@@ -32,6 +34,8 @@ export const Controls: React.FC<ControlsProps> = ({
   isOwner,
   username,
   timestamp,
+  storyId,
+  storyUrl,
 }) => {
   const [showMenu, setShowMenu] = useState(false);
   const [showShareMenu, setShowShareMenu] = useState(false);
@@ -58,7 +62,7 @@ export const Controls: React.FC<ControlsProps> = ({
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          story_id: username, // Using username as a placeholder since we don't have story_id
+          story_id: storyId,
           reason: 'inappropriate',
         }),
       });
@@ -72,8 +76,7 @@ export const Controls: React.FC<ControlsProps> = ({
 
   const handleDownload = async () => {
     try {
-      const image = document.querySelector('.story-image') as HTMLImageElement;
-      const response = await fetch(image.src);
+      const response = await fetch(storyUrl);
       const blob = await response.blob();
       const url = window.URL.createObjectURL(blob);
       const link = document.createElement('a');

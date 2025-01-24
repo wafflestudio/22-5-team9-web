@@ -16,8 +16,8 @@ export const ReactionBar: React.FC<ReactionBarProps> = ({
 
   const handleReact = async () => {
     try {
-      const endpoint = `https://waffle-instaclone.kro.kr/api/like/story_${isLiked ? 'unlike' : 'like'}`;
-      const response = await fetch(`${endpoint}?content_id=${storyId}`, {
+      const endpoint = `https://waffle-instaclone.kro.kr/api/story/${storyId}/${isLiked ? 'unlike' : 'like'}`;
+      const response = await fetch(endpoint, {
         method: 'POST',
         headers: {
           Authorization: `Bearer ${localStorage.getItem('access_token') ?? ''}`,
@@ -41,7 +41,7 @@ export const ReactionBar: React.FC<ReactionBarProps> = ({
     try {
       setIsSending(true);
       const response = await fetch(
-        'https://waffle-instaclone.kro.kr/api/comment/',
+        'https://waffle-instaclone.kro.kr/api/story/comment/',
         {
           method: 'POST',
           headers: {
@@ -50,7 +50,7 @@ export const ReactionBar: React.FC<ReactionBarProps> = ({
           },
           body: JSON.stringify({
             comment_text: message,
-            post_id: storyId,
+            story_id: storyId,
             user_id: userId,
           }),
         },
