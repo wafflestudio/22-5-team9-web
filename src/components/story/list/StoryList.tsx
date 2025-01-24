@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import { useStories } from '../../../hooks/story/useStories';
+import { useStoryProcessing } from '../../../hooks/story/useStoryProcessing';
 import type { Story } from '../../../types/story';
 import type { UserProfile } from '../../../types/user';
 import { StoryCreator } from '../creation/StoryCreator';
@@ -23,6 +24,48 @@ export function StoryList() {
     deleteStory,
   } = useStories(currentUserId ?? 0);
 
+  const {
+    processing,
+    error: processingError,
+    processMedia,
+  } = useStoryProcessing();
+
+  // Handle file processing
+  const handleStoryCreate = async (file: File) => {
+    try {
+      const processedMedia = await processMedia(file);
+      if (processedMedia === null) {
+        throw new Error('Failed to process media');
+      }
+
+      // Add processed media to form data
+      const formData = new FormData();
+      formData.append('files', processedMedia.file);
+
+      // Upload processed story
+      const response = await fetch(
+        'https://waffle-instaclone.kro.kr/api/story/',
+        {
+          method: 'POST',
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem('access_token') ?? ''}`,
+          },
+          body: formData,
+        },
+      );
+
+      if (!response.ok) {
+        throw new Error('Failed to upload story');
+      }
+
+      // Refresh stories
+      window.location.reload();
+    } catch (err) {
+      console.error('Error creating story:', err);
+      setError(err instanceof Error ? err.message : 'Failed to create story');
+    }
+  };
+
   useEffect(() => {
     const fetchUserInfo = async () => {
       try {
@@ -30,13 +73,13 @@ export function StoryList() {
         const token = localStorage.getItem('access_token');
 
         if (token == null) {
-          localStorage.removeItem('isLoggedIn'); // Clear login state
-          void navigate('/'); // Redirect to login
+          localStorage.removeItem('isLoggedIn');
+          void navigate('/');
           throw new Error('No access token found');
         }
 
         const response = await fetch(
-          'http://3.34.185.81:8000/api/user/profile',
+          'http://waffle-instaclone.kro.kr/api/user/profile',
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -82,7 +125,7 @@ export function StoryList() {
     setCurrentStoryIndex(0);
   };
 
-  if (loading) {
+  if (loading || processing) {
     return (
       <div className="flex space-x-4 overflow-x-auto pb-4 mb-8">
         <div className="animate-pulse flex space-x-4">
@@ -94,12 +137,13 @@ export function StoryList() {
     );
   }
 
-  if (error != null) {
-    return null; // Don't show error UI, just hide the stories section
-  }
-
-  if (storiesError != null) {
-    return null; // Don't show error UI, just hide the stories section
+  if (error != null || storiesError != null || processingError != null) {
+    console.error({
+      mainError: error,
+      storiesError,
+      processingError,
+    });
+    return null;
   }
 
   // Group stories by user
@@ -116,7 +160,7 @@ export function StoryList() {
 
   return (
     <div className="flex space-x-4 overflow-x-auto pb-4 mb-8">
-      <StoryCreator />
+      <StoryCreator onFileSelect={handleStoryCreate} />
       {Object.entries(storiesByUser).map(([userId, userStories]) => (
         <StoryItem
           key={userId}

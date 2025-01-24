@@ -2,8 +2,8 @@ import { useCallback, useState } from 'react';
 
 import type { Story } from '../../types/story';
 
-export const useStoryNavigation = (stories: Story[]) => {
-  const [currentIndex, setCurrentIndex] = useState(0);
+export const useStoryNavigation = (stories: Story[], initialIndex: number = 0) => {
+  const [currentIndex, setCurrentIndex] = useState(initialIndex);
   const [isPaused, setIsPaused] = useState(false);
 
   const goToNext = useCallback(() => {

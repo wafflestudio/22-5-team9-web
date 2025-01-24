@@ -8,7 +8,12 @@ const STORY_DURATION = 5000; // 5 seconds
 export const useStoryViewer = (stories: Story[]) => {
   const [isVisible, setIsVisible] = useState(false);
   const [progress, setProgress] = useState(0);
+  const [isPaused, setIsPaused] = useState(false);
   const navigation = useStoryNavigation(stories);
+
+  const resetProgress = () => {
+    setProgress(0);
+  }
 
   useEffect(() => {
     if (!isVisible || navigation.isPaused) return;
@@ -34,6 +39,9 @@ export const useStoryViewer = (stories: Story[]) => {
   return {
     isVisible,
     progress,
+    isPaused,
+    setIsPaused,
+    resetProgress,
     setIsVisible,
     ...navigation,
   };

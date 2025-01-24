@@ -17,7 +17,7 @@ export const TextEditor: React.FC<TextEditorProps> = ({ onTextAdd }) => {
     fontSize: 24,
     color: '#ffffff',
     backgroundColor: null,
-    fontFamily: 'sans-serif',
+    fontFamily: 'sans-serif'
   });
 
   return (
@@ -25,32 +25,26 @@ export const TextEditor: React.FC<TextEditorProps> = ({ onTextAdd }) => {
       <input
         type="text"
         value={text}
-        onChange={(e) => {
-          setText(e.target.value);
-        }}
+        onChange={(e) => { setText(e.target.value); }}
         placeholder="Type something..."
         className="w-full p-4 bg-transparent border-none outline-none text-white text-center text-2xl"
         style={{
           fontSize: `${style.fontSize}px`,
           fontFamily: style.fontFamily,
           color: style.color,
-          backgroundColor: style.backgroundColor ?? undefined,
+          backgroundColor: style.backgroundColor ?? undefined
         }}
       />
       <div className="flex justify-center gap-4 mt-4">
         <button
-          onClick={() => {
-            setStyle({ ...style, fontSize: style.fontSize + 2 });
-          }}
+          onClick={() => { setStyle({ ...style, fontSize: style.fontSize + 2 }); }}
           className="p-2 bg-black/50 text-white rounded"
           type="button"
         >
           A+
         </button>
         <button
-          onClick={() => {
-            setStyle({ ...style, fontSize: style.fontSize - 2 });
-          }}
+          onClick={() => { setStyle({ ...style, fontSize: style.fontSize - 2 }); }}
           className="p-2 bg-black/50 text-white rounded"
           type="button"
         >
@@ -59,9 +53,7 @@ export const TextEditor: React.FC<TextEditorProps> = ({ onTextAdd }) => {
         <input
           type="color"
           value={style.color}
-          onChange={(e) => {
-            setStyle({ ...style, color: e.target.value });
-          }}
+          onChange={(e) => { setStyle({ ...style, color: e.target.value }); }}
           className="w-8 h-8 rounded cursor-pointer"
         />
         <button

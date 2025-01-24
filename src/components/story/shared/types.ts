@@ -25,3 +25,10 @@ export interface StoryItemProps {
   stories: Story[];
   onView: () => void;
 }
+
+export interface TextStyle {
+	fontSize: number;
+	fontFamily: string;
+	color: string;
+	backgroundColor?: string;
+}
