@@ -1,12 +1,4 @@
-import {
-  Compass,
-  Heart,
-  Home,
-  Menu,
-  PlusSquare,
-  Search,
-  User,
-} from 'lucide-react';
+import { Compass, Heart, Home, Menu, MessageCircle, PlusSquare, Search, User } from 'lucide-react';
 import { useContext, useEffect, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 
@@ -32,12 +24,14 @@ const SideBar = () => {
       setActiveItem('home');
     } else if (path === '/explore') {
       setActiveItem('explore');
+    } else if (path === '/messages') {
+      setActiveItem('messages');
     } else if (path === `/${String(context.myProfile?.username)}`) {
       setActiveItem('profile');
     } else {
       setActiveItem('');
     }
-  }, [location.pathname, context.myProfile, context.myProfile?.username]);
+  }, [location.pathname, context.myProfile?.username]);
 
   const handleCreateClick = (itemName: string) => {
     setActiveItem(itemName);
@@ -72,6 +66,13 @@ const SideBar = () => {
             icon={<Compass />}
             label="Explore"
             active={activeItem === 'explore'}
+          />
+        </Link>
+        <Link to="/messages">
+          <NavItem
+            icon={<MessageCircle />}
+            label="Messages"
+            active={activeItem === 'messages'}
           />
         </Link>
         <NavItem

@@ -20,7 +20,7 @@ export function StoryList() {
     stories,
     error: storiesError,
     deleteStory,
-  } = useStories(currentUserId ?? 0);
+  } = useStories(currentUserId);
 
   useEffect(() => {
     const fetchUserInfo = async () => {

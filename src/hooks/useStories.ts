@@ -9,7 +9,7 @@ export function useStories(userId: number | null) {
 
   useEffect(() => {
     const fetchStories = async () => {
-      if (userId == null) {
+      if (userId == null || userId === 0) {
         setLoading(false);
         return;
       }
@@ -22,7 +22,7 @@ export function useStories(userId: number | null) {
         }
 
         const response = await fetch(
-          `https://waffle-instaclone.kro.kr/api/story/list/39`,
+          `https://waffle-instaclone.kro.kr/api/story/list/${userId}`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
