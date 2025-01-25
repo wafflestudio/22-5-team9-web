@@ -12,6 +12,7 @@ export interface Post {
 export type PostProps = {
   post_id: number;
   username: string;
+  profileImage: string;
   imageUrl: string;
   location: string;
   caption: string;

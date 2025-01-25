@@ -6,6 +6,7 @@ import type { PostProps } from '../../types/post';
 const Post = ({
   post_id,
   username,
+  profileImage,
   imageUrl,
   caption,
   likes,
@@ -20,7 +21,7 @@ const Post = ({
     <div className="bg-white border rounded-md">
       <div className="flex items-center p-4">
         <img
-          src="/placeholder.svg"
+          src={`https://waffle-instaclone.kro.kr/${profileImage}`}
           alt={username}
           className="w-8 h-8 rounded-full"
         />

@@ -1,5 +1,9 @@
+import { useEffect, useState } from 'react';
+
+import { fetchUserProfile } from '../../api/profile';
 import { usePosts } from '../../hooks/usePosts';
 import type { PostsProps } from '../../types/post';
+import type { UserProfile } from '../../types/user';
 import Post from './Post';
 
 const Posts = ({
@@ -10,6 +14,31 @@ const Posts = ({
 }: PostsProps) => {
   const { currentPosts, currentPage, totalPages, nextPage, prevPage } =
     usePosts(posts, postsPerPage);
+  const [userDetails, setUserDetails] = useState<{
+    [key: string]: UserProfile;
+  }>({});
+
+  useEffect(() => {
+    const fetchUsers = async () => {
+      const userIds = [...new Set(currentPosts.map((post) => post.user_id))];
+
+      for (const userId of userIds) {
+        if (userDetails[userId] == null) {
+          try {
+            const userData = await fetchUserProfile(userId.toString());
+            setUserDetails((prev) => ({
+              ...prev,
+              [userId]: userData,
+            }));
+          } catch (error) {
+            console.error(`Failed to fetch user ${userId}:`, error);
+          }
+        }
+      }
+    };
+
+    void fetchUsers();
+  }, [currentPosts, userDetails]);
 
   return (
     <div className="space-y-8">
@@ -17,7 +46,8 @@ const Posts = ({
         <Post
           key={post.post_id}
           post_id={post.post_id}
-          username={post.user_id.toString()}
+          username={userDetails[post.user_id]?.username as string}
+          profileImage={userDetails[post.user_id]?.profile_image as string}
           imageUrl={post.file_url[0] as string}
           caption={post.post_text}
           likes={post.likes.length}

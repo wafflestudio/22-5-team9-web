@@ -82,3 +82,19 @@ export const createPost = async (imageFile: File, content?: string) => {
 
   return result.json() as Promise<Post>;
 };
+
+export const deletePost = async (postId: number): Promise<void> => {
+  const response = await fetch(
+    `https://waffle-instaclone.kro.kr/api/post/${postId}`,
+    {
+      method: 'DELETE',
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem('access_token') as string}`,
+      },
+    },
+  );
+
+  if (!response.ok) {
+    throw new Error(`Failed to delete post: ${response.status}`);
+  }
+};

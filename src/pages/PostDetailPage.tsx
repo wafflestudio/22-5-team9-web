@@ -1,8 +1,11 @@
-import { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { Heart, MessageCircle, MoreHorizontal } from 'lucide-react';
+import { useContext, useEffect, useState } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
 
 import { fetchComments } from '../api/comment';
-import { fetchPost } from '../api/post';
+import { likePost, unlikePost } from '../api/like';
+import { deletePost, fetchPost } from '../api/post';
+import { LoginContext } from '../App';
 import MobileBar from '../components/layout/MobileBar';
 import MobileHeader from '../components/layout/MobileHeader';
 import SideBar from '../components/layout/SideBar';
@@ -12,7 +15,50 @@ const PostDetailPage = () => {
   const [post, setPost] = useState<Post | null>(null);
   const [comments, setComments] = useState<Comment[]>([]);
   const [loading, setLoading] = useState(true);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
   const { postId } = useParams();
+  const context = useContext(LoginContext);
+  const navigate = useNavigate();
+
+  const isOwnPost = post?.user_id === context?.myProfile?.user_id;
+
+  const handleDelete = async () => {
+    if (post == null) return;
+
+    try {
+      await deletePost(post.post_id);
+      void navigate('/');
+    } catch (error) {
+      console.error('Error deleting post:', error);
+    }
+  };
+
+  const handleLikeToggle = async () => {
+    if (post == null || context?.myProfile?.user_id == null) return;
+
+    try {
+      const userId = context.myProfile.user_id;
+      const isLiked = post.likes.includes(userId);
+
+      if (isLiked) {
+        await unlikePost(post.post_id);
+      } else {
+        await likePost(post.post_id);
+      }
+
+      setPost((prev) => {
+        if (prev == null) return null;
+        return {
+          ...prev,
+          likes: isLiked
+            ? prev.likes.filter((id) => id !== userId)
+            : [...prev.likes, userId],
+        };
+      });
+    } catch (error) {
+      console.error('Error toggling like:', error);
+    }
+  };
 
   useEffect(() => {
     const loadPostAndComments = async () => {
@@ -53,7 +99,7 @@ const PostDetailPage = () => {
                     />
                   </div>
                   <div className="md:w-[40%] border-l flex flex-col h-full">
-                    <div className="p-4 border-b flex-shrink-0">
+                    <div className="flex items-center justify-between p-4 border-b">
                       <div className="flex items-center space-x-2">
                         <img
                           src={''}
@@ -62,8 +108,59 @@ const PostDetailPage = () => {
                         />
                         <span className="font-semibold">{post.user_id}</span>
                       </div>
+                      <div className="relative">
+                        <button
+                          onClick={() => {
+                            setIsMenuOpen(!isMenuOpen);
+                          }}
+                          className="p-2 hover:bg-gray-100 rounded-full"
+                        >
+                          <MoreHorizontal className="w-5 h-5" />
+                        </button>
+                        {isMenuOpen && (
+                          <div className="absolute right-0 mt-2 w-56 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 z-50">
+                            <div className="py-1">
+                              {isOwnPost ? (
+                                <>
+                                  <button
+                                    className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left"
+                                    onClick={() => {
+                                      setIsMenuOpen(false);
+                                    }}
+                                  >
+                                    Edit
+                                  </button>
+                                  <button
+                                    className="block px-4 py-2 text-sm text-red-600 hover:bg-gray-100 w-full text-left"
+                                    onClick={() => {
+                                      if (
+                                        window.confirm(
+                                          'Are you sure you want to delete this post?',
+                                        )
+                                      ) {
+                                        void handleDelete();
+                                      }
+                                      setIsMenuOpen(false);
+                                    }}
+                                  >
+                                    Delete
+                                  </button>
+                                </>
+                              ) : (
+                                <button
+                                  className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left"
+                                  onClick={() => {
+                                    setIsMenuOpen(false);
+                                  }}
+                                >
+                                  Report
+                                </button>
+                              )}
+                            </div>
+                          </div>
+                        )}
+                      </div>
                     </div>
-
                     <div className="flex-1 flex flex-col min-h-0">
                       <div className="flex-1 overflow-y-auto p-4">
                         <div className="flex space-x-2 mb-4">
@@ -102,38 +199,23 @@ const PostDetailPage = () => {
 
                       <div className="border-t p-4 flex-shrink-0">
                         <div className="flex items-center space-x-4 mb-4">
-                          <button>
-                            <svg
-                              className="w-6 h-6"
-                              fill="none"
-                              stroke="currentColor"
-                              viewBox="0 0 24 24"
-                            >
-                              <path
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                strokeWidth="2"
-                                d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
-                              />
-                            </svg>
-                          </button>
-                          <button>
-                            <svg
-                              className="w-6 h-6"
-                              fill="none"
-                              stroke="currentColor"
-                              viewBox="0 0 24 24"
-                            >
-                              <path
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                strokeWidth="2"
-                                d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"
-                              />
-                            </svg>
-                          </button>
+                          <Heart
+                            className={`w-6 h-6 cursor-pointer ${
+                              post.likes.includes(
+                                context?.myProfile?.user_id ?? -1,
+                              )
+                                ? 'fill-red-500 text-red-500'
+                                : ''
+                            }`}
+                            onClick={() => {
+                              void handleLikeToggle();
+                            }}
+                          />
+                          <MessageCircle className="w-6 h-6" />
                         </div>
-                        <p className="font-semibold mb-1">{0} likes</p>
+                        <p className="font-semibold mb-1">
+                          {post.likes.length.toLocaleString()} likes
+                        </p>
                       </div>
                     </div>
                   </div>
