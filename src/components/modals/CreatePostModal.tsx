@@ -1,4 +1,7 @@
-import { useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
+
+import { createPost } from '../../api/post';
+import { LoginContext } from '../../App';
 
 type CreatePostModalProps = {
   isOpen: boolean;
@@ -6,51 +9,51 @@ type CreatePostModalProps = {
 };
 
 const CreatePostModal = ({ isOpen, onClose }: CreatePostModalProps) => {
-  const [selectedImage, setSelectedImage] = useState<string | null>(null);
+  const context = useContext(LoginContext);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [content, setContent] = useState('');
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file != null) {
+      setSelectedFile(file);
       const imageUrl = URL.createObjectURL(file);
-      setSelectedImage(imageUrl);
+      setPreviewUrl(imageUrl);
     }
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (selectedImage == null) return;
+    if (selectedFile == null) return;
 
-    try {
-      const queryParams = new URLSearchParams();
-      if (content.length > 0) {
-        queryParams.append('post_text', content);
+    void (async () => {
+      try {
+        const createdPost = await createPost(selectedFile, content);
+        if (context != null && context.myProfile != null) {
+          context.setMyProfile({
+            ...context.myProfile,
+            post_ids: [...context.myProfile.post_ids, createdPost.post_id],
+            post_count: context.myProfile.post_count + 1,
+          });
+        }
+        alert('Post created successfully!');
+        onClose();
+      } catch (error) {
+        console.error('Error creating post:', error);
+        alert('Failed to create post. Please try again.');
       }
-
-      const result = await fetch(
-        `https://waffle-instaclone.kro.kr/api/post/?${queryParams.toString()}`,
-        {
-          method: 'POST',
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem('token') as string}`,
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            image_url: selectedImage,
-          }),
-        },
-      );
-
-      if (!result.ok) {
-        throw new Error('Failed to create post');
-      }
-
-      onClose();
-    } catch (error) {
-      console.error('Error creating post:', error);
-    }
+    })();
   };
+
+  useEffect(() => {
+    return () => {
+      if (previewUrl != null) {
+        URL.revokeObjectURL(previewUrl);
+      }
+    };
+  }, [previewUrl]);
 
   return (
     <>
@@ -58,20 +61,21 @@ const CreatePostModal = ({ isOpen, onClose }: CreatePostModalProps) => {
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
           <div className="bg-white rounded-lg p-6 w-11/12 md:w-1/2 max-w-2xl">
             <h2 className="text-lg font-bold mb-4">Create New Post</h2>
-            <form onSubmit={void handleSubmit}>
+            <form onSubmit={handleSubmit}>
               <div className="mb-4">
                 <div className="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center">
-                  {selectedImage != null ? (
+                  {previewUrl != null ? (
                     <div className="relative">
                       <img
-                        src={selectedImage}
+                        src={previewUrl}
                         alt="Preview"
                         className="max-h-[400px] mx-auto object-contain"
                       />
                       <button
                         type="button"
                         onClick={() => {
-                          setSelectedImage(null);
+                          setSelectedFile(null);
+                          setPreviewUrl(null);
                         }}
                         className="absolute top-2 right-2 bg-gray-800 text-white p-2 rounded-full"
                       >
@@ -131,7 +135,7 @@ const CreatePostModal = ({ isOpen, onClose }: CreatePostModalProps) => {
                 <button
                   type="submit"
                   className="bg-blue-500 text-white rounded-md px-4 py-2"
-                  disabled={selectedImage == null}
+                  disabled={selectedFile == null}
                 >
                   Share
                 </button>

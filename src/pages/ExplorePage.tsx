@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 
-import { getExplorePosts } from '../api/getContents';
+import { getExplorePosts } from '../api/post';
 import MobileBar from '../components/layout/MobileBar';
 import SideBar from '../components/layout/SideBar';
 import PostGrid from '../components/shared/PostGrid';

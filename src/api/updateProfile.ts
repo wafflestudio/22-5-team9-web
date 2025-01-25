@@ -3,9 +3,9 @@ import type { UserProfile } from '../types/user';
 type ProfileUpdateData = {
   username?: string;
   introduce?: string;
-  profile_image?: string;
+  profile_image?: File;
 };
-// ToDO: 이미지 업로드
+
 export const updateProfile = async (
   data: ProfileUpdateData,
 ): Promise<UserProfile> => {
@@ -13,19 +13,24 @@ export const updateProfile = async (
 
   if (data.username != null) params.append('username', data.username);
   if (data.introduce != null) params.append('introduce', data.introduce);
-  if (data.profile_image != null) {
-    params.append('profile_image', data.profile_image);
-  }
 
   const url = `https://waffle-instaclone.kro.kr/api/user/profile/edit?${params.toString()}`;
 
-  const response = await fetch(url, {
+  const options: RequestInit = {
     method: 'PATCH',
-    headers: {
+    headers: new Headers({
       Authorization: `Bearer ${localStorage.getItem('access_token') as string}`,
       Accept: 'application/json',
-    },
-  });
+    }),
+  };
+
+  if (data.profile_image != null) {
+    const formData = new FormData();
+    formData.append('profile_image', data.profile_image);
+    options.body = formData;
+  }
+
+  const response = await fetch(url, options);
 
   if (!response.ok) {
     throw new Error(`Failed to update profile`);

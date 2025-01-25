@@ -65,3 +65,32 @@ export const fetchComments = async (postId: string) => {
   );
   return response.json() as Promise<Comment[]>;
 };
+
+export const createPost = async (imageFile: File, content?: string) => {
+  const queryParams = new URLSearchParams();
+  if (content != null && content.length > 0) {
+    queryParams.append('post_text', content);
+  }
+
+  const formData = new FormData();
+  formData.append('media', imageFile);
+
+  const result = await fetch(
+    `https://waffle-instaclone.kro.kr/api/post/?${queryParams.toString()}`,
+    {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem('access_token') as string}`, // 'token'에서 'access_token'으로 수정
+      },
+      body: formData,
+    },
+  );
+
+  if (!result.ok) {
+    const errorData = await result.text();
+    console.error('Post creation failed:', errorData);
+    throw new Error(`Failed to create post: ${result.status} ${errorData}`);
+  }
+
+  return result.json() as Promise<Post>;
+};

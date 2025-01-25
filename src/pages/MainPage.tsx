@@ -1,7 +1,7 @@
 import { useContext, useEffect, useState } from 'react';
 
-import { fetchFollowingPosts } from '../api/getContents';
 import { likePost, unlikePost } from '../api/like';
+import { fetchFollowingPosts } from '../api/post';
 import { LoginContext } from '../App';
 import Posts from '../components/feed/Posts';
 import { Stories } from '../components/feed/Stories';
@@ -16,7 +16,6 @@ const MainPage = () => {
   const [loading, setLoading] = useState(true);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const context = useContext(LoginContext);
-
   useEffect(() => {
     const targetIds = [
       ...(context?.myProfile?.following as number[]),
