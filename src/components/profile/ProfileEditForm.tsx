@@ -1,6 +1,6 @@
 import React, { useContext, useEffect, useRef, useState } from 'react';
 
-import { updateProfile } from '../../api/updateProfile';
+import { updateProfile } from '../../api/profile';
 import { LoginContext } from '../../App';
 
 const ProfileEditForm = () => {
@@ -36,7 +36,6 @@ const ProfileEditForm = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log('submit');
     setIsLoading(true);
     try {
       const updatedProfile = await updateProfile({
@@ -58,7 +57,12 @@ const ProfileEditForm = () => {
   return (
     <div className="h-full max-w-2xl mx-auto bg-white rounded-lg shadow-lg p-8 flex flex-col">
       <h1 className="text-2xl font-bold mb-8 text-center">Edit Profile</h1>
-      <form onSubmit={handleSubmit} className="flex-1 flex flex-col">
+      <form
+        onSubmit={(e) => {
+          void handleSubmit(e);
+        }}
+        className="flex-1 flex flex-col"
+      >
         <div className="flex flex-col items-center mb-8">
           <div className="relative">
             <img

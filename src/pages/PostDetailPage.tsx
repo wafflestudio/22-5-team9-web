@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 
-import { fetchComments, fetchPost } from '../api/post';
+import { fetchComments } from '../api/comment';
+import { fetchPost } from '../api/post';
 import MobileBar from '../components/layout/MobileBar';
 import MobileHeader from '../components/layout/MobileHeader';
 import SideBar from '../components/layout/SideBar';

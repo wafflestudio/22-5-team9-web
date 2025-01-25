@@ -1,7 +1,7 @@
 import { useContext, useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 
-import { fetchUserProfile } from '../api/userProfile';
+import { fetchUserProfile } from '../api/profile';
 import { LoginContext } from '../App';
 import MobileBar from '../components/layout/MobileBar';
 import MobileHeader from '../components/layout/MobileHeader';

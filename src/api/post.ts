@@ -1,4 +1,4 @@
-import type { Comment, Post } from '../types/post';
+import type { Post } from '../types/post';
 
 export const fetchUserPosts = async (userId: number): Promise<Post[]> => {
   const response = await fetch(
@@ -52,18 +52,6 @@ export const fetchPost = async (postId: string) => {
     },
   );
   return response.json() as Promise<Post>;
-};
-
-export const fetchComments = async (postId: string) => {
-  const response = await fetch(
-    `https://waffle-instaclone.kro.kr/api/comment/list/${postId}`,
-    {
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem('access_token') as string}`,
-      },
-    },
-  );
-  return response.json() as Promise<Comment[]>;
 };
 
 export const createPost = async (imageFile: File, content?: string) => {
