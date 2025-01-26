@@ -72,10 +72,6 @@ const ProfilePage = () => {
             fullName={userProfile.full_name}
             bio={userProfile.introduce}
           />
-          <div className="hidden md:block mb-4">
-            <h2 className="font-semibold">{userProfile.full_name}</h2>
-            <p>{userProfile.introduce}</p>
-          </div>
           <Highlights />
           <ProfileTabs postIds={userProfile.post_ids} />
         </div>

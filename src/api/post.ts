@@ -98,3 +98,24 @@ export const deletePost = async (postId: number): Promise<void> => {
     throw new Error(`Failed to delete post: ${response.status}`);
   }
 };
+
+export const editPost = async (postId: number, content: string) => {
+  const queryParams = new URLSearchParams();
+  queryParams.append('post_text', content);
+
+  const response = await fetch(
+    `https://waffle-instaclone.kro.kr/api/post/${postId}?${queryParams.toString()}`,
+    {
+      method: 'PATCH',
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem('access_token') as string}`,
+      },
+    },
+  );
+
+  if (!response.ok) {
+    throw new Error(`Failed to edit post: ${response.status}`);
+  }
+
+  return response.json() as Promise<Post>;
+};

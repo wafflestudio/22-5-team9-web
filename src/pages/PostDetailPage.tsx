@@ -50,6 +50,10 @@ const PostDetailPage = () => {
     }
   };
 
+  const handleEdit = (updatedPost: Post) => {
+    setPost(updatedPost);
+  };
+
   const handleDelete = () => {
     if (post == null) return;
     try {
@@ -124,6 +128,8 @@ const PostDetailPage = () => {
                       userId={post.user_id}
                       isOwnPost={isOwnPost}
                       onDelete={handleDelete}
+                      post={post}
+                      onEdit={handleEdit}
                     />
                     <div className="flex-1 flex flex-col min-h-0">
                       <PostContent
