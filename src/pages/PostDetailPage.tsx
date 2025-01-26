@@ -50,6 +50,12 @@ const PostDetailPage = () => {
     }
   };
 
+  const handleCommentDelete = (commentId: number) => {
+    setComments((prevComments) =>
+      prevComments.filter((comment) => comment.comment_id !== commentId),
+    );
+  };
+
   const handleEdit = (updatedPost: Post) => {
     setPost(updatedPost);
   };
@@ -136,7 +142,11 @@ const PostDetailPage = () => {
                         userId={post.user_id}
                         postText={post.post_text}
                       />
-                      <CommentSection comments={comments} />
+                      <CommentSection
+                        comments={comments}
+                        currentUserId={context?.myProfile?.user_id ?? -1}
+                        onCommentDelete={handleCommentDelete}
+                      />
                       <PostActions
                         likes={post.likes}
                         currentUserId={context?.myProfile?.user_id ?? -1}

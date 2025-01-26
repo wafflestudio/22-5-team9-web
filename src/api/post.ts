@@ -1,6 +1,6 @@
 import type { Post } from '../types/post';
 
-export const fetchUserPosts = async (userId: number): Promise<Post[]> => {
+const fetchUserPosts = async (userId: number): Promise<Post[]> => {
   const response = await fetch(
     `https://waffle-instaclone.kro.kr/api/post/user/${userId}`,
     {

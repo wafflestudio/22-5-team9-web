@@ -47,3 +47,37 @@ export const createComment = async (
 
   return (await response.json()) as CommentResponse;
 };
+
+// export const updateComment = async (
+//   commentId: number,
+//   commentText: string
+// ): Promise<Comment> => {
+//   const response = await fetch(`https://waffle-instaclone.kro.kr/api/comment/${commentId}`, {
+//     method: 'PATCH',
+//     headers: {
+//       'Content-Type': 'application/json',
+//     },
+//     body: JSON.stringify({ comment_text: commentText }),
+//     credentials: 'include',
+//   });
+
+//   if (!response.ok) {
+//     throw new Error('Failed to update comment');
+//   }
+
+//   return response.json() as Promise<Comment>;
+// };
+
+export const deleteComment = async (commentId: number): Promise<void> => {
+  const response = await fetch(
+    `https://waffle-instaclone.kro.kr/api/comment/${commentId}`,
+    {
+      method: 'DELETE',
+      credentials: 'include',
+    },
+  );
+
+  if (!response.ok) {
+    throw new Error('Failed to delete comment');
+  }
+};
