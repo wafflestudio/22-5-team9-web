@@ -22,7 +22,7 @@ export function StoryList() {
     stories,
     error: storiesError,
     deleteStory,
-  } = useStories(currentUserId ?? 0);
+  } = useStories(currentUserId);
 
   const {
     processing,
@@ -79,11 +79,12 @@ export function StoryList() {
         }
 
         const response = await fetch(
-          'http://waffle-instaclone.kro.kr/api/user/profile',
+          'https://waffle-instaclone.kro.kr/api/user/profile',
           {
             headers: {
               Authorization: `Bearer ${token}`,
             },
+            credentials: 'include'
           },
         );
 

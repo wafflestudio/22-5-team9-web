@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 
 import { useStoryNavigation } from '../../../../hooks/story/useStoryNavigation';
 import { useStoryViewer } from '../../../../hooks/story/useStoryViewer';
@@ -23,9 +23,9 @@ export const StoryViewer: React.FC<StoryViewerProps> = ({
 		resetProgress,
 		currentIndex,
 		goToNext,
-		goToPrevious,
-		canGoNext,
-		canGoPrevious,
+		//goToPrevious,
+		//canGoNext,
+		//canGoPrevious,
 		isVisible,
 		setIsVisible,
   } = useStoryViewer(stories);
