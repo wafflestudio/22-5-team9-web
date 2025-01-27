@@ -1,5 +1,6 @@
 import { MoreHorizontal } from 'lucide-react';
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 import { useUserInfo } from '../../hooks/useUserInfo';
 import type { Post } from '../../types/post';
@@ -23,11 +24,21 @@ const PostHeader = ({
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const { userInfo, loading } = useUserInfo(userId.toString());
+  const navigate = useNavigate();
+
+  const handleProfileClick = () => {
+    if (userInfo?.username != null) {
+      void navigate(`/${userInfo.username}`);
+    }
+  };
 
   return (
     <>
       <div className="flex items-center justify-between p-4 border-b">
-        <div className="flex items-center space-x-2">
+        <div
+          className="flex items-center space-x-2 cursor-pointer hover:bg-gray-50 rounded-lg transition-colors p-2"
+          onClick={handleProfileClick}
+        >
           <img
             src={
               userInfo?.profile_image != null

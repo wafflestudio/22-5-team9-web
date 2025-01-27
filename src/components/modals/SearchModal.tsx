@@ -1,5 +1,6 @@
 import { Search, X } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 import { searchUsers } from '../../api/search';
 import type { UserProfile } from '../../types/user';
@@ -10,6 +11,7 @@ interface SearchModalProps {
 }
 
 const SearchModal = ({ isOpen, onClose }: SearchModalProps) => {
+  const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState('');
   const [searchResults, setSearchResults] = useState<UserProfile[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -71,6 +73,11 @@ const SearchModal = ({ isOpen, onClose }: SearchModalProps) => {
     };
   }, [searchTerm]);
 
+  const handleUserClick = (username: string) => {
+    onClose();
+    void navigate(`/${username}`);
+  };
+
   if (!isOpen) return null;
 
   return (
@@ -124,6 +131,9 @@ const SearchModal = ({ isOpen, onClose }: SearchModalProps) => {
                   {searchResults.map((user) => (
                     <div
                       key={user?.user_id}
+                      onClick={() => {
+                        handleUserClick(user?.username as string);
+                      }}
                       className="flex items-center space-x-3 p-3 hover:bg-gray-50 rounded-lg cursor-pointer transition-colors"
                     >
                       <img
