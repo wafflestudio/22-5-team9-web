@@ -9,13 +9,16 @@ interface SignupRequest {
 }
 
 export const signup = async (formData: SignupRequest) => {
-  const response = await fetch('http://3.34.185.81:8000/api/user/signup', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
+  const response = await fetch(
+    'https://waffle-instaclone.kro.kr/api/user/signup',
+    {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(formData),
     },
-    body: JSON.stringify(formData),
-  });
+  );
 
   if (!response.ok) {
     const errorData = (await response.json()) as { detail?: string };
