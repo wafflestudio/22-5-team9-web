@@ -9,13 +9,15 @@ import MobileBar from '../components/layout/MobileBar';
 import MobileHeader from '../components/layout/MobileHeader';
 import SideBar from '../components/layout/SideBar';
 import SearchModal from '../components/modals/SearchModal';
+import { useSearch } from '../hooks/useSearch';
 import type { Post } from '../types/post';
 
 const MainPage = () => {
   const [posts, setPosts] = useState<Post[]>([]);
   const [loading, setLoading] = useState(true);
-  const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const { isSearchOpen, setIsSearchOpen } = useSearch();
   const context = useContext(LoginContext);
+
   useEffect(() => {
     const targetIds = [
       ...(context?.myProfile?.following as number[]),

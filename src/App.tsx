@@ -1,6 +1,6 @@
 import './index.css';
 
-import { createContext } from 'react';
+import { createContext, useState } from 'react';
 import { Navigate, Route, Routes } from 'react-router-dom';
 
 import { useAuth } from './hooks/useAuth';
@@ -12,52 +12,59 @@ import ProfileEditPage from './pages/ProfileEditPage';
 import ProfilePage from './pages/ProfilePage';
 import RegisterPage from './pages/RegisterPage';
 import type { LoginContextType } from './types/auth';
+import type { SearchContextType } from './types/search';
 
 export const LoginContext = createContext<LoginContextType | null>(null);
+export const SearchContext = createContext<SearchContextType | null>(null);
 
 export const App = () => {
   const auth = useAuth();
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
 
   return (
     <LoginContext.Provider value={auth}>
-      <Routes>
-        <Route
-          path="/"
-          element={
-            auth.isLoggedIn ? (
-              <MainPage />
-            ) : (
-              <LoginPage handleIsLoggedIn={auth.handleIsLoggedIn} />
-            )
-          }
-        />
-        <Route
-          path="/register"
-          element={
-            auth.isLoggedIn ? (
-              <Navigate to="/" />
-            ) : (
-              <RegisterPage handleIsLoggedIn={auth.handleIsLoggedIn} />
-            )
-          }
-        />
-        <Route
-          path="/explore"
-          element={auth.isLoggedIn ? <ExplorePage /> : <Navigate to="/" />}
-        />
-        <Route
-          path="/:username"
-          element={auth.isLoggedIn ? <ProfilePage /> : <Navigate to="/" />}
-        />
-        <Route
-          path="/accounts/edit"
-          element={auth.isLoggedIn ? <ProfileEditPage /> : <Navigate to="/" />}
-        />
-        <Route
-          path="/post/:postId"
-          element={auth.isLoggedIn ? <PostDetailPage /> : <Navigate to="/" />}
-        />
-      </Routes>
+      <SearchContext.Provider value={{ isSearchOpen, setIsSearchOpen }}>
+        <Routes>
+          <Route
+            path="/"
+            element={
+              auth.isLoggedIn ? (
+                <MainPage />
+              ) : (
+                <LoginPage handleIsLoggedIn={auth.handleIsLoggedIn} />
+              )
+            }
+          />
+          <Route
+            path="/register"
+            element={
+              auth.isLoggedIn ? (
+                <Navigate to="/" />
+              ) : (
+                <RegisterPage handleIsLoggedIn={auth.handleIsLoggedIn} />
+              )
+            }
+          />
+          <Route
+            path="/explore"
+            element={auth.isLoggedIn ? <ExplorePage /> : <Navigate to="/" />}
+          />
+          <Route
+            path="/:username"
+            element={auth.isLoggedIn ? <ProfilePage /> : <Navigate to="/" />}
+          />
+          <Route
+            path="/accounts/edit"
+            element={
+              auth.isLoggedIn ? <ProfileEditPage /> : <Navigate to="/" />
+            }
+          />
+          <Route
+            path="/post/:postId"
+            element={auth.isLoggedIn ? <PostDetailPage /> : <Navigate to="/" />}
+          />
+        </Routes>
+      </SearchContext.Provider>
     </LoginContext.Provider>
   );
 };
