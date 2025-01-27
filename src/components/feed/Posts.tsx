@@ -1,23 +1,63 @@
+import { useEffect, useState } from 'react';
+
+import { fetchUserProfile } from '../../api/profile';
 import { usePosts } from '../../hooks/usePosts';
 import type { PostsProps } from '../../types/post';
+import type { UserProfile } from '../../types/user';
 import Post from './Post';
 
-const Posts = ({ posts, postsPerPage }: PostsProps) => {
+const Posts = ({
+  posts,
+  postsPerPage,
+  currentUserId,
+  onLikeToggle,
+}: PostsProps) => {
   const { currentPosts, currentPage, totalPages, nextPage, prevPage } =
     usePosts(posts, postsPerPage);
+  const [userDetails, setUserDetails] = useState<{
+    [key: string]: UserProfile;
+  }>({});
+
+  useEffect(() => {
+    const fetchUsers = async () => {
+      const userIds = [...new Set(currentPosts.map((post) => post.user_id))];
+
+      for (const userId of userIds) {
+        if (userDetails[userId] == null) {
+          try {
+            const userData = await fetchUserProfile(userId.toString());
+            setUserDetails((prev) => ({
+              ...prev,
+              [userId]: userData,
+            }));
+          } catch (error) {
+            console.error(`Failed to fetch user ${userId}:`, error);
+          }
+        }
+      }
+    };
+
+    void fetchUsers();
+  }, [currentPosts, userDetails]);
 
   return (
     <div className="space-y-8">
       {currentPosts.map((post) => (
         <Post
           key={post.post_id}
-          username={post.user_id.toString()}
+          post_id={post.post_id}
+          username={userDetails[post.user_id]?.username as string}
+          profileImage={userDetails[post.user_id]?.profile_image as string}
           imageUrl={post.file_url[0] as string}
           caption={post.post_text}
-          likes={0}
+          likes={post.likes.length}
           location={post.location}
           creation_date={post.creation_date}
-          comments={0}
+          comments={post.comments.length}
+          isLiked={
+            currentUserId != null ? post.likes.includes(currentUserId) : false
+          }
+          onLikeToggle={onLikeToggle}
         />
       ))}
       <div className="flex justify-center mt-8 mb-16 md:mb-8">

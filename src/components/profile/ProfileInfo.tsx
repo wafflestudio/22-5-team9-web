@@ -3,7 +3,7 @@ import { useContext, useState } from 'react';
 import { Link } from 'react-router-dom';
 
 import { followUser, unfollowUser } from '../../api/follow';
-import { myProfile } from '../../api/myProfile';
+import { myProfile } from '../../api/profile';
 import { LoginContext } from '../../App';
 
 type ProfileInfoProps = {
