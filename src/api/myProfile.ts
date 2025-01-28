@@ -1,14 +1,26 @@
 import type { UserProfile } from '../types/user';
+import { refreshToken } from './refresh';
 
 export const myProfile = async (token: string) => {
+  const fetchWithRetry = async (url: string, options: RequestInit) => {
+    let response = await fetch(url, options);
+
+    // Token expired - attempt refresh
+    if (response.status === 401) {
+      const newToken = await refreshToken();
+      response = await fetch(url, {
+        ...options,
+        headers: { ...options.headers, Authorization: `Bearer ${newToken}` },
+      });
+    }
+
+    return response;
+  };
   try {
-    const response = await fetch(
+    const response = await fetchWithRetry(
       'https://waffle-instaclone.kro.kr/api/user/profile',
       {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          accept: 'application/json',
-        },
+        headers: { Authorization: `Bearer ${token}` },
       },
     );
 
