@@ -1,5 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 
+import type { UserProfile } from '../types/user';
 import { useAuth } from './useAuth';
 
 interface GoogleUserInfo {
@@ -106,16 +107,16 @@ export function useAuthCallback() {
       if (!profileResponse.ok) {
         throw new Error('Failed to fetch user profile');
       }
-
-      const userProfile = await profileResponse.json();
+      const userProfile = (await profileResponse.json()) as UserProfile;
       auth.handleIsLoggedIn(true, userProfile);
 
       // Navigate to home page after successful login
       void navigate('/');
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Unknown error occurred';
+      const errorMessage =
+        err instanceof Error ? err.message : 'Unknown error occurred';
       console.error('Auth callback error:', errorMessage);
-      
+
       void navigate('/', {
         state: {
           error: 'Failed to complete social login',

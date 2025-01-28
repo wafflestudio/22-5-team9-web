@@ -2,7 +2,7 @@ import type { Message, NewMessageRequest } from '../types/message';
 
 const API_BASE_URL = 'https://waffle-instaclone.kro.kr';
 
-export class ApiError extends Error {
+class ApiError extends Error {
   constructor(
     public status: number,
     message: string,
@@ -146,7 +146,10 @@ export const dmApi = {
       },
     );
     if (!response.ok) {
-      throw new ApiError(response.status, 'Failed to fetch conversation messages');
+      throw new ApiError(
+        response.status,
+        'Failed to fetch conversation messages',
+      );
     }
     return response.json() as Promise<Message[]>;
   },

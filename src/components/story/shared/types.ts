@@ -19,12 +19,12 @@ export interface StoryViewerProps {
   onDelete?: (storyId: number) => Promise<void>;
 }
 
-export interface StoryItemProps {
+/* export interface StoryItemProps {
   username: string;
   profileImage?: string;
   stories: Story[];
   onView: () => void;
-}
+} */
 
 export interface TextStyle {
   fontSize: number;

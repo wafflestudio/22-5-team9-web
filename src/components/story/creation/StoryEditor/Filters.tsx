@@ -1,6 +1,6 @@
 import React from 'react';
 
-export const FILTERS = [
+const FILTERS = [
   { id: 'normal', name: 'Normal', filter: '' },
   { id: 'grayscale', name: 'B&W', filter: 'grayscale(100%)' },
   { id: 'sepia', name: 'Sepia', filter: 'sepia(100%)' },

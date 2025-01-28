@@ -12,11 +12,11 @@ export interface NewMessageRequest {
   text: string;
 }
 
-export interface MessageResponse {
+/* export interface MessageResponse {
   success: boolean;
   message?: Message;
   error?: string;
-}
+} */
 
 export interface Conversation {
   userId: number;
@@ -26,7 +26,7 @@ export interface Conversation {
   unreadCount: number;
 }
 
-export interface ConversationParticipant {
+/* export interface ConversationParticipant {
   user_id: number;
   username: string;
   profile_image: string;
@@ -53,15 +53,13 @@ export function isMessageResponse(obj: unknown): obj is MessageResponse {
     'success' in obj &&
     (('message' in obj && isMessage(obj.message)) || 'error' in obj)
   );
-}
+} */
 
 export function processMessagesIntoConversations(
   sent: Message[],
   received: Message[],
   currentUserId: number,
 ): Conversation[] {
-  console.log('Raw sent messages:', sent);
-  console.log('Raw received messages:', received);
   const allMessages = [...sent, ...received].sort(
     (a, b) =>
       new Date(b.creation_date).getTime() - new Date(a.creation_date).getTime(),

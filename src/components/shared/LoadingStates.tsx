@@ -10,7 +10,7 @@ export function MessageSkeleton() {
   );
 }
 
-export function ConversationSkeleton() {
+/* export function ConversationSkeleton() {
   return (
     <div className="animate-pulse flex items-center p-4 space-x-4">
       <div className="h-12 w-12 bg-gray-200 rounded-full"></div>
@@ -20,7 +20,7 @@ export function ConversationSkeleton() {
       </div>
     </div>
   );
-}
+} */
 
 export function LoadingSpinner() {
   return (
