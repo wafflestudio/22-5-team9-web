@@ -54,8 +54,7 @@ export const dmApi = {
       throw new ApiError(response.status, 'Failed to fetch sent messages');
     }
 
-    const data = (await response.json()) as Message[];
-    return data;
+    return response.json() as Promise<Message[]>;
   },
 
   async getReceivedMessages(): Promise<Message[]> {
@@ -72,8 +71,7 @@ export const dmApi = {
       throw new ApiError(response.status, 'Failed to fetch received messages');
     }
 
-    const data = (await response.json()) as Message[];
-    return data;
+    return response.json() as Promise<Message[]>;
   },
 
   async sendMessage(request: NewMessageRequest): Promise<Message> {
@@ -136,11 +134,19 @@ export const dmApi = {
     offset,
     limit,
   }: GetConversationMessagesParams): Promise<Message[]> {
+    const token = localStorage.getItem('access_token');
+    if (token == null) throw new Error('No access token');
+
     const response = await fetch(
-      `/api/messages/conversation/${recipientId}?offset=${offset}&limit=${limit}`,
+      `${API_BASE_URL}/api/messages/conversation/${recipientId}?offset=${offset}&limit=${limit}`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      },
     );
     if (!response.ok) {
-      throw new Error('Failed to fetch conversation messages');
+      throw new ApiError(response.status, 'Failed to fetch conversation messages');
     }
     return response.json() as Promise<Message[]>;
   },

@@ -23,13 +23,11 @@ export function useMessagePolling(
         ]);
 
         const conversationMessages = [...sent, ...received].filter((msg) => {
-          const isRelevantParticipant =
-            msg.sender_id === userId || msg.receiver_id === userId;
           const isNewMessage =
             lastMessageTimestamp.current === null ||
             new Date(msg.creation_date) >
               new Date(lastMessageTimestamp.current);
-          return isRelevantParticipant && isNewMessage;
+          return isNewMessage;
         });
 
         if (conversationMessages.length > 0) {

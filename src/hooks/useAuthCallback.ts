@@ -111,12 +111,12 @@ export function useAuthCallback() {
       auth.handleIsLoggedIn(true, userProfile);
 
       // Navigate to home page after successful login
-      navigate('/');
+      void navigate('/');
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Unknown error occurred';
       console.error('Auth callback error:', errorMessage);
       
-      navigate('/', {
+      void navigate('/', {
         state: {
           error: 'Failed to complete social login',
           details: errorMessage,
