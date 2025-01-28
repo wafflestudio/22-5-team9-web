@@ -1,4 +1,3 @@
-
 import { useNavigate } from 'react-router-dom';
 
 import { useAuth } from './useAuth';
@@ -52,7 +51,8 @@ export function useAuthCallback() {
             googleData: {
               email: authData.user_info.email,
               fullName: authData.user_info.name,
-              picture: authData.user_info.picture
+              picture: authData.user_info.picture,
+              sub: authData.user_info.sub
             },
             isGoogleSignup: true
           }
@@ -68,7 +68,7 @@ export function useAuthCallback() {
         },
         body: JSON.stringify({
           username: authData.username,
-          password: 'default'
+          password: authData.user_info.sub
         }),
       });
 

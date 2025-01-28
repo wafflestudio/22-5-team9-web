@@ -7,6 +7,7 @@ interface GoogleSignupData {
   email: string;
   fullName: string;
   picture: string;
+  sub?: string;
 }
 
 interface LocationState {
@@ -114,6 +115,11 @@ const RegisterPage = ({ handleIsLoggedIn }: RegisterPageProps) => {
     }
 
     try {
+      // Generate a secure password for Google signup
+      const signupPassword = (isGoogleSignup ?? false) 
+        ? (googleData?.sub ?? crypto.randomUUID()) // Use Google sub or generate UUID as fallback
+        : formData.password;
+
       const response = await fetch('http://waffle-instaclone.kro.kr/api/user/signup', {
         method: 'POST',
         headers: {
@@ -121,7 +127,7 @@ const RegisterPage = ({ handleIsLoggedIn }: RegisterPageProps) => {
         },
         body: JSON.stringify({
           username: formData.username,
-          password: (isGoogleSignup ?? false) ? 'default' : formData.password,
+          password: signupPassword,
           full_name: formData.fullName,
           email: formData.email,
           phone_number: formData.phoneNumber,
@@ -140,7 +146,7 @@ const RegisterPage = ({ handleIsLoggedIn }: RegisterPageProps) => {
             },
             body: JSON.stringify({
               username: formData.username,
-              password: (isGoogleSignup ?? false) ? 'default' : formData.password,
+              password: signupPassword,
             }),
           },
         );
