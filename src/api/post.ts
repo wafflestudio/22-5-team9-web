@@ -1,4 +1,5 @@
 import type { Post } from '../types/post';
+import { authenticatedFetch } from '../utils/auth';
 
 const fetchUserPosts = async (userId: number): Promise<Post[]> => {
   const response = await fetch(
@@ -43,7 +44,7 @@ export const getExplorePosts = async () => {
 };
 
 export const fetchPost = async (postId: string) => {
-  const response = await fetch(
+  const response = await authenticatedFetch(
     `https://waffle-instaclone.kro.kr/api/post/${postId}`,
     {
       headers: {
