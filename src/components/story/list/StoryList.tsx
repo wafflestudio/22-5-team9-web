@@ -5,6 +5,7 @@ import { useStories } from '../../../hooks/story/useStories';
 import { useStoryProcessing } from '../../../hooks/story/useStoryProcessing';
 import type { Story } from '../../../types/story';
 import type { UserProfile } from '../../../types/user';
+import { authenticatedFetch } from '../../../utils/auth';
 import { StoryCreator } from '../creation/StoryCreator';
 import { StoryViewer } from '../viewer/StoryViewer/index';
 import { StoryItem } from './StoryItem';
@@ -78,8 +79,8 @@ export function StoryList() {
           throw new Error('No access token found');
         }
 
-        const response = await fetch(
-          'https://waffle-instaclone.kro.kr/api/user/profile',
+        const response = await authenticatedFetch(
+          'http://waffle-instaclone.kro.kr/api/user/profile',
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -89,20 +90,12 @@ export function StoryList() {
         );
 
         if (!response.ok) {
-          if (response.status === 401) {
-            localStorage.removeItem('access_token');
-            localStorage.removeItem('isLoggedIn');
-            void navigate('/');
-            throw new Error('Token expired or invalid');
-          }
           throw new Error('Failed to fetch user info');
         }
 
         const userData = (await response.json()) as UserProfile;
-        if (userData != null) {
-          setCurrentUserId(userData.user_id);
-          setError(null);
-        }
+        setCurrentUserId(userData != null ? userData.user_id : null);
+        setError(null);
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Unknown error occurred');
         console.error('Error fetching user info:', err);

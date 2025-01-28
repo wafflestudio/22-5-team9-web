@@ -1,6 +1,6 @@
 import React, { useContext, useEffect, useRef, useState } from 'react';
 
-import { updateProfile } from '../../api/updateProfile';
+import { updateProfile } from '../../api/profile';
 import { LoginContext } from '../../App';
 
 const ProfileEditForm = () => {
@@ -37,16 +37,14 @@ const ProfileEditForm = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
-
     try {
       const updatedProfile = await updateProfile({
         username: name,
         introduce: bio,
         profile_image: imageFile,
       });
-      if (context?.setMyProfile != null) {
-        context.setMyProfile(updatedProfile);
-      }
+
+      context?.handleIsLoggedIn(true, updatedProfile);
       alert('Profile updated successfully!');
     } catch (error) {
       console.error('Error updating profile:', error);

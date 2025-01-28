@@ -1,8 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 
-import { signup } from '../api/signup';
-import { signin } from '../api/singin';
+import { signin, signup } from '../api/auth';
 import type { UserProfile } from '../types/user';
 
 type RegisterPageProps = {
