@@ -2,7 +2,8 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 // Google OAuth configuration
-const GOOGLE_CLIENT_ID = '557745293077-gbn9t05u2o9q9a6uqmfjar2befgerpnc.apps.googleusercontent.com';
+const GOOGLE_CLIENT_ID =
+  '557745293077-gbn9t05u2o9q9a6uqmfjar2befgerpnc.apps.googleusercontent.com';
 const REDIRECT_URI = 'https://waffle-instaclone.kro.kr/auth/callback';
 
 interface GoogleAuthProps {
@@ -11,9 +12,9 @@ interface GoogleAuthProps {
 }
 
 interface TokenData {
-    access_token: string;
-    refresh_token: string;
-  }
+  access_token: string;
+  refresh_token: string;
+}
 
 const GoogleAuth = ({ onSuccess, onError }: GoogleAuthProps) => {
   const [loading, setLoading] = useState(false);
@@ -22,7 +23,8 @@ const GoogleAuth = ({ onSuccess, onError }: GoogleAuthProps) => {
   const handleGoogleLogin = () => {
     try {
       setLoading(true);
-      const authUrl = 'https://accounts.google.com/o/oauth2/v2/auth?' +
+      const authUrl =
+        'https://accounts.google.com/o/oauth2/v2/auth?' +
         `client_id=${GOOGLE_CLIENT_ID}&` +
         `redirect_uri=${encodeURIComponent(REDIRECT_URI)}&` +
         'response_type=code&' +
@@ -40,13 +42,15 @@ const GoogleAuth = ({ onSuccess, onError }: GoogleAuthProps) => {
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const code = params.get('code');
-    
+
     if (code != null) {
       const handleCallback = async () => {
         try {
           setLoading(true);
-          const callbackResponse = await fetch(`https://waffle-instaclone.kro.kr/auth/callback?code=${code}`);
-          
+          const callbackResponse = await fetch(
+            `https://waffle-instaclone.kro.kr/auth/callback?code=${code}`,
+          );
+
           if (!callbackResponse.ok) {
             throw new Error('Failed to exchange code for tokens');
           }
@@ -61,7 +65,7 @@ const GoogleAuth = ({ onSuccess, onError }: GoogleAuthProps) => {
               sub: string;
             };
           }
-          const authData = await callbackResponse.json() as GoogleAuthData;
+          const authData = (await callbackResponse.json()) as GoogleAuthData;
 
           // If user doesn't exist, redirect to registration
           if (!authData.is_created) {
@@ -80,25 +84,30 @@ const GoogleAuth = ({ onSuccess, onError }: GoogleAuthProps) => {
           }
 
           // If user exists, proceed with sign in
-          const signinResponse = await fetch('https://waffle-instaclone.kro.kr/api/user/signin', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
+          const signinResponse = await fetch(
+            'https://waffle-instaclone.kro.kr/api/user/signin',
+            {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({
+                username: authData.username,
+                password: authData.user_info.sub,
+              }),
             },
-            body: JSON.stringify({
-              username: authData.username,
-              password: authData.user_info.sub,
-            }),
-          });
+          );
 
           if (!signinResponse.ok) {
             throw new Error('Failed to sign in with Google credentials');
           }
-          const tokenData = await signinResponse.json() as TokenData;
+          const tokenData = (await signinResponse.json()) as TokenData;
           onSuccess(tokenData.access_token, tokenData.refresh_token);
           void navigate('/');
         } catch (error) {
-          onError(error instanceof Error ? error.message : 'Authentication failed');
+          onError(
+            error instanceof Error ? error.message : 'Authentication failed',
+          );
           console.error('Auth callback error:', error);
         } finally {
           setLoading(false);

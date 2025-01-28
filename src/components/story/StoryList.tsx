@@ -36,7 +36,7 @@ export function StoryList() {
         }
 
         const response = await authenticatedFetch(
-          'http://3.34.185.81:8000/api/user/profile',
+          'http://waffle-instaclone.kro.kr/api/user/profile',
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -49,7 +49,7 @@ export function StoryList() {
         }
 
         const userData = (await response.json()) as UserProfile;
-        setCurrentUserId(userData.user_id);
+        setCurrentUserId(userData != null ? userData.user_id : null);
         setError(null);
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Unknown error occurred');

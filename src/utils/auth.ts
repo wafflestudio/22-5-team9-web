@@ -13,13 +13,14 @@ export async function refreshTokens() {
     const response = await fetch(`${API_BASE_URL}/user/refresh`, {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json'
-      }
+        'Content-Type': 'application/json',
+      },
     });
 
     if (!response.ok) throw new Error('Refresh failed');
-    
-    const { access_token, refresh_token } = await response.json() as TokenResponse;
+
+    const { access_token, refresh_token } =
+      (await response.json()) as TokenResponse;
     localStorage.setItem('access_token', access_token);
     localStorage.setItem('refresh_token', refresh_token);
     return access_token;
@@ -30,13 +31,16 @@ export async function refreshTokens() {
   }
 }
 
-export async function authenticatedFetch(url: string, options: RequestInit = {}) {
+export async function authenticatedFetch(
+  url: string,
+  options: RequestInit = {},
+) {
   const accessToken = localStorage.getItem('access_token');
-  
+
   // Add auth header if token exists
   const headers = {
     ...options.headers,
-    ...((accessToken != null) && { Authorization: `Bearer ${accessToken}` }),
+    ...(accessToken != null && { Authorization: `Bearer ${accessToken}` }),
   };
 
   let response = await fetch(url, { ...options, headers });

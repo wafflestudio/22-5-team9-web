@@ -31,16 +31,22 @@ const LoginPage = ({ handleIsLoggedIn }: LoginPageProps) => {
     }
   };
 
-  const handleGoogleSuccess = async (accessToken: string, refreshToken: string) => {
+  const handleGoogleSuccess = async (
+    accessToken: string,
+    refreshToken: string,
+  ) => {
     // Store tokens
     localStorage.setItem('access_token', accessToken);
     localStorage.setItem('refresh_token', refreshToken);
-    const response = await fetch('https://waffle-instaclone.kro.kr/api/user/profile', {
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
+    const response = await fetch(
+      'https://waffle-instaclone.kro.kr/api/user/profile',
+      {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
       },
-    });
-  
+    );
+
     if (response.ok) {
       const userData = (await response.json()) as UserProfile;
       handleIsLoggedIn(true, userData);
@@ -50,7 +56,6 @@ const LoginPage = ({ handleIsLoggedIn }: LoginPageProps) => {
   const handleGoogleError = (err: string) => {
     setError(err);
   };
-
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
@@ -133,13 +138,17 @@ const LoginPage = ({ handleIsLoggedIn }: LoginPageProps) => {
                 <div className="w-full border-t border-gray-300" />
               </div>
               <div className="relative flex justify-center text-sm">
-                <span className="px-2 bg-white text-gray-500">Or continue with</span>
+                <span className="px-2 bg-white text-gray-500">
+                  Or continue with
+                </span>
               </div>
             </div>
 
             <div className="mt-6">
-              <GoogleAuth 
-                onSuccess={(accessToken, refreshToken) => void handleGoogleSuccess(accessToken, refreshToken)}
+              <GoogleAuth
+                onSuccess={(accessToken, refreshToken) =>
+                  void handleGoogleSuccess(accessToken, refreshToken)
+                }
                 onError={handleGoogleError}
               />
             </div>
