@@ -37,7 +37,7 @@ export function StoryList() {
 
         // First get current user info
         const userResponse = await fetch(
-          'http://3.34.185.81:8000/api/user/profile',
+          'https://waffle-instaclone.kro.kr/api/user/profile',
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -59,7 +59,7 @@ export function StoryList() {
 
         // Then get stories
         const storiesResponse = await fetch(
-          `http://3.34.185.81:8000/api/story/list/${userData.user_id}`,
+          `https://waffle-instaclone.kro.kr/api/story/list/${userData.user_id}`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -87,7 +87,7 @@ export function StoryList() {
           Object.entries(storiesByUser).map(async ([userId, userStories]) => {
             try {
               const userProfileResponse = await fetch(
-                `http://3.34.185.81:8000/api/user/profile`,
+                `https://waffle-instaclone.kro.kr/api/user/profile`,
                 {
                   headers: {
                     Authorization: `Bearer ${token}`,
@@ -148,7 +148,7 @@ export function StoryList() {
       if (token == null) throw new Error('No access token');
 
       const response = await fetch(
-        `http://3.34.185.81:8000/api/story/${storyId}`,
+        `https://waffle-instaclone.kro.kr/api/story/${storyId}`,
         {
           method: 'DELETE',
           headers: {

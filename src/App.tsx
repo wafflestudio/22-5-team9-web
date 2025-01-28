@@ -1,6 +1,7 @@
 import { createContext, useEffect,useState } from 'react';
 import { Navigate, Route, Routes } from 'react-router-dom';
 
+import AuthCallback from './components/auth/AuthCallback';
 import { useAuth } from './hooks/useAuth';
 import ExplorePage from './pages/ExplorePage';
 import LoginPage from './pages/LoginPage';
@@ -12,6 +13,11 @@ import type { UserProfile } from './types/user';
 
 export const LoginContext = createContext<LoginContextType | null>(null);
 
+interface AuthError extends Error {
+  message: string;
+  status?: number;
+}
+
 export const App = () => {
   const auth = useAuth();
   const [currentUserId, setCurrentUserId] = useState<number | null>(null);
@@ -20,10 +26,10 @@ export const App = () => {
   useEffect(() => {
     const fetchCurrentUserId = async () => {
       setIsLoading(true);
-      const token = auth.getAccessToken();
-      if (token != null) {
-        try {
-          const response = await fetch('http://3.34.185.81:8000/api/user/profile', {
+      try {
+        const token = auth.getAccessToken();
+        if (token != null) {
+          const response = await fetch('http://waffle-instaclone.kro.kr/api/user/profile', {
             headers: {
               Authorization: `Bearer ${token}`,
             },
@@ -35,9 +41,10 @@ export const App = () => {
           } else {
             console.error('Failed to fetch current user ID');
           }
-        } catch (error) {
-          console.error('Error fetching current user ID:', error);
         }
+      } catch (error) {
+        const err = error as AuthError;
+        console.error('Error fetching current user ID:', err.message);
       }
       setIsLoading(false);
     };
@@ -56,6 +63,12 @@ export const App = () => {
           path="/"
           element={
             auth.isLoggedIn ? <MainPage /> : <LoginPage />
+          }
+        />
+        <Route 
+          path="/auth/callback"
+          element={
+            <AuthCallback />
           }
         />
         <Route

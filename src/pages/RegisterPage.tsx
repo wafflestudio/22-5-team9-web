@@ -1,7 +1,19 @@
-import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import React, { useEffect,useState } from 'react';
+import { Link, useLocation,useNavigate } from 'react-router-dom';
 
 import SocialLogin from '../components/shared/SocialLogin';
+
+interface GoogleSignupData {
+  email: string;
+  fullName: string;
+  picture: string;
+}
+
+interface LocationState {
+  googleData?: GoogleSignupData;
+  isGoogleSignup?: boolean;
+}
+
 
 type RegisterPageProps = {
   handleIsLoggedIn: (value: boolean) => void;
@@ -9,6 +21,8 @@ type RegisterPageProps = {
 
 const RegisterPage = ({ handleIsLoggedIn }: RegisterPageProps) => {
   const navigate = useNavigate();
+  const location = useLocation();
+  const { googleData, isGoogleSignup } = location.state as LocationState;
   const [formData, setFormData] = useState({
     email: '',
     fullName: '',
@@ -24,6 +38,17 @@ const RegisterPage = ({ handleIsLoggedIn }: RegisterPageProps) => {
     password: '',
     phoneNumber: '',
   });
+
+  useEffect(() => {
+    // Pre-fill form with Google data if available
+    if (googleData != null) {
+      setFormData(prev => ({
+        ...prev,
+        email: googleData.email,
+        fullName: googleData.fullName,
+      }));
+    }
+  }, [googleData]);
 
   const validateForm = () => {
     let isValid = true;
@@ -89,24 +114,25 @@ const RegisterPage = ({ handleIsLoggedIn }: RegisterPageProps) => {
     }
 
     try {
-      const response = await fetch('http://3.34.185.81:8000/api/user/signup', {
+      const response = await fetch('http://waffle-instaclone.kro.kr/api/user/signup', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
           username: formData.username,
-          password: formData.password,
+          password: (isGoogleSignup ?? false) ? 'default' : formData.password,
           full_name: formData.fullName,
           email: formData.email,
           phone_number: formData.phoneNumber,
+          profile_image: googleData?.picture,
         }),
       });
 
       if (response.ok) {
         // After successful signup, attempt to login
         const loginResponse = await fetch(
-          'http://3.34.185.81:8000/api/user/signin',
+          'http://waffle-instaclone.kro.kr/api/user/signin',
           {
             method: 'POST',
             headers: {
@@ -114,7 +140,7 @@ const RegisterPage = ({ handleIsLoggedIn }: RegisterPageProps) => {
             },
             body: JSON.stringify({
               username: formData.username,
-              password: formData.password,
+              password: (isGoogleSignup ?? false) ? 'default' : formData.password,
             }),
           },
         );
@@ -139,7 +165,6 @@ const RegisterPage = ({ handleIsLoggedIn }: RegisterPageProps) => {
       }
     } catch (error) {
       console.error('Registration/Login failed:', error);
-      // Handle specific error messages here
     }
   };
 
@@ -165,13 +190,20 @@ const RegisterPage = ({ handleIsLoggedIn }: RegisterPageProps) => {
           Instagram
         </h1>
         <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
-          회원가입
+          {(isGoogleSignup ?? false) ? 'Complete Your Profile' : '회원가입'}
         </h2>
+        {(isGoogleSignup === true) && (
+          <p className="mt-2 text-center text-sm text-gray-600">
+            Please provide additional information to complete your registration
+          </p>
+        )}
       </div>
 
+      {/* Form fields */}
       <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
         <div className="bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10">
           <form className="space-y-6" onSubmit={(e) => void handleSubmit(e)}>
+            {/* Email field - disabled if from Google */}
             <div>
               <label
                 htmlFor="email"
@@ -188,6 +220,7 @@ const RegisterPage = ({ handleIsLoggedIn }: RegisterPageProps) => {
                   required
                   value={formData.email}
                   onChange={handleChange}
+                  disabled={isGoogleSignup}
                   className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                 />
                 {errors.email.length > 0 && (
@@ -268,7 +301,8 @@ const RegisterPage = ({ handleIsLoggedIn }: RegisterPageProps) => {
               </div>
             </div>
 
-            <div>
+            {(isGoogleSignup === false) && (
+              <div>
               <label
                 htmlFor="password"
                 className="block text-sm font-medium text-gray-700"
@@ -291,27 +325,32 @@ const RegisterPage = ({ handleIsLoggedIn }: RegisterPageProps) => {
                 )}
               </div>
             </div>
+            )}
 
             <div>
               <button
                 type="submit"
                 className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-gradient-to-r from-purple-500 via-pink-500 to-pink-400 hover:from-purple-600 hover:via-pink-600 hover:to-pink-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-pink-500"
               >
-                가입하기
+                {(isGoogleSignup === true) ? 'Complete Registration' : '가입하기'}
               </button>
             </div>
           </form>
 
-          <div className="mt-6">
-            <div className="text-sm text-center">
-              <Link
-                to="/"
-                className="font-medium text-blue-600 hover:text-blue-500"
-              >
-                이미 계정이 있으신가요? 로그인하기
-              </Link>
-            </div>
-          </div>
+          {(isGoogleSignup === false) && (
+            <>
+              <div className="mt-6">
+                <div className="text-sm text-center">
+                  <Link to="/" className="font-medium text-indigo-600 hover:text-indigo-500">
+                    이미 계정이 있으신가요? 로그인하기
+                  </Link>
+                </div>
+              </div>
+              <div className="mt-6">
+                <SocialLogin />
+              </div>
+            </>
+          )}
         </div>
       </div>
     </div>

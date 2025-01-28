@@ -49,7 +49,7 @@ export function useAuth() {
   const handleSocialLogin = async (provider: string): Promise<void> => {
     return new Promise<void>((resolve, reject) => {
         try {
-            window.location.href = `http://3.34.185.81:8000/api/auth/${provider}`;
+            window.location.href = `https://waffle-instaclone.kro.kr/api/auth/${provider}`;
             resolve();
         } catch (error) {
             console.error(`${provider} login failed:`, error);

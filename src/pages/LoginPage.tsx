@@ -18,7 +18,7 @@ const LoginPage = () => {
       return;
     }
     try {
-      const response = await fetch('http://3.34.185.81:8000/api/user/signin', {
+      const response = await fetch('https://waffle-instaclone.kro.kr/api/user/signin', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

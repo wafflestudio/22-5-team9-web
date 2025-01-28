@@ -43,7 +43,7 @@ const ProfilePage = ({ currentUserId }: ProfilePageProps) => {
         if (username == null) {
           throw new Error('Username is undefined');
         }
-        const response = await fetch(`http://3.34.185.81:8000/api/user/${username}`);
+        const response = await fetch(`https://waffle-instaclone.kro.kr/api/user/${username}`);
         if (response.ok) {
           const data: UserProfile = await response.json() as UserProfile;
           setProfileData({

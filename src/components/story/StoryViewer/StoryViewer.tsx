@@ -61,7 +61,7 @@ const StoryViewer = ({ stories, onClose, onDelete, isOwner = false }: StoryViewe
 
   const getFullImageUrl = (url: string) => {
     if (url.startsWith('http')) return url;
-    return `http://3.34.185.81:8000/${url.replace(/^\/+/, '')}`;
+    return `https://waffle-instaclone.kro.kr/${url.replace(/^\/+/, '')}`;
   };
 
   return (

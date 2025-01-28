@@ -21,7 +21,7 @@ export function useFollow(initialIsFollowing: boolean = false) {
         throw new Error('No access token');
       }
 
-      const response = await fetch(`http://3.34.185.81:8000/api/follower/follower_number`, {
+      const response = await fetch(`https://waffle-instaclone.kro.kr/api/follower/follower_number`, {
         headers: {
           Authorization: `Bearer ${token}`
         }
@@ -51,7 +51,7 @@ export function useFollow(initialIsFollowing: boolean = false) {
       }
 
       const endpoint = isFollowing ? 'unfollow' : 'follow';
-      const response = await fetch(`http://3.34.185.81:8000/api/follower/${endpoint}`, {
+      const response = await fetch(`https://waffle-instaclone.kro.kr/api/follower/${endpoint}`, {
         method: 'POST',
         headers: {
           Authorization: `Bearer ${token}`,
