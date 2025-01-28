@@ -58,34 +58,40 @@ export function isMessageResponse(obj: unknown): obj is MessageResponse {
 export function processMessagesIntoConversations(
   sent: Message[],
   received: Message[],
-  currentUserId: number
+  currentUserId: number,
 ): Conversation[] {
-	console.log('Raw sent messages:', sent);
-	console.log('Raw received messages:', received);
+  console.log('Raw sent messages:', sent);
+  console.log('Raw received messages:', received);
   const allMessages = [...sent, ...received].sort(
-    (a, b) => new Date(b.creation_date).getTime() - new Date(a.creation_date).getTime()
+    (a, b) =>
+      new Date(b.creation_date).getTime() - new Date(a.creation_date).getTime(),
   );
-  
+
   const conversations = new Map<number, Conversation>();
-  
-  allMessages.forEach(msg => {
-    const partnerId = msg.sender_id === currentUserId ? msg.receiver_id : msg.sender_id;
-    
+
+  allMessages.forEach((msg) => {
+    const partnerId =
+      msg.sender_id === currentUserId ? msg.receiver_id : msg.sender_id;
+
     if (!conversations.has(partnerId)) {
       conversations.set(partnerId, {
         userId: partnerId,
         username: `User ${partnerId}`, // Will be updated with real data
         profileImage: '', // Will be updated with real data
         lastMessage: msg,
-        unreadCount: 0
+        unreadCount: 0,
       });
     }
-    
+
     const conversation = conversations.get(partnerId);
-    if ((conversation != null) && msg.receiver_id === currentUserId && !(msg.read ?? false)) {
+    if (
+      conversation != null &&
+      msg.receiver_id === currentUserId &&
+      !(msg.read ?? false)
+    ) {
       conversation.unreadCount += 1;
     }
   });
-  
+
   return Array.from(conversations.values());
 }

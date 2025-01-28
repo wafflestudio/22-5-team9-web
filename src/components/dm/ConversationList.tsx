@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 
 import { useConversations } from '../../hooks/useConversations';
@@ -10,7 +9,9 @@ interface ConversationListProps {
   onSelectConversation: (userId: number) => void;
 }
 
-export function ConversationList({ onSelectConversation }: ConversationListProps) {
+export function ConversationList({
+  onSelectConversation,
+}: ConversationListProps) {
   const { conversations, loading, error } = useConversations();
   const [activeUserId, setActiveUserId] = useState<number | null>(null);
 
@@ -23,18 +24,12 @@ export function ConversationList({ onSelectConversation }: ConversationListProps
   }
 
   if (error != null) {
-    return (
-      <div className="p-4 text-red-500 text-center">
-        {error}
-      </div>
-    );
+    return <div className="p-4 text-red-500 text-center">{error}</div>;
   }
 
   if (conversations.length === 0) {
     return (
-      <div className="p-4 text-gray-500 text-center">
-        No conversations yet
-      </div>
+      <div className="p-4 text-gray-500 text-center">No conversations yet</div>
     );
   }
 
@@ -46,11 +41,13 @@ export function ConversationList({ onSelectConversation }: ConversationListProps
   return (
     <div className="flex flex-col">
       {conversations.map((conversation) => (
-        <ConversationItem 
+        <ConversationItem
           key={conversation.userId}
           conversation={conversation}
           isActive={conversation.userId === activeUserId}
-          onClick={() => { handleConversationClick(conversation); }}
+          onClick={() => {
+            handleConversationClick(conversation);
+          }}
         />
       ))}
     </div>

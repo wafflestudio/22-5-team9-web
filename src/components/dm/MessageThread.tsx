@@ -13,8 +13,11 @@ interface MessageThreadProps {
 
 export function MessageThread({ userId }: MessageThreadProps) {
   const messagesEndRef = useRef<HTMLDivElement>(null);
-  const { ref: loadMoreRef, inView } = useInView({ threshold: 0, rootMargin: '100px' });
-  
+  const { ref: loadMoreRef, inView } = useInView({
+    threshold: 0,
+    rootMargin: '100px',
+  });
+
   const {
     messages,
     loading,
@@ -23,7 +26,7 @@ export function MessageThread({ userId }: MessageThreadProps) {
     sending,
     sendMessage,
     loadMore,
-    markAsRead
+    markAsRead,
   } = useConversation(userId);
 
   // Auto-scroll to bottom on new messages
@@ -36,18 +39,22 @@ export function MessageThread({ userId }: MessageThreadProps) {
   // Load more messages when scrolling up
   useEffect(() => {
     if (inView && hasMore && !loading) {
-      loadMore().catch((err: unknown) => { console.error(err); });
+      loadMore().catch((err: unknown) => {
+        console.error(err);
+      });
     }
   }, [inView, hasMore, loading, loadMore]);
 
   // Mark messages as read
   useEffect(() => {
     const unreadMessages = messages
-      .filter(msg => (msg.read === false) && msg.receiver_id === userId)
-      .map(msg => msg.message_id);
+      .filter((msg) => msg.read === false && msg.receiver_id === userId)
+      .map((msg) => msg.message_id);
 
     if (unreadMessages.length > 0) {
-      markAsRead(unreadMessages).catch((err: unknown) => { console.error(err); });
+      markAsRead(unreadMessages).catch((err: unknown) => {
+        console.error(err);
+      });
     }
   }, [messages, userId, markAsRead]);
 
@@ -65,8 +72,8 @@ export function MessageThread({ userId }: MessageThreadProps) {
 
   return (
     <div className="flex flex-col h-full">
-      {(error != null) && (
-        <ErrorBanner 
+      {error != null && (
+        <ErrorBanner
           message={error}
           onDismiss={() => {}} // Add error dismissal logic if needed
         />
@@ -86,11 +93,11 @@ export function MessageThread({ userId }: MessageThreadProps) {
             isOwnMessage={message.sender_id === userId}
           />
         ))}
-        
+
         <div ref={messagesEndRef} />
       </div>
 
-      <MessageInput 
+      <MessageInput
         onSend={async (text) => {
           try {
             await sendMessage(text);

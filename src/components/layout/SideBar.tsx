@@ -1,4 +1,13 @@
-import { Compass, Heart, Home, Menu, MessageCircle, PlusSquare, Search, User } from 'lucide-react';
+import {
+  Compass,
+  Heart,
+  Home,
+  Menu,
+  MessageCircle,
+  PlusSquare,
+  Search,
+  User,
+} from 'lucide-react';
 import { useContext, useEffect, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 

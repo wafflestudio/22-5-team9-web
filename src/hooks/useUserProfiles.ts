@@ -10,9 +10,16 @@ export function useUserProfiles(userIds: number[]) {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const uncachedIds = userIds.filter(id => !userProfileCache.has(id));
+    const uncachedIds = userIds.filter((id) => !userProfileCache.has(id));
     if (uncachedIds.length === 0) {
-      setProfiles(new Map(userIds.map(id => [id, userProfileCache.get(id) ?? {} as UserProfile])));
+      setProfiles(
+        new Map(
+          userIds.map((id) => [
+            id,
+            userProfileCache.get(id) ?? ({} as UserProfile),
+          ]),
+        ),
+      );
       return;
     }
 
@@ -24,9 +31,10 @@ export function useUserProfiles(userIds: number[]) {
 
         const promises = uncachedIds.map(async (id) => {
           const response = await fetch(`/api/user/profile/${id}`, {
-            headers: { Authorization: `Bearer ${token}` }
+            headers: { Authorization: `Bearer ${token}` },
           });
-          if (!response.ok) throw new Error(`Failed to fetch profile for user ${id}`);
+          if (!response.ok)
+            throw new Error(`Failed to fetch profile for user ${id}`);
           return response.json() as Promise<UserProfile>;
         });
 
@@ -38,10 +46,19 @@ export function useUserProfiles(userIds: number[]) {
           }
         });
 
-        setProfiles(new Map(userIds.map(id => [id, userProfileCache.get(id) ?? {} as UserProfile])));
+        setProfiles(
+          new Map(
+            userIds.map((id) => [
+              id,
+              userProfileCache.get(id) ?? ({} as UserProfile),
+            ]),
+          ),
+        );
         setError(null);
       } catch (err) {
-        setError(err instanceof Error ? err.message : 'Failed to fetch profiles');
+        setError(
+          err instanceof Error ? err.message : 'Failed to fetch profiles',
+        );
       } finally {
         setLoading(false);
       }

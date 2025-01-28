@@ -21,12 +21,12 @@ export function useConversations() {
     }
 
     fetch('https://waffle-instaclone.kro.kr/api/user/profile', {
-      headers: { Authorization: `Bearer ${token}` }
+      headers: { Authorization: `Bearer ${token}` },
     })
-      .then(async res => {
+      .then(async (res) => {
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         const contentType = res.headers.get('content-type');
-        if ((contentType?.includes('application/json')) === false) {
+        if (contentType?.includes('application/json') === false) {
           const text = await res.text();
           console.error('Non-JSON response:', text);
           throw new Error('Server returned non-JSON response');
@@ -59,39 +59,52 @@ export function useConversations() {
         setLoading(true);
         const [sent, received] = await Promise.all([
           dmApi.getSentMessages(),
-          dmApi.getReceivedMessages()
+          dmApi.getReceivedMessages(),
         ]);
-        
+
         const processedConversations = processMessagesIntoConversations(
           sent,
           received,
-          currentUserId
+          currentUserId,
         );
-        
+
         const conversationsWithUsers = await Promise.all(
           processedConversations.map(async (conv) => {
             try {
-              const response = await fetch(`https://waffle-instaclone.kro.kr/api/user/${conv.userId}`, {
-                headers: { Authorization: `Bearer ${localStorage.getItem('access_token') ?? ''}` }
-              });
+              const response = await fetch(
+                `https://waffle-instaclone.kro.kr/api/user/${conv.userId}`,
+                {
+                  headers: {
+                    Authorization: `Bearer ${localStorage.getItem('access_token') ?? ''}`,
+                  },
+                },
+              );
               if (!response.ok) throw new Error('Failed to fetch user data');
-              const userData = await response.json() as { username: string, profile_image: string };
+              const userData = (await response.json()) as {
+                username: string;
+                profile_image: string;
+              };
               return {
                 ...conv,
                 username: userData.username,
-                profileImage: userData.profile_image
+                profileImage: userData.profile_image,
               };
             } catch (err) {
-              console.warn(`Could not load details for user ${conv.userId}:`, err);
+              console.warn(
+                `Could not load details for user ${conv.userId}:`,
+                err,
+              );
               return conv;
             }
-          })
+          }),
         );
 
         setConversations(conversationsWithUsers);
         setError(null);
       } catch (err) {
-        setError(err instanceof Error ? err.message : 'Failed to load conversations');
+        setError(
+          err instanceof Error ? err.message : 'Failed to load conversations',
+        );
       } finally {
         setLoading(false);
       }
@@ -101,44 +114,53 @@ export function useConversations() {
   }, [currentUserId]);
 
   // Handle new messages from polling
-  const handleNewMessages = useCallback((newMessages: Message[]) => {
-    if (currentUserId == null) return;
+  const handleNewMessages = useCallback(
+    (newMessages: Message[]) => {
+      if (currentUserId == null) return;
 
-    setConversations(prevConversations => {
-      const updatedConversations = [...prevConversations];
+      setConversations((prevConversations) => {
+        const updatedConversations = [...prevConversations];
 
-      newMessages.forEach(msg => {
-        const partnerId = msg.sender_id === currentUserId ? msg.receiver_id : msg.sender_id;
-        const conversationIndex = updatedConversations.findIndex(c => c.userId === partnerId);
+        newMessages.forEach((msg) => {
+          const partnerId =
+            msg.sender_id === currentUserId ? msg.receiver_id : msg.sender_id;
+          const conversationIndex = updatedConversations.findIndex(
+            (c) => c.userId === partnerId,
+          );
 
-        if (conversationIndex >= 0) {
-          // Update existing conversation
-          const conversation = updatedConversations[conversationIndex];
-          if (conversation != null) {
-            if (!(msg.read ?? false) && msg.receiver_id === currentUserId) {
-              conversation.unreadCount += 1;
+          if (conversationIndex >= 0) {
+            // Update existing conversation
+            const conversation = updatedConversations[conversationIndex];
+            if (conversation != null) {
+              if (!(msg.read ?? false) && msg.receiver_id === currentUserId) {
+                conversation.unreadCount += 1;
+              }
+              conversation.lastMessage = msg;
             }
-            conversation.lastMessage = msg;
+          } else {
+            // Create new conversation
+            updatedConversations.push({
+              userId: partnerId,
+              username: `User ${partnerId}`, // Will be updated with real data
+              profileImage: '', // Will be updated with real data
+              lastMessage: msg,
+              unreadCount:
+                msg.receiver_id === currentUserId && !(msg.read ?? false)
+                  ? 1
+                  : 0,
+            });
           }
-        } else {
-          // Create new conversation
-          updatedConversations.push({
-            userId: partnerId,
-            username: `User ${partnerId}`, // Will be updated with real data
-            profileImage: '', // Will be updated with real data
-            lastMessage: msg,
-            unreadCount: msg.receiver_id === currentUserId && !(msg.read ?? false) ? 1 : 0
-          });
-        }
-      });
+        });
 
-      return updatedConversations.sort((a, b) => {
-        const dateA = a.lastMessage?.creation_date ?? '';
-        const dateB = b.lastMessage?.creation_date ?? '';
-        return new Date(dateB).getTime() - new Date(dateA).getTime();
+        return updatedConversations.sort((a, b) => {
+          const dateA = a.lastMessage?.creation_date ?? '';
+          const dateB = b.lastMessage?.creation_date ?? '';
+          return new Date(dateB).getTime() - new Date(dateA).getTime();
+        });
       });
-    });
-  }, [currentUserId]);
+    },
+    [currentUserId],
+  );
 
   // Set up message polling
   useMessagePolling(currentUserId, handleNewMessages, (err) => {
