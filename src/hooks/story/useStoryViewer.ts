@@ -12,7 +12,7 @@ export const useStoryViewer = (stories: Story[]) => {
 
   const resetProgress = () => {
     setProgress(0);
-  }
+  };
 
   useEffect(() => {
     if (!isVisible || navigation.isPaused) return;

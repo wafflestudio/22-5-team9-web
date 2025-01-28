@@ -27,8 +27,8 @@ export interface StoryItemProps {
 }
 
 export interface TextStyle {
-	fontSize: number;
-	fontFamily: string;
-	color: string;
-	backgroundColor?: string;
+  fontSize: number;
+  fontFamily: string;
+  color: string;
+  backgroundColor?: string;
 }

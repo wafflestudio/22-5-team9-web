@@ -18,7 +18,7 @@ export function StoryCreator({ onFileSelect }: StoryCreatorProps) {
     try {
       // First process the media file
       await processMedia(file);
-      
+
       // Create a FileList-like object
       const dataTransfer = new DataTransfer();
       dataTransfer.items.add(file);

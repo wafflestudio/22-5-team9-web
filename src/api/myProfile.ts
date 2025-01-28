@@ -21,7 +21,7 @@ export const myProfile = async (token: string) => {
       'https://waffle-instaclone.kro.kr/api/user/profile',
       {
         headers: { Authorization: `Bearer ${token}` },
-      }
+      },
     );
 
     if (response.ok) {

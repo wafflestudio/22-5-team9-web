@@ -25,7 +25,7 @@ export const followUser = async (token: string, followId: number) => {
 export const unfollowUser = async (token: string, followId: number) => {
   try {
     const response = await fetch(
-      `https://waffle-instaclone.kro.kr/api/follower/follow?follow_id=${followId}`,
+      `https://waffle-instaclone.kro.kr/api/follower/unfollow?follow_id=${followId}`,
       {
         method: 'POST',
         headers: {

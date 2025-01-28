@@ -84,7 +84,7 @@ export function StoryList() {
             headers: {
               Authorization: `Bearer ${token}`,
             },
-            credentials: 'include'
+            credentials: 'include',
           },
         );
 

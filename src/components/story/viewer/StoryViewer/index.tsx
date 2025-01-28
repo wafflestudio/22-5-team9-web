@@ -20,23 +20,23 @@ export const StoryViewer: React.FC<StoryViewerProps> = ({
     progress,
     isPaused,
     setIsPaused,
-		resetProgress,
-		currentIndex,
-		goToNext,
-		//goToPrevious,
-		//canGoNext,
-		//canGoPrevious,
-		isVisible,
-		setIsVisible,
+    resetProgress,
+    currentIndex,
+    goToNext,
+    //goToPrevious,
+    //canGoNext,
+    //canGoPrevious,
+    isVisible,
+    setIsVisible,
   } = useStoryViewer(stories);
 
-	useEffect(() => {
+  useEffect(() => {
     resetProgress();
   }, [currentIndex, resetProgress]);
 
-	useEffect(() => {
+  useEffect(() => {
     if (!isPaused && progress >= 5000) {
-  		goToNext();
+      goToNext();
     }
   }, [progress, isPaused, goToNext]);
 
@@ -101,10 +101,18 @@ export const StoryViewer: React.FC<StoryViewerProps> = ({
 
         <div
           className="absolute inset-0 flex items-center justify-center"
-          onTouchStart={() => { setIsPaused(true); }}
-          onTouchEnd={() => { setIsPaused(false); }}
-          onMouseDown={() => { setIsPaused(true); }}
-          onMouseUp={() => { setIsPaused(false); }}
+          onTouchStart={() => {
+            setIsPaused(true);
+          }}
+          onTouchEnd={() => {
+            setIsPaused(false);
+          }}
+          onMouseDown={() => {
+            setIsPaused(true);
+          }}
+          onMouseUp={() => {
+            setIsPaused(false);
+          }}
         >
           <img
             src={`https://waffle-instaclone.kro.kr/${currentStory.file_url[0] ?? ''}`}

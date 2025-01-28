@@ -23,15 +23,27 @@ export const Canvas: React.FC<CanvasProps> = ({ mediaUrl, onCanvasReady }) => {
       canvas.width = STORY_CONSTANTS.MAX_WIDTH;
       canvas.height = STORY_CONSTANTS.MAX_HEIGHT;
 
-      // Draw image maintaining aspect ratio
-      const scale = Math.max(
+      // Draw image maintaining aspect ratio - using Math.min for proper containment
+      const scale = Math.min(
         canvas.width / img.width,
         canvas.height / img.height,
       );
-      const x = (canvas.width - img.width * scale) * 0.5;
-      const y = (canvas.height - img.height * scale) * 0.5;
+      const scaledWidth = img.width * scale;
+      const scaledHeight = img.height * scale;
+      const x = (canvas.width - scaledWidth) * 0.5;
+      const y = (canvas.height - scaledHeight) * 0.5;
 
-      ctx.drawImage(img, x, y, img.width * scale, img.height * scale);
+      // Clear canvas before drawing
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      // Draw blurred background first
+      ctx.filter = 'blur(20px)';
+      ctx.drawImage(img, -20, -20, canvas.width + 40, canvas.height + 40);
+      ctx.filter = 'none';
+
+      // Draw the main image
+      ctx.drawImage(img, x, y, scaledWidth, scaledHeight);
+
       setIsInitialized(true);
       onCanvasReady(canvas);
     };

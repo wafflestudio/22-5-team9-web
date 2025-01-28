@@ -1,5 +1,5 @@
 import { Image, X } from 'lucide-react';
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 
 import { STORY_CONSTANTS } from '../../shared/constants';
 import type { StoryEditorProps } from '../../shared/types';
@@ -8,22 +8,30 @@ import {
   processVideo,
   validateStoryMedia,
 } from '../../shared/utils';
-import { Canvas } from './Canvas';
+import { CanvasManager } from './CanvasManager';
 import { Controls } from './Controls';
+import { DrawingTool } from './DrawingTool';
 import { Filters } from './Filters';
 import { TextEditor } from './TextEditor';
+
+interface TextLayer {
+  id: string;
+  text: string;
+  x: number;
+  y: number;
+  style: {
+    fontSize: number;
+    color: string;
+    backgroundColor: string | null;
+    fontFamily: string;
+  };
+}
 
 interface MediaState {
   url: string;
   type: 'image' | 'video';
   file: File;
-}
-
-interface TextStyle {
-  fontSize: number;
-  fontFamily: string;
-  color: string;
-  backgroundColor?: string | null;
+  videoElement?: HTMLVideoElement;
 }
 
 export const StoryEditor: React.FC<StoryEditorProps> = ({
@@ -31,19 +39,24 @@ export const StoryEditor: React.FC<StoryEditorProps> = ({
   onSubmit,
 }) => {
   const [media, setMedia] = useState<MediaState | null>(null);
-  const [activeTab, setActiveTab] = useState('draw');
+  const [activeTab, setActiveTab] = useState('text');
   const [currentFilter, setCurrentFilter] = useState('');
-  const [canvas, setCanvas] = useState<HTMLCanvasElement | null>(null);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const canvasManagerRef = useRef<CanvasManager | null>(null);
+  const [textLayers, setTextLayers] = useState<TextLayer[]>([]);
+  const [drawingLayer, setDrawingLayer] = useState<HTMLCanvasElement | null>(
+    null,
+  );
+  const [isProcessing, setIsProcessing] = useState(false);
 
-  const handleCanvasReady = (canvasElement: HTMLCanvasElement) => {
-    setCanvas(canvasElement);
-  };
-
-  const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileUpload = async (
+    event: React.ChangeEvent<HTMLInputElement>,
+  ) => {
     const file = event.target.files?.[0];
     if (file == null) return;
 
     try {
+      setIsProcessing(true);
       await validateStoryMedia(file);
       const isVideo = file.type.startsWith('video/');
 
@@ -51,90 +64,243 @@ export const StoryEditor: React.FC<StoryEditorProps> = ({
         ? await processVideo(file)
         : await processImage(file);
 
-      setMedia({
-        url: processed,
-        type: isVideo ? 'video' : 'image',
-        file
-      });
+      if (isVideo) {
+        const videoElement = document.createElement('video');
+        videoElement.src = processed;
+        videoElement.loop = true;
+        videoElement.muted = true;
+        videoElement.playsInline = true;
+
+        // Wait for video to be loaded
+        await new Promise<void>((resolve) => {
+          videoElement.onloadedmetadata = () => {
+            resolve();
+          };
+          videoElement.load();
+        });
+
+        setMedia({
+          url: processed,
+          type: 'video',
+          file,
+          videoElement,
+        });
+      } else {
+        // Handle image
+        const img = document.createElement('img');
+        img.onload = () => {
+          if (canvasRef.current != null) {
+            canvasManagerRef.current = new CanvasManager(canvasRef.current);
+            canvasManagerRef.current.drawImage(img);
+          }
+        };
+        img.src = processed;
+        setMedia({
+          url: processed,
+          type: 'image',
+          file,
+        });
+      }
     } catch (error) {
       alert(error instanceof Error ? error.message : 'Failed to process media');
+    } finally {
+      setIsProcessing(false);
     }
   };
 
-  const handleTextAdd = (text: string, style: TextStyle) => {
-    if (canvas == null) return;
-    const ctx = canvas.getContext('2d');
-    if (ctx == null) return;
-
-    // Save the current canvas state
-    ctx.save();
-
-    // Apply text styles
-    ctx.font = `${style.fontSize}px ${style.fontFamily}`;
-    ctx.fillStyle = style.color;
-    ctx.textAlign = 'center';
-    
-    // Add background if specified
-    if (style.backgroundColor != null) {
-      const metrics = ctx.measureText(text);
-      const padding = 5;
-      ctx.fillStyle = style.backgroundColor;
-      ctx.fillRect(
-        canvas.width / 2 - metrics.width / 2 - padding,
-        canvas.height / 2 - style.fontSize / 2 - padding,
-        metrics.width + padding * 2,
-        style.fontSize + padding * 2
-      );
-    }
-
-    // Draw text
-    ctx.fillStyle = style.color;
-    ctx.fillText(text, canvas.width / 2, canvas.height / 2);
-
-    // Restore canvas state
-    ctx.restore();
+  const handleTextAdd = (
+    text: string,
+    style: TextLayer['style'],
+    x: number,
+    y: number,
+  ) => {
+    const newLayer: TextLayer = {
+      id: `text-${Date.now()}`,
+      text,
+      x,
+      y,
+      style,
+    };
+    setTextLayers([...textLayers, newLayer]);
   };
 
-  const handleFilterChange = (filter: string) => {
-    setCurrentFilter(filter);
-    if (canvas == null) return;
-    canvas.style.filter = filter;
+  const handleTextUpdate = (
+    id: string,
+    text: string,
+    style: TextLayer['style'],
+    x: number,
+    y: number,
+  ) => {
+    setTextLayers((layers) =>
+      layers.map((layer) =>
+        layer.id === id ? { ...layer, text, style, x, y } : layer,
+      ),
+    );
+  };
+
+  const handleTextDelete = (id: string) => {
+    setTextLayers((layers) => layers.filter((layer) => layer.id !== id));
+  };
+
+  const handleDrawingComplete = (drawingCanvas: HTMLCanvasElement) => {
+    setDrawingLayer(drawingCanvas);
+  };
+
+  const createFinalCanvas = async () => {
+    const finalCanvas = document.createElement('canvas');
+    finalCanvas.width = STORY_CONSTANTS.MAX_WIDTH;
+    finalCanvas.height = STORY_CONSTANTS.MAX_HEIGHT;
+    const ctx = finalCanvas.getContext('2d');
+    if (ctx == null) throw new Error('Could not get canvas context');
+
+    // Apply filter globally if any
+    ctx.filter = currentFilter;
+
+    if (media?.type === 'video' && media.videoElement != null) {
+      // Set up MediaRecorder for video
+      const stream = finalCanvas.captureStream();
+      const mediaRecorder = new MediaRecorder(stream, {
+        mimeType: 'video/webm',
+        videoBitsPerSecond: 2500000, // 2.5 Mbps
+      });
+
+      const chunks: Blob[] = [];
+      mediaRecorder.ondataavailable = (e) => {
+        if (e.data.size > 0) chunks.push(e.data);
+      };
+
+      return new Promise<File>((resolve) => {
+        mediaRecorder.onstop = () => {
+          const blob = new Blob(chunks, { type: 'video/webm' });
+          resolve(new File([blob], 'story.webm', { type: 'video/webm' }));
+        };
+
+        // Start recording and processing frames
+        mediaRecorder.start();
+
+        const processFrame = () => {
+          // Draw current video frame
+          if (media.videoElement != null) {
+            ctx.drawImage(
+              media.videoElement,
+              0,
+              0,
+              finalCanvas.width,
+              finalCanvas.height,
+            );
+          }
+
+          // Draw drawing layer if exists
+          if (drawingLayer != null) {
+            ctx.globalAlpha = 0.8;
+            ctx.drawImage(drawingLayer, 0, 0);
+            ctx.globalAlpha = 1;
+          }
+
+          // Draw text layers
+          textLayers.forEach((layer) => {
+            ctx.font = `${layer.style.fontSize}px ${layer.style.fontFamily}`;
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+
+            if (layer.style.backgroundColor != null) {
+              const metrics = ctx.measureText(layer.text);
+              const padding = 5;
+              ctx.fillStyle = layer.style.backgroundColor;
+              ctx.fillRect(
+                layer.x - metrics.width / 2 - padding,
+                layer.y - layer.style.fontSize / 2 - padding,
+                metrics.width + padding * 2,
+                layer.style.fontSize + padding * 2,
+              );
+            }
+
+            ctx.fillStyle = layer.style.color;
+            ctx.fillText(layer.text, layer.x, layer.y);
+          });
+
+          if (
+            media.videoElement?.paused === false &&
+            !media.videoElement.ended
+          ) {
+            requestAnimationFrame(processFrame);
+          } else {
+            mediaRecorder.stop();
+          }
+        };
+
+        // Start playback and processing
+        void media.videoElement?.play().then(() => {
+          processFrame();
+        });
+      });
+    } else {
+      // For images, draw once
+      if (canvasRef.current != null) {
+        ctx.drawImage(canvasRef.current, 0, 0);
+      }
+
+      if (drawingLayer != null) {
+        ctx.globalAlpha = 0.8;
+        ctx.drawImage(drawingLayer, 0, 0);
+        ctx.globalAlpha = 1;
+      }
+
+      textLayers.forEach((layer) => {
+        ctx.font = `${layer.style.fontSize}px ${layer.style.fontFamily}`;
+        ctx.fillStyle = layer.style.color;
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+
+        if (layer.style.backgroundColor != null) {
+          const metrics = ctx.measureText(layer.text);
+          const padding = 5;
+          ctx.fillStyle = layer.style.backgroundColor;
+          ctx.fillRect(
+            layer.x - metrics.width / 2 - padding,
+            layer.y - layer.style.fontSize / 2 - padding,
+            metrics.width + padding * 2,
+            layer.style.fontSize + padding * 2,
+          );
+        }
+
+        ctx.fillStyle = layer.style.color;
+        ctx.fillText(layer.text, layer.x, layer.y);
+      });
+
+      return new Promise<File>((resolve) => {
+        finalCanvas.toBlob(
+          (blob) => {
+            if (blob != null) {
+              resolve(new File([blob], 'story.jpg', { type: 'image/jpeg' }));
+            }
+          },
+          'image/jpeg',
+          0.9,
+        );
+      });
+    }
   };
 
   const handleShare = async () => {
     if (media == null) return;
 
     try {
-      if (media.type === 'video') {
-        // For videos, submit the original processed file
-        await onSubmit(media.file);
-      } else {
-        // For images, get the canvas with applied filters and text
-        if (canvas == null) return;
-
-        // Create a new canvas to apply filters permanently
-        const finalCanvas = document.createElement('canvas');
-        finalCanvas.width = canvas.width;
-        finalCanvas.height = canvas.height;
-        const ctx = finalCanvas.getContext('2d');
-        if (ctx == null) return;
-
-        // Draw the filtered image
-        ctx.filter = currentFilter;
-        ctx.drawImage(canvas, 0, 0);
-
-        // Convert to blob and submit
-        const blob = await new Promise<Blob | null>(resolve => 
-          { finalCanvas.toBlob(resolve, 'image/jpeg', 0.9); }
-        );
-        
-        if (blob != null) {
-          await onSubmit(new File([blob], 'story.jpg', { type: 'image/jpeg' }));
-        }
-      }
+      setIsProcessing(true);
+      const finalFile = await createFinalCanvas();
+      await onSubmit(finalFile);
     } catch (error) {
       console.error('Error saving story:', error);
       alert('Failed to save story. Please try again.');
+    } finally {
+      setIsProcessing(false);
+    }
+  };
+
+  const handleFilterChange = (filter: string) => {
+    setCurrentFilter(filter);
+    if (canvasRef.current != null) {
+      canvasRef.current.style.filter = filter;
     }
   };
 
@@ -153,44 +319,37 @@ export const StoryEditor: React.FC<StoryEditorProps> = ({
                 playsInline
               />
             ) : (
-              <Canvas mediaUrl={media.url} onCanvasReady={handleCanvasReady} />
+              <>
+                <canvas
+                  ref={canvasRef}
+                  className="max-h-full w-auto mx-auto"
+                  style={{ filter: currentFilter }}
+                />
+                {activeTab === 'draw' && (
+                  <DrawingTool
+                    onDrawingComplete={handleDrawingComplete}
+                    width={STORY_CONSTANTS.MAX_WIDTH}
+                    height={STORY_CONSTANTS.MAX_HEIGHT}
+                  />
+                )}
+                {activeTab === 'text' && (
+                  <TextEditor
+                    onTextAdd={handleTextAdd}
+                    onTextUpdate={handleTextUpdate}
+                    onTextDelete={handleTextDelete}
+                    layers={textLayers}
+                  />
+                )}
+                {activeTab === 'filters' && (
+                  <Filters
+                    onFilterSelect={handleFilterChange}
+                    currentFilter={currentFilter}
+                    previewUrl={media.url}
+                  />
+                )}
+              </>
             )}
-            
-            {activeTab === 'text' && media.type === 'image' && (
-              <TextEditor onTextAdd={handleTextAdd} />
-            )}
-            {activeTab === 'filters' && media.type === 'image' && (
-              <Filters
-                onFilterSelect={handleFilterChange}
-                currentFilter={currentFilter}
-              />
-            )}
-          </>
-        ) : (
-          <label className="absolute inset-0 flex items-center justify-center cursor-pointer">
-            <input
-              type="file"
-              accept={[
-                ...STORY_CONSTANTS.SUPPORTED_IMAGE_TYPES,
-                ...STORY_CONSTANTS.SUPPORTED_VIDEO_TYPES,
-              ].join(',')}
-              onChange={(e) => void handleFileUpload(e)}
-              className="hidden"
-            />
-            <div className="text-white text-center">
-              <Image className="w-16 h-16 mx-auto mb-2" />
-              <span className="block">Upload Photo or Video</span>
-              <span className="block text-sm text-gray-400 mt-2">
-                Photos will be resized to 1080x1920
-                <br />
-                Videos must be 15 seconds or less
-              </span>
-            </div>
-          </label>
-        )}
 
-        {media != null && (
-          <>
             <button
               onClick={onClose}
               className="absolute top-4 right-4 p-2 bg-black/50 rounded-full"
@@ -202,11 +361,36 @@ export const StoryEditor: React.FC<StoryEditorProps> = ({
 
             <button
               onClick={() => void handleShare()}
-              className="absolute bottom-4 right-4 px-6 py-2 bg-blue-500 text-white rounded-full"
+              disabled={isProcessing}
+              className={`absolute bottom-4 right-4 px-6 py-2 bg-blue-500 text-white rounded-full ${
+                isProcessing ? 'opacity-50' : ''
+              }`}
             >
-              Share
+              {isProcessing ? 'Processing...' : 'Share'}
             </button>
           </>
+        ) : (
+          <label className="absolute inset-0 flex items-center justify-center cursor-pointer">
+            <input
+              type="file"
+              accept={[
+                ...STORY_CONSTANTS.SUPPORTED_IMAGE_TYPES,
+                ...STORY_CONSTANTS.SUPPORTED_VIDEO_TYPES,
+              ].join(',')}
+              onChange={(e) => void handleFileUpload(e)}
+              className="hidden"
+              disabled={isProcessing}
+            />
+            <div className="text-white text-center">
+              <Image className="w-16 h-16 mx-auto mb-2" />
+              <span className="block">
+                {isProcessing ? 'Processing...' : 'Upload Photo or Video'}
+              </span>
+              <span className="block text-sm text-gray-400 mt-2">
+                Share your story with your followers
+              </span>
+            </div>
+          </label>
         )}
       </div>
     </div>

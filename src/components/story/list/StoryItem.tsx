@@ -15,11 +15,18 @@ export function StoryItem({
 }: StoryItemProps) {
   const hasActiveStory = stories.length > 0;
 
+  const handleClick = () => {
+    if (hasActiveStory) {
+      onView();
+    }
+  };
+
   return (
     <button
-      onClick={onView}
-      className="flex flex-col items-center"
+      onClick={handleClick}
+      className={`flex flex-col items-center ${hasActiveStory ? 'cursor-pointer' : 'cursor-default'}`}
       type="button"
+      disabled={!hasActiveStory}
     >
       <div
         className={`w-16 h-16 rounded-full p-0.5 ${
@@ -33,6 +40,10 @@ export function StoryItem({
             src={profileImage ?? '/placeholder.svg'}
             alt={username}
             className="w-full h-full rounded-full object-cover"
+            onError={(e) => {
+              const target = e.target as HTMLImageElement;
+              target.src = '/placeholder.svg';
+            }}
           />
         </div>
       </div>

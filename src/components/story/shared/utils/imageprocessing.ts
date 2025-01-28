@@ -13,25 +13,36 @@ export const processImage = async (file: File): Promise<string> => {
         return;
       }
 
-      let width = Math.min(img.width, STORY_CONSTANTS.MAX_WIDTH);
-      let height = width * STORY_CONSTANTS.ASPECT_RATIO;
+      canvas.width = STORY_CONSTANTS.MAX_WIDTH;
+      canvas.height = STORY_CONSTANTS.MAX_HEIGHT;
 
-      if (height > STORY_CONSTANTS.MAX_HEIGHT) {
-        height = STORY_CONSTANTS.MAX_HEIGHT;
-        width = height / STORY_CONSTANTS.ASPECT_RATIO;
-      }
+      // Calculate scaling and positioning for center fit
+      const scale = Math.min(
+        STORY_CONSTANTS.MAX_WIDTH / img.width,
+        STORY_CONSTANTS.MAX_HEIGHT / img.height,
+      );
+      const scaledWidth = img.width * scale;
+      const scaledHeight = img.height * scale;
+      const x = (STORY_CONSTANTS.MAX_WIDTH - scaledWidth) / 2;
+      const y = (STORY_CONSTANTS.MAX_HEIGHT - scaledHeight) / 2;
 
-      canvas.width = width;
-      canvas.height = height;
+      // Clear canvas
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-      // Center the image
-      const scale = Math.max(width / img.width, height / img.height);
-      const x = (width - img.width * scale) * 0.5;
-      const y = (height - img.height * scale) * 0.5;
+      // Draw blurred background by scaling the original image
+      ctx.filter = 'blur(20px)';
+      // Extend background beyond edges to prevent white borders during blur
+      ctx.drawImage(
+        img,
+        -20,
+        -20,
+        STORY_CONSTANTS.MAX_WIDTH + 40,
+        STORY_CONSTANTS.MAX_HEIGHT + 40,
+      );
+      ctx.filter = 'none';
 
-      ctx.fillStyle = '#000';
-      ctx.fillRect(0, 0, width, height);
-      ctx.drawImage(img, x, y, img.width * scale, img.height * scale);
+      // Draw the actual image in the center
+      ctx.drawImage(img, x, y, scaledWidth, scaledHeight);
 
       resolve(canvas.toDataURL('image/jpeg', 0.9));
     };
