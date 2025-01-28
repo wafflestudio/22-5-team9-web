@@ -1,6 +1,6 @@
 import { useState } from 'react';
 
-import type { Story } from '../types/story';
+import type { Story } from '../../types/story';
 
 export function useStoryUpload() {
   const [isUploading, setIsUploading] = useState(false);
