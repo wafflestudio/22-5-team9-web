@@ -7,6 +7,7 @@ import { useAuth } from './hooks/useAuth';
 import ExplorePage from './pages/ExplorePage';
 import LoginPage from './pages/LoginPage';
 import MainPage from './pages/MainPage';
+import MessagesPage from './pages/MessagePage';
 import ProfileEditPage from './pages/ProfileEditPage';
 import ProfilePage from './pages/ProfilePage';
 import RegisterPage from './pages/RegisterPage';
@@ -43,6 +44,10 @@ export const App = () => {
         <Route
           path="/explore"
           element={auth.isLoggedIn ? <ExplorePage /> : <Navigate to="/" />}
+        />
+        <Route
+          path="/messages"
+          element={auth.isLoggedIn ? <MessagesPage /> : <Navigate to="/" />}
         />
         <Route
           path="/:username"

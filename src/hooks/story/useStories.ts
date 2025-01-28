@@ -9,7 +9,7 @@ export function useStories(userId: number | null) {
 
   useEffect(() => {
     const fetchStories = async () => {
-      if (userId == null) {
+      if (userId == null || userId === 0) {
         setLoading(false);
         return;
       }
