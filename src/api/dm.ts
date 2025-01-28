@@ -1,5 +1,7 @@
 import type { Message, NewMessageRequest } from '../types/message';
 
+const API_BASE_URL = 'https://waffle-instaclone.kro.kr';
+
 export class ApiError extends Error {
   constructor(public status: number, message: string) {
     super(message);
@@ -18,7 +20,7 @@ export const dmApi = {
     const token = localStorage.getItem('access_token');
     if (token == null) throw new Error('No access token');
     
-    const response = await fetch(`/api/dm/message/${messageId}`, {
+    const response = await fetch(`${API_BASE_URL}/api/dm/message/${messageId}`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -36,7 +38,7 @@ export const dmApi = {
     const token = localStorage.getItem('access_token');
     if (token == null) throw new Error('No access token');
     
-    const response = await fetch('/api/dm/sent', {
+    const response = await fetch(`${API_BASE_URL}/api/dm/sent`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -54,7 +56,7 @@ export const dmApi = {
     const token = localStorage.getItem('access_token');
     if (token == null) throw new Error('No access token');
     
-    const response = await fetch('/api/dm/received', {
+    const response = await fetch(`${API_BASE_URL}/api/dm/received`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -72,7 +74,7 @@ export const dmApi = {
     const token = localStorage.getItem('access_token');
     if (token == null) throw new Error('No access token');
     
-    const response = await fetch('/api/dm/', {
+    const response = await fetch(`${API_BASE_URL}/api/dm/`, {
       method: 'POST',
       headers: {
         Authorization: `Bearer ${token}`,
@@ -93,7 +95,7 @@ export const dmApi = {
     const token = localStorage.getItem('access_token');
     if (token == null) throw new Error('No access token');
     
-    const response = await fetch(`/api/dm/${messageId}`, {
+    const response = await fetch(`${API_BASE_URL}/api/dm/${messageId}`, {
       method: 'DELETE',
       headers: {
         Authorization: `Bearer ${token}`,
@@ -109,7 +111,7 @@ export const dmApi = {
     const token = localStorage.getItem('access_token');
     if (token == null) throw new Error('No access token');
     
-    const response = await fetch('/api/dm/mark-read', {
+    const response = await fetch(`${API_BASE_URL}/api/dm/mark-read`, {
       method: 'POST',
       headers: {
         Authorization: `Bearer ${token}`,

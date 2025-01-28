@@ -25,11 +25,18 @@ export function useConversations() {
     })
       .then(async res => {
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
-        const text = await res.text();
+        const contentType = res.headers.get('content-type');
+        if ((contentType?.includes('application/json')) === false) {
+          const text = await res.text();
+          console.error('Non-JSON response:', text);
+          throw new Error('Server returned non-JSON response');
+        }
         try {
-          return JSON.parse(text) as { user_id: number };
-        } catch {
-          console.error('Failed to parse response:', text);
+          const data = (await res.json()) as { user_id: number };
+          if (data.user_id === 0) throw new Error('Invalid user data format');
+          return data;
+        } catch (err) {
+          console.error('Failed to parse response:', err);
           throw new Error('Invalid response format');
         }
       })

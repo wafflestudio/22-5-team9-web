@@ -36,18 +36,18 @@ export function MessageThread({ userId }: MessageThreadProps) {
   // Load more messages when scrolling up
   useEffect(() => {
     if (inView && hasMore && !loading) {
-      loadMore().catch(console.error);
+      loadMore().catch((err: unknown) => { console.error(err); });
     }
   }, [inView, hasMore, loading, loadMore]);
 
   // Mark messages as read
   useEffect(() => {
     const unreadMessages = messages
-      .filter(msg => !msg.read && msg.receiver_id === userId)
+      .filter(msg => (msg.read === false) && msg.receiver_id === userId)
       .map(msg => msg.message_id);
 
     if (unreadMessages.length > 0) {
-      markAsRead(unreadMessages).catch(console.error);
+      markAsRead(unreadMessages).catch((err: unknown) => { console.error(err); });
     }
   }, [messages, userId, markAsRead]);
 
@@ -65,7 +65,7 @@ export function MessageThread({ userId }: MessageThreadProps) {
 
   return (
     <div className="flex flex-col h-full">
-      {error && (
+      {(error != null) && (
         <ErrorBanner 
           message={error}
           onDismiss={() => {}} // Add error dismissal logic if needed
