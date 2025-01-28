@@ -12,7 +12,7 @@ export function useAuth() {
 
   const [user, setUser] = useState<User>(() => {
     const savedUser = localStorage.getItem('user');
-    return (savedUser != null) ? JSON.parse(savedUser) as User : null;
+    return savedUser != null ? (JSON.parse(savedUser) as User) : null;
   });
 
   const handleIsLoggedIn = (value: boolean) => {
@@ -48,20 +48,20 @@ export function useAuth() {
 
   const handleSocialLogin = async (provider: string): Promise<void> => {
     return new Promise<void>((resolve, reject) => {
-        try {
-            window.location.href = `https://waffle-instaclone.kro.kr/api/auth/${provider}`;
-            resolve();
-        } catch (error) {
-            console.error(`${provider} login failed:`, error);
-            reject(
-              new Error(
-                `${provider} login failed: ${
-                  error instanceof Error ? error.message : String(error)
-                }`,
-              ),
-            );
-        }
-    })
+      try {
+        window.location.href = `https://waffle-instaclone.kro.kr/api/auth/${provider}`;
+        resolve();
+      } catch (error) {
+        console.error(`${provider} login failed:`, error);
+        reject(
+          new Error(
+            `${provider} login failed: ${
+              error instanceof Error ? error.message : String(error)
+            }`,
+          ),
+        );
+      }
+    });
   };
 
   return {

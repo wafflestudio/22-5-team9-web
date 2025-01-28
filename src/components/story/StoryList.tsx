@@ -74,13 +74,16 @@ export function StoryList() {
         const stories = (await storiesResponse.json()) as Story[];
 
         // Group stories by user and fetch user details
-        const storiesByUser = stories.reduce<Record<number, Story[]>>((acc, story) => {
-          if (acc[story.user_id] == null) {
-            acc[story.user_id] = [];
-          }
-          acc[story.user_id]?.push(story);
-          return acc;
-        }, {});
+        const storiesByUser = stories.reduce<Record<number, Story[]>>(
+          (acc, story) => {
+            if (acc[story.user_id] == null) {
+              acc[story.user_id] = [];
+            }
+            acc[story.user_id]?.push(story);
+            return acc;
+          },
+          {},
+        );
 
         // For each user with stories, fetch their profile
         const storyGroups = await Promise.all(
@@ -99,7 +102,8 @@ export function StoryList() {
                 throw new Error('Failed to fetch user profile');
               }
 
-              const userProfile = (await userProfileResponse.json()) as UserProfile;
+              const userProfile =
+                (await userProfileResponse.json()) as UserProfile;
 
               return {
                 userId: Number(userId),
@@ -161,10 +165,14 @@ export function StoryList() {
 
       // Update the UI after successful deletion
       setUserStoryGroups((prevGroups) =>
-        prevGroups.map((group) => ({
-          ...group,
-          stories: group.stories.filter((story) => story.story_id !== storyId),
-        })).filter((group) => group.stories.length > 0),
+        prevGroups
+          .map((group) => ({
+            ...group,
+            stories: group.stories.filter(
+              (story) => story.story_id !== storyId,
+            ),
+          }))
+          .filter((group) => group.stories.length > 0),
       );
 
       handleCloseViewer();
@@ -198,18 +206,26 @@ export function StoryList() {
           username={group.username}
           profileImage={group.profileImage}
           stories={group.stories}
-          onView={() => { handleViewStory(group.userId, group.stories); }}
+          onView={() => {
+            handleViewStory(group.userId, group.stories);
+          }}
         />
       ))}
       {viewingStories.length > 0 && (
         <StoryViewer
-          stories={viewingStories.map(story => ({
+          stories={viewingStories.map((story) => ({
             ...story,
-            username: userStoryGroups.find(group => group.userId === story.user_id)?.username ?? '',
-            profileImage: userStoryGroups.find(group => group.userId === story.user_id)?.profileImage ?? '',
+            username:
+              userStoryGroups.find((group) => group.userId === story.user_id)
+                ?.username ?? '',
+            profileImage:
+              userStoryGroups.find((group) => group.userId === story.user_id)
+                ?.profileImage ?? '',
           }))}
           onClose={handleCloseViewer}
-          onDelete={selectedUserId === currentUserId ? handleDeleteStory : undefined}
+          onDelete={
+            selectedUserId === currentUserId ? handleDeleteStory : undefined
+          }
           isOwner={selectedUserId === currentUserId}
         />
       )}

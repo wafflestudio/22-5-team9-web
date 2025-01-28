@@ -1,5 +1,5 @@
-import React, { useEffect,useState } from 'react';
-import { Link, useLocation,useNavigate } from 'react-router-dom';
+import React, { useEffect, useState } from 'react';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 
 import SocialLogin from '../components/shared/SocialLogin';
 
@@ -14,7 +14,6 @@ interface LocationState {
   googleData?: GoogleSignupData;
   isGoogleSignup?: boolean;
 }
-
 
 type RegisterPageProps = {
   handleIsLoggedIn: (value: boolean) => void;
@@ -43,7 +42,7 @@ const RegisterPage = ({ handleIsLoggedIn }: RegisterPageProps) => {
   useEffect(() => {
     // Pre-fill form with Google data if available
     if (googleData != null) {
-      setFormData(prev => ({
+      setFormData((prev) => ({
         ...prev,
         email: googleData.email,
         fullName: googleData.fullName,
@@ -116,24 +115,28 @@ const RegisterPage = ({ handleIsLoggedIn }: RegisterPageProps) => {
 
     try {
       // Generate a secure password for Google signup
-      const signupPassword = (isGoogleSignup ?? false) 
-        ? (googleData?.sub ?? crypto.randomUUID()) // Use Google sub or generate UUID as fallback
-        : formData.password;
+      const signupPassword =
+        (isGoogleSignup ?? false)
+          ? (googleData?.sub ?? crypto.randomUUID()) // Use Google sub or generate UUID as fallback
+          : formData.password;
 
-      const response = await fetch('http://waffle-instaclone.kro.kr/api/user/signup', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
+      const response = await fetch(
+        'http://waffle-instaclone.kro.kr/api/user/signup',
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            username: formData.username,
+            password: signupPassword,
+            full_name: formData.fullName,
+            email: formData.email,
+            phone_number: formData.phoneNumber,
+            profile_image: googleData?.picture,
+          }),
         },
-        body: JSON.stringify({
-          username: formData.username,
-          password: signupPassword,
-          full_name: formData.fullName,
-          email: formData.email,
-          phone_number: formData.phoneNumber,
-          profile_image: googleData?.picture,
-        }),
-      });
+      );
 
       if (response.ok) {
         // After successful signup, attempt to login
@@ -198,7 +201,7 @@ const RegisterPage = ({ handleIsLoggedIn }: RegisterPageProps) => {
         <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
           {(isGoogleSignup ?? false) ? 'Complete Your Profile' : '회원가입'}
         </h2>
-        {(isGoogleSignup === true) && (
+        {isGoogleSignup === true && (
           <p className="mt-2 text-center text-sm text-gray-600">
             Please provide additional information to complete your registration
           </p>
@@ -307,30 +310,32 @@ const RegisterPage = ({ handleIsLoggedIn }: RegisterPageProps) => {
               </div>
             </div>
 
-            {(isGoogleSignup === false) && (
+            {isGoogleSignup === false && (
               <div>
-              <label
-                htmlFor="password"
-                className="block text-sm font-medium text-gray-700"
-              >
-                비밀번호
-              </label>
-              <div className="mt-1">
-                <input
-                  id="password"
-                  name="password"
-                  type="password"
-                  autoComplete="new-password"
-                  required
-                  value={formData.password}
-                  onChange={handleChange}
-                  className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                />
-                {errors.password.length > 0 && (
-                  <p className="mt-1 text-xs text-red-600">{errors.password}</p>
-                )}
+                <label
+                  htmlFor="password"
+                  className="block text-sm font-medium text-gray-700"
+                >
+                  비밀번호
+                </label>
+                <div className="mt-1">
+                  <input
+                    id="password"
+                    name="password"
+                    type="password"
+                    autoComplete="new-password"
+                    required
+                    value={formData.password}
+                    onChange={handleChange}
+                    className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                  />
+                  {errors.password.length > 0 && (
+                    <p className="mt-1 text-xs text-red-600">
+                      {errors.password}
+                    </p>
+                  )}
+                </div>
               </div>
-            </div>
             )}
 
             <div>
@@ -338,16 +343,19 @@ const RegisterPage = ({ handleIsLoggedIn }: RegisterPageProps) => {
                 type="submit"
                 className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-gradient-to-r from-purple-500 via-pink-500 to-pink-400 hover:from-purple-600 hover:via-pink-600 hover:to-pink-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-pink-500"
               >
-                {(isGoogleSignup === true) ? 'Complete Registration' : '가입하기'}
+                {isGoogleSignup === true ? 'Complete Registration' : '가입하기'}
               </button>
             </div>
           </form>
 
-          {(isGoogleSignup === false) && (
+          {isGoogleSignup === false && (
             <>
               <div className="mt-6">
                 <div className="text-sm text-center">
-                  <Link to="/" className="font-medium text-indigo-600 hover:text-indigo-500">
+                  <Link
+                    to="/"
+                    className="font-medium text-indigo-600 hover:text-indigo-500"
+                  >
                     이미 계정이 있으신가요? 로그인하기
                   </Link>
                 </div>

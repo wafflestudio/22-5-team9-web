@@ -30,47 +30,48 @@ export function useAuthCallback() {
         {
           method: 'GET',
           headers: {
-            'Accept': 'application/json',
+            Accept: 'application/json',
           },
-        }
+        },
       );
       if (!callbackResponse.ok) {
         const errorText = await callbackResponse.text();
         console.error('Error response:', errorText);
         throw new Error('Failed to exchange code for tokens');
       }
-      
-      const authData = await callbackResponse.json() as GoogleAuthResponse;
-      console.log('Auth data:', authData);
+
+      const authData = (await callbackResponse.json()) as GoogleAuthResponse;
 
       if (!authData.is_created) {
         // If user doesn't exist, redirect to registration with Google data
-        console.log('New user - redirecting to registration');
         void navigate('/register', {
           state: {
             googleData: {
               email: authData.user_info.email,
               fullName: authData.user_info.name,
               picture: authData.user_info.picture,
-              sub: authData.user_info.sub
+              sub: authData.user_info.sub,
             },
-            isGoogleSignup: true
-          }
+            isGoogleSignup: true,
+          },
         });
         return;
       }
 
       // If user exists, proceed with sign in
-      const signinResponse = await fetch('https://waffle-instaclone.kro.kr/api/user/signin', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
+      const signinResponse = await fetch(
+        'https://waffle-instaclone.kro.kr/api/user/signin',
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            username: authData.username,
+            password: authData.user_info.sub,
+          }),
         },
-        body: JSON.stringify({
-          username: authData.username,
-          password: authData.user_info.sub
-        }),
-      });
+      );
 
       if (!signinResponse.ok) {
         const errorText = await signinResponse.text();
@@ -78,7 +79,7 @@ export function useAuthCallback() {
         throw new Error('Failed to sign in with social credentials');
       }
 
-      const tokenData = await signinResponse.json() as {
+      const tokenData = (await signinResponse.json()) as {
         access_token: string;
         refresh_token: string;
       };
@@ -90,11 +91,12 @@ export function useAuthCallback() {
       void navigate('/');
     } catch (error) {
       console.error('Auth callback error:', error);
-      void navigate('/', { 
-        state: { 
+      void navigate('/', {
+        state: {
           error: 'Failed to complete social login',
-          details: error instanceof Error ? error.message : 'Unknown error occurred'
-        } 
+          details:
+            error instanceof Error ? error.message : 'Unknown error occurred',
+        },
       });
     }
   };

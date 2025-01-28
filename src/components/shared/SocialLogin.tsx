@@ -4,7 +4,8 @@ const SocialLogin = () => {
   const handleGoogleLogin = () => {
     try {
       // Use the full OAuth URL directly since this is what's being used
-      window.location.href = 'https://accounts.google.com/o/oauth2/v2/auth?' +
+      window.location.href =
+        'https://accounts.google.com/o/oauth2/v2/auth?' +
         'client_id=557745293077-gbn9t05u2o9q9a6uqmfjar2befgerpnc.apps.googleusercontent.com&' +
         'redirect_uri=https://waffle-instaclone.kro.kr/auth/callback&' +
         'response_type=code&' +
@@ -24,8 +25,8 @@ const SocialLogin = () => {
           <span className="bg-white px-2 text-gray-500">Or continue with</span>
         </div>
       </div>
-      
-      <button 
+
+      <button
         onClick={handleGoogleLogin}
         className="flex items-center justify-center gap-3 rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-semibold text-gray-700 transition-all hover:bg-gray-50"
       >

@@ -21,13 +21,14 @@ const ProfileInfo = ({
   posts,
   fullName,
   bio,
-  isOwner
+  isOwner,
 }: ProfileInfoProps) => {
-  const { isFollowing, followerStats, toggleFollow, fetchFollowerStats } = useFollow();
+  const { isFollowing, followerStats, toggleFollow, fetchFollowerStats } =
+    useFollow();
 
   useEffect(() => {
     if (userId !== 0) {
-      void fetchFollowerStats(userId);
+      void fetchFollowerStats();
     }
   }, [userId, fetchFollowerStats]);
 
@@ -43,10 +44,12 @@ const ProfileInfo = ({
           <div className="flex items-center mb-2">
             <h1 className="text-xl font-semibold mr-4">{username}</h1>
             {!isOwner && (
-              <FollowButton 
+              <FollowButton
                 userId={userId}
                 isFollowing={isFollowing}
-                onFollowChange={() => { void toggleFollow(userId); }}
+                onFollowChange={() => {
+                  void toggleFollow(userId);
+                }}
               />
             )}
             {isOwner && <Settings className="w-6 h-6" />}

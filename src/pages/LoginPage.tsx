@@ -18,19 +18,22 @@ const LoginPage = () => {
       return;
     }
     try {
-      const response = await fetch('https://waffle-instaclone.kro.kr/api/user/signin', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
+      const response = await fetch(
+        'https://waffle-instaclone.kro.kr/api/user/signin',
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            username,
+            password,
+          }),
         },
-        body: JSON.stringify({
-          username,
-          password,
-        }),
-      });
+      );
 
       if (response.ok) {
-        const data = await response.json() as {
+        const data = (await response.json()) as {
           access_token: string;
           refresh_token: string;
         };
@@ -62,7 +65,12 @@ const LoginPage = () => {
 
       <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
         <div className="bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10">
-          <form className="space-y-6" onSubmit={(e) => { void handleSubmit(e); }}>
+          <form
+            className="space-y-6"
+            onSubmit={(e) => {
+              void handleSubmit(e);
+            }}
+          >
             {error.length > 0 && (
               <div className="text-red-500 text-sm text-center">{error}</div>
             )}

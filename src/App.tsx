@@ -1,4 +1,4 @@
-import { createContext, useEffect,useState } from 'react';
+import { createContext, useEffect, useState } from 'react';
 import { Navigate, Route, Routes } from 'react-router-dom';
 
 import AuthCallback from './components/auth/AuthCallback';
@@ -11,7 +11,7 @@ import RegisterPage from './pages/RegisterPage';
 import type { LoginContextType } from './types/auth';
 import type { UserProfile } from './types/user';
 
-export const LoginContext = createContext<LoginContextType | null>(null);
+const LoginContext = createContext<LoginContextType | null>(null);
 
 interface AuthError extends Error {
   message: string;
@@ -29,14 +29,17 @@ export const App = () => {
       try {
         const token = auth.getAccessToken();
         if (token != null) {
-          const response = await fetch('http://waffle-instaclone.kro.kr/api/user/profile', {
-            headers: {
-              Authorization: `Bearer ${token}`,
+          const response = await fetch(
+            'http://waffle-instaclone.kro.kr/api/user/profile',
+            {
+              headers: {
+                Authorization: `Bearer ${token}`,
+              },
             },
-          });
-  
+          );
+
           if (response.ok) {
-            const userData = await response.json() as UserProfile;
+            const userData = (await response.json()) as UserProfile;
             setCurrentUserId(userData.user_id);
           } else {
             console.error('Failed to fetch current user ID');
@@ -48,10 +51,10 @@ export const App = () => {
       }
       setIsLoading(false);
     };
-  
+
     void fetchCurrentUserId();
   }, [auth]);
-  
+
   if (isLoading) {
     return <div>Loading...</div>; // Render a loading indicator
   }
@@ -61,16 +64,9 @@ export const App = () => {
       <Routes>
         <Route
           path="/"
-          element={
-            auth.isLoggedIn ? <MainPage /> : <LoginPage />
-          }
+          element={auth.isLoggedIn ? <MainPage /> : <LoginPage />}
         />
-        <Route 
-          path="/auth/callback"
-          element={
-            <AuthCallback />
-          }
-        />
+        <Route path="/auth/callback" element={<AuthCallback />} />
         <Route
           path="/register"
           element={
@@ -87,11 +83,15 @@ export const App = () => {
         />
         <Route
           path="/:username"
-          element={auth.isLoggedIn ? <ProfilePage currentUserId={currentUserId} /> : <Navigate to="/" />}
+          element={
+            auth.isLoggedIn ? (
+              <ProfilePage currentUserId={currentUserId} />
+            ) : (
+              <Navigate to="/" />
+            )
+          }
         />
       </Routes>
     </LoginContext.Provider>
   );
 };
-
-export default App;

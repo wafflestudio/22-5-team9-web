@@ -1,4 +1,4 @@
-import { useEffect,useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 
 import MobileBar from '../components/layout/MobileBar';
@@ -43,9 +43,11 @@ const ProfilePage = ({ currentUserId }: ProfilePageProps) => {
         if (username == null) {
           throw new Error('Username is undefined');
         }
-        const response = await fetch(`https://waffle-instaclone.kro.kr/api/user/${username}`);
+        const response = await fetch(
+          `https://waffle-instaclone.kro.kr/api/user/${username}`,
+        );
         if (response.ok) {
-          const data: UserProfile = await response.json() as UserProfile;
+          const data: UserProfile = (await response.json()) as UserProfile;
           setProfileData({
             username: data.username,
             post_count: data.post_count,
@@ -64,8 +66,9 @@ const ProfilePage = ({ currentUserId }: ProfilePageProps) => {
             post_ids: data.post_ids,
           });
         } else {
-          const errorData = await response.json() as { detail?: string }; // Possible error structure
-          const errorMessage = errorData.detail ?? 'Failed to fetch profile data';
+          const errorData = (await response.json()) as { detail?: string }; // Possible error structure
+          const errorMessage =
+            errorData.detail ?? 'Failed to fetch profile data';
           setError(errorMessage);
         }
       } catch {
@@ -93,7 +96,14 @@ const ProfilePage = ({ currentUserId }: ProfilePageProps) => {
       <div className="flex-1 p-4 pb-16 md:pb-4 md:ml-64 overflow-y-auto">
         <div className="max-w-3xl mx-auto">
           <MobileHeader />
-          <ProfileInfo userId={0} posts={0} fullName={''} bio={''} isOwner={isOwner} {...profileData} />
+          <ProfileInfo
+            userId={0}
+            posts={0}
+            fullName={''}
+            bio={''}
+            isOwner={isOwner}
+            {...profileData}
+          />
           <div className="hidden md:block mb-4">
             <h2 className="font-semibold">{profileData.full_name}</h2>
             <p>{profileData.introduce}</p>
