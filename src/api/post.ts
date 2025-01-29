@@ -56,24 +56,19 @@ export const fetchPost = async (postId: string) => {
 };
 
 export const createPost = async (imageFile: File, content?: string) => {
-  const queryParams = new URLSearchParams();
-  if (content != null && content.length > 0) {
-    queryParams.append('post_text', content);
-  }
-
   const formData = new FormData();
   formData.append('media', imageFile);
+  if (content != null && content.length > 0) {
+    formData.append('post_text', content);
+  }
 
-  const result = await fetch(
-    `https://waffle-instaclone.kro.kr/api/post/?${queryParams.toString()}`,
-    {
-      method: 'POST',
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem('access_token') as string}`, // 'token'에서 'access_token'으로 수정
-      },
-      body: formData,
+  const result = await fetch('https://waffle-instaclone.kro.kr/api/post/', {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${localStorage.getItem('access_token') as string}`,
     },
-  );
+    body: formData,
+  });
 
   if (!result.ok) {
     const errorData = await result.text();
@@ -101,16 +96,17 @@ export const deletePost = async (postId: number): Promise<void> => {
 };
 
 export const editPost = async (postId: number, content: string) => {
-  const queryParams = new URLSearchParams();
-  queryParams.append('post_text', content);
+  const formData = new FormData();
+  formData.append('post_text', content);
 
   const response = await fetch(
-    `https://waffle-instaclone.kro.kr/api/post/${postId}?${queryParams.toString()}`,
+    `https://waffle-instaclone.kro.kr/api/post/${postId}`,
     {
       method: 'PATCH',
       headers: {
         Authorization: `Bearer ${localStorage.getItem('access_token') as string}`,
       },
+      body: formData,
     },
   );
 

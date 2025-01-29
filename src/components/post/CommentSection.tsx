@@ -30,7 +30,7 @@ const CommentItem = ({
   };
 
   return (
-    <div className="flex space-x-2 p-4 border-b">
+    <div className="flex space-x-2 p-3 md:p-4 border-b last:border-b-0">
       <img
         src={
           userInfo?.profile_image != null
@@ -38,28 +38,33 @@ const CommentItem = ({
             : '/placeholder.svg'
         }
         alt={userInfo?.username ?? 'User'}
-        className="w-8 h-8 rounded-full"
+        className="w-7 h-7 md:w-8 md:h-8 rounded-full flex-shrink-0"
       />
-      <div className="flex-1">
-        <div className="flex justify-between items-center">
-          <span className="font-semibold mr-2">
-            {loading ? '...' : userInfo?.username}
-          </span>
+      <div className="flex-1 min-w-0">
+        <div className="flex justify-between items-start">
+          <div className="flex-1 min-w-0">
+            <span className="font-semibold text-sm md:text-base mr-2">
+              {loading ? '...' : userInfo?.username}
+            </span>
+            <span className="text-sm md:text-base break-words">
+              {comment.comment_text}
+            </span>
+          </div>
           {isOwnComment && (
-            <div className="relative">
+            <div className="relative ml-2 flex-shrink-0">
               <button
                 onClick={() => {
                   setIsMenuOpen(!isMenuOpen);
                 }}
-                className="p-2 hover:bg-gray-100 rounded-full"
+                className="p-1.5 hover:bg-gray-100 rounded-full transition-colors"
               >
-                <MoreHorizontal className="w-5 h-5" />
+                <MoreHorizontal className="w-4 h-4 md:w-5 md:h-5" />
               </button>
               {isMenuOpen && (
-                <div className="absolute right-0 mt-2 w-56 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 z-50">
+                <div className="absolute right-0 mt-2 w-48 md:w-56 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 z-50">
                   <div className="py-1">
                     <button
-                      className="block px-4 py-2 text-sm text-red-600 hover:bg-gray-100 w-full text-left"
+                      className="block w-full px-4 py-2 text-sm text-left text-red-600 hover:bg-gray-100"
                       onClick={() => {
                         if (window.confirm('Delete this comment?')) {
                           void handleDelete();
@@ -75,7 +80,6 @@ const CommentItem = ({
             </div>
           )}
         </div>
-        <span>{comment.comment_text}</span>
       </div>
     </div>
   );
@@ -93,15 +97,21 @@ const CommentSection = ({
   onCommentDelete,
 }: CommentSectionProps) => {
   return (
-    <div className="flex-1 overflow-y-auto">
-      {comments.map((comment) => (
-        <CommentItem
-          key={comment.comment_id}
-          comment={comment}
-          currentUserId={currentUserId}
-          onCommentDelete={onCommentDelete}
-        />
-      ))}
+    <div className="flex-1 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent">
+      {comments.length === 0 ? (
+        <div className="flex items-center justify-center h-full text-gray-500 text-sm md:text-base">
+          No comments yet
+        </div>
+      ) : (
+        comments.map((comment) => (
+          <CommentItem
+            key={comment.comment_id}
+            comment={comment}
+            currentUserId={currentUserId}
+            onCommentDelete={onCommentDelete}
+          />
+        ))
+      )}
     </div>
   );
 };

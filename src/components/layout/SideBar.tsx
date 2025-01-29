@@ -1,6 +1,5 @@
 import {
   Compass,
-  Heart,
   Home,
   Menu,
   MessageCircle,
@@ -92,14 +91,8 @@ const SideBar = ({ onSearchClick }: SideBarProps) => {
           />
         </Link>
         <NavItem
-          icon={<Heart />}
-          label="Notifications"
-          active={activeItem === 'notifications'}
-        />
-        <NavItem
           icon={<PlusSquare />}
           label="Create"
-          active={activeItem === 'create'}
           onClick={() => {
             handleCreateClick('create');
           }}

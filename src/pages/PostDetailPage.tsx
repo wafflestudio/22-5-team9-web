@@ -118,18 +118,18 @@ const PostDetailPage = () => {
   }, [postId]);
 
   return (
-    <div className="flex flex-col h-screen bg-gray-50">
-      <div className="flex-1 p-4 pb-16 md:pb-4 md:ml-64 overflow-y-auto">
-        <div className="h-[calc(100vh-2rem)] max-w-5xl mx-auto">
-          <MobileHeader />
+    <div className="flex flex-col h-screen bg-white md:bg-gray-50">
+      <MobileHeader />
+      <div className="flex-1 md:p-4 pb-16 md:pb-4 md:ml-64 overflow-y-auto">
+        <div className="h-full md:h-[calc(100vh-2rem)] md:max-w-5xl mx-auto">
           {loading ? (
             <div className="text-center py-4">Loading post...</div>
           ) : (
             post != null && (
-              <div className="bg-white border rounded-lg overflow-hidden h-full">
+              <div className="bg-white h-full md:border md:rounded-lg overflow-hidden">
                 <div className="flex flex-col md:flex-row h-full">
                   <PostImage imageUrl={post.file_url[0] as string} />
-                  <div className="md:w-[40%] border-l flex flex-col h-full">
+                  <div className="md:w-[40%] md:border-l flex flex-col h-full">
                     <PostHeader
                       userId={post.user_id}
                       isOwnPost={isOwnPost}
@@ -150,12 +150,10 @@ const PostDetailPage = () => {
                       <PostActions
                         likes={post.likes}
                         currentUserId={context?.myProfile?.user_id ?? -1}
-                        onLikeToggle={() => {
-                          void handleLikeToggle();
-                        }}
-                        onAddComment={(comment) => {
-                          void handleAddComment(comment);
-                        }}
+                        onLikeToggle={() => void handleLikeToggle()}
+                        onAddComment={(comment) =>
+                          void handleAddComment(comment)
+                        }
                       />
                     </div>
                   </div>
@@ -165,14 +163,17 @@ const PostDetailPage = () => {
           )}
         </div>
       </div>
-
       <div className="fixed bottom-0 left-0 right-0 md:left-0 md:top-0 md:right-auto md:w-64 bg-white border-t md:border-r md:border-t-0">
         <SideBar
           onSearchClick={function (): void {
             throw new Error('Function not implemented.');
           }}
         />
-        <MobileBar />
+        <MobileBar
+          onSearchClick={function (): void {
+            throw new Error('Function not implemented.');
+          }}
+        />
       </div>
     </div>
   );

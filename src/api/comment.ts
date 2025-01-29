@@ -73,7 +73,9 @@ export const deleteComment = async (commentId: number): Promise<void> => {
     `https://waffle-instaclone.kro.kr/api/comment/${commentId}`,
     {
       method: 'DELETE',
-      credentials: 'include',
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem('access_token') as string}`,
+      },
     },
   );
 

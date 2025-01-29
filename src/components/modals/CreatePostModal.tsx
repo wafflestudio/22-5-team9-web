@@ -38,6 +38,7 @@ const CreatePostModal = ({ isOpen, onClose }: CreatePostModalProps) => {
             post_count: context.myProfile.post_count + 1,
           });
         }
+        localStorage.setItem('userProfile', JSON.stringify(context?.myProfile));
         alert('Post created successfully!');
         onClose();
       } catch (error) {
