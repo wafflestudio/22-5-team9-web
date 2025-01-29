@@ -105,11 +105,7 @@ const MainPage = () => {
             setIsSearchOpen(true);
           }}
         />
-        <MobileBar
-          onSearchClick={() => {
-            setIsSearchOpen(true);
-          }}
-        />
+        <MobileBar />
       </div>
     </div>
   );

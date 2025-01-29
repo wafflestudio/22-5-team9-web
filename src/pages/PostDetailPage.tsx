@@ -169,11 +169,7 @@ const PostDetailPage = () => {
             throw new Error('Function not implemented.');
           }}
         />
-        <MobileBar
-          onSearchClick={function (): void {
-            throw new Error('Function not implemented.');
-          }}
-        />
+        <MobileBar />
       </div>
     </div>
   );

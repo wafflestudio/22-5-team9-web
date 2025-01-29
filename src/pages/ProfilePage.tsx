@@ -92,11 +92,7 @@ const ProfilePage = () => {
             setIsSearchOpen(true);
           }}
         />
-        <MobileBar
-          onSearchClick={() => {
-            setIsSearchOpen(true);
-          }}
-        />
+        <MobileBar />
       </div>
     </div>
   );

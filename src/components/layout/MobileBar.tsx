@@ -1,4 +1,4 @@
-import { Compass, Home, PlusSquare, Search, User } from 'lucide-react';
+import { Compass, Home, PlusSquare, User } from 'lucide-react';
 import { useContext, useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 
@@ -6,11 +6,7 @@ import { LoginContext } from '../../App';
 import CreatePostModal from '../modals/CreatePostModal';
 import { NavItem } from './NavItem';
 
-interface MobileBarProps {
-  onSearchClick: () => void;
-}
-
-const MobileBar = ({ onSearchClick }: MobileBarProps) => {
+const MobileBar = () => {
   const [activeItem, setActiveItem] = useState('home');
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const location = useLocation();
@@ -42,27 +38,43 @@ const MobileBar = ({ onSearchClick }: MobileBarProps) => {
   return (
     <>
       <nav className="flex md:hidden justify-around py-2 bg-white border-t fixed bottom-0 w-full">
-        <NavItem icon={<Home />} to="/" mobile active={activeItem === 'home'} />
         <NavItem
-          icon={<Search />}
+          icon={
+            <Home size={24} strokeWidth={activeItem === 'home' ? 2.5 : 1.5} />
+          }
+          to="/"
           mobile
-          active={activeItem === 'search'}
-          onClick={onSearchClick}
+          active={activeItem === 'home'}
         />
         <NavItem
-          icon={<Compass />}
+          icon={
+            <Compass
+              size={24}
+              strokeWidth={activeItem === 'explore' ? 2.5 : 1.5}
+            />
+          }
           to="/explore"
           mobile
           active={activeItem === 'explore'}
         />
         <NavItem
-          icon={<PlusSquare />}
+          icon={
+            <PlusSquare
+              size={24}
+              strokeWidth={activeItem === 'create' ? 2.5 : 1.5}
+            />
+          }
           mobile
           active={activeItem === 'create'}
           onClick={handleCreateClick}
         />
         <NavItem
-          icon={<User />}
+          icon={
+            <User
+              size={24}
+              strokeWidth={activeItem === 'profile' ? 2.5 : 1.5}
+            />
+          }
           to={`/${String(context.myProfile?.username)}`}
           mobile
           active={activeItem === 'profile'}
