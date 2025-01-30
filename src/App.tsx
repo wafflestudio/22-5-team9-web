@@ -5,6 +5,7 @@ import { Navigate, Route, Routes } from 'react-router-dom';
 
 import { useAuth } from './hooks/useAuth';
 import ExplorePage from './pages/ExplorePage';
+import FriendMapPage from './pages/FriendMapPage';
 import LoginPage from './pages/LoginPage';
 import MainPage from './pages/MainPage';
 import MessagePage from './pages/MessagePage';
@@ -67,6 +68,10 @@ export const App = () => {
           <Route
             path="/post/:postId"
             element={auth.isLoggedIn ? <PostDetailPage /> : <Navigate to="/" />}
+          />
+          <Route
+            path="/map"
+            element={auth.isLoggedIn ? <FriendMapPage /> : <Navigate to="/" />}
           />
         </Routes>
       </SearchContext.Provider>
