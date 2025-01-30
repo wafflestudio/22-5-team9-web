@@ -72,6 +72,7 @@ export function StoryList() {
       try {
         setLoading(true);
         const token = localStorage.getItem('access_token');
+        console.log('Access token check:', !(token == null));
 
         if (token == null) {
           localStorage.removeItem('isLoggedIn');
@@ -80,32 +81,58 @@ export function StoryList() {
         }
 
         const response = await authenticatedFetch(
-          'http://waffle-instaclone.kro.kr/api/user/profile',
+          'https://waffle-instaclone.kro.kr/api/user/profile',
           {
             headers: {
-              Authorization: `Bearer ${token}`,
+              Authorization: `Bearer ${token}`
             },
-            credentials: 'include',
+            credentials: 'include'
           },
         );
 
-        if (!response.ok) {
-          throw new Error('Failed to fetch user info');
-        }
+        console.log('Response status:', response.status);
+        console.log('Response headers:', Object.fromEntries(response.headers));
 
-        const userData = (await response.json()) as UserProfile;
-        setCurrentUserId(userData != null ? userData.user_id : null);
-        setError(null);
+        if (!response.ok) {
+          const errorText = await response.text();
+          console.error('Server response:', {
+            status: response.status,
+            statusText: response.statusText,
+            body: errorText
+          });
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        const contentType = response.headers.get("content-type");
+        console.log('Content type:', contentType);
+        if (contentType?.includes('application/json') === false) {
+          const text = await response.text();
+          console.error('Non-JSON response:', text);
+          throw new Error('Server returned non-JSON response');
+        }
+        try {
+          const userData = await response.json() as UserProfile;
+          console.log('User data received:', userData?.user_id); // Debug user data
+          if (userData?.user_id === 0) throw new Error('Invalid user data format');
+          setCurrentUserId(userData != null ? userData.user_id : null);
+          setError(null);
+        } catch (err) {
+          console.error('Failed to parse response:', err);
+          throw new Error('Invalid response format');
+        }
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Unknown error occurred');
-        console.error('Error fetching user info:', err);
+        console.error('Error fetching user info:', {
+          error: err,
+          token: (localStorage.getItem('access_token') != null) ? 'Token exists' : 'No token',
+          currentUserId
+        });
       } finally {
         setLoading(false);
       }
     };
 
     void fetchUserInfo();
-  }, [navigate]);
+  }, [currentUserId, navigate]);
 
   const handleViewStory = (userId: number, userStories: Story[]) => {
     setSelectedUserId(userId);
@@ -122,6 +149,7 @@ export function StoryList() {
   if (loading || processing) {
     return (
       <div className="flex space-x-4 overflow-x-auto pb-4 mb-8">
+        <StoryCreator onFileSelect={handleStoryCreate} />
         <div className="animate-pulse flex space-x-4">
           <div className="w-16 h-16 bg-gray-200 rounded-full"></div>
           <div className="w-16 h-16 bg-gray-200 rounded-full"></div>
@@ -137,7 +165,11 @@ export function StoryList() {
       storiesError,
       processingError,
     });
-    return null;
+    return (
+      <div className="flex space-x-4 overflow-x-auto pb-4 mb-8">
+        <StoryCreator onFileSelect={handleStoryCreate} />
+      </div>
+    );
   }
 
   // Group stories by user

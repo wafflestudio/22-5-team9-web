@@ -2,6 +2,7 @@ import { useEffect, useRef } from 'react';
 
 import { dmApi } from '../api/dm';
 import type { Message } from '../types/message';
+import { authenticatedFetch } from '../utils/auth';
 
 export function useMessagePolling(
   userId: number | null,
@@ -12,11 +13,29 @@ export function useMessagePolling(
   const lastMessageTimestamp = useRef<string | null>(null);
 
   useEffect(() => {
+    const validateSession = async () => {
+      try {
+        const response = await authenticatedFetch('https://waffle-instaclone.kro.kr/api/user/profile');
+        if (!response.ok) {
+          throw new Error('Session validation failed');
+        }
+        return true;
+      } catch (error) {
+        console.error('Session validation error:', error);
+        return false;
+      }
+    };
     // Skip polling if no valid userId
     if (userId === null) return;
 
     const pollMessages = async () => {
       try {
+        // First validate session
+        const isSessionValid = await validateSession();
+        if (!isSessionValid) {
+          throw new Error('Invalid session');
+        }
+
         const [sent, received] = await Promise.all([
           dmApi.getSentMessages(),
           dmApi.getReceivedMessages(),
@@ -46,6 +65,14 @@ export function useMessagePolling(
         const err =
           error instanceof Error ? error : new Error('Failed to poll messages');
         console.error('Error polling messages:', err);
+        // Check if the error is authentication related
+        if (err.message.includes('token') || err.message.includes('auth') || err.message.includes('session')) {
+          // Redirect to login
+          localStorage.removeItem('access_token');
+          localStorage.removeItem('refresh_token');
+          localStorage.removeItem('isLoggedIn');
+          window.location.href = '/';
+        }
         onError?.(err);
       }
     };

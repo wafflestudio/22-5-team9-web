@@ -1,8 +1,10 @@
 import { useCallback, useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 import { dmApi } from '../api/dm';
 import type { Conversation, Message } from '../types/message';
 import { processMessagesIntoConversations } from '../types/message';
+import { authenticatedFetch } from '../utils/auth';
 import { useMessagePolling } from './useMessagePolling';
 
 export function useConversations() {
@@ -10,6 +12,7 @@ export function useConversations() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [currentUserId, setCurrentUserId] = useState<number | null>(null);
+  const navigate = useNavigate();
 
   // Get current user ID on mount
   useEffect(() => {
@@ -20,9 +23,7 @@ export function useConversations() {
       return;
     }
 
-    fetch('https://waffle-instaclone.kro.kr/api/user/profile', {
-      headers: { Authorization: `Bearer ${token}` },
-    })
+    authenticatedFetch('https://waffle-instaclone.kro.kr/api/user/profile')
       .then(async (res) => {
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         const contentType = res.headers.get('content-type');
@@ -31,14 +32,7 @@ export function useConversations() {
           console.error('Non-JSON response:', text);
           throw new Error('Server returned non-JSON response');
         }
-        try {
-          const data = (await res.json()) as { user_id: number };
-          if (data.user_id === 0) throw new Error('Invalid user data format');
-          return data;
-        } catch (err) {
-          console.error('Failed to parse response:', err);
-          throw new Error('Invalid response format');
-        }
+        return res.json() as Promise<{ user_id: number }>;
       })
       .then((data) => {
         setCurrentUserId(data.user_id);
@@ -102,16 +96,19 @@ export function useConversations() {
         setConversations(conversationsWithUsers);
         setError(null);
       } catch (err) {
-        setError(
-          err instanceof Error ? err.message : 'Failed to load conversations',
-        );
+        const errorMessage = err instanceof Error ? err.message : 'Failed to load conversations';
+        setError(errorMessage);
+        if (err instanceof Error && 
+            (errorMessage.includes('401') || errorMessage.includes('token'))) {
+          void navigate('/');
+        }
       } finally {
         setLoading(false);
       }
     };
 
     void loadConversations();
-  }, [currentUserId]);
+  }, [currentUserId, navigate]);
 
   // Handle new messages from polling
   const handleNewMessages = useCallback(
