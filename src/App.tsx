@@ -3,6 +3,7 @@ import './index.css';
 import { createContext, useState } from 'react';
 import { Route, Routes } from 'react-router-dom';
 
+import StoryEditor from './components/story/Editor/StoryEditor';
 import { useAuth } from './hooks/useAuth';
 import LoginPage from './pages/LoginPage';
 import MainPage from './pages/MainPage';
@@ -34,6 +35,10 @@ export const App = () => {
           <Route 
             path="/stories/:username/:storyId" 
             element={auth.isLoggedIn ? <StoryPage /> : <LoginPage handleIsLoggedIn={auth.handleIsLoggedIn} />} 
+          />
+          <Route 
+            path="/stories/new" 
+            element={auth.isLoggedIn ? <StoryEditor /> : <LoginPage handleIsLoggedIn={auth.handleIsLoggedIn} />} 
           />
         </Routes>
       </SearchContext.Provider>

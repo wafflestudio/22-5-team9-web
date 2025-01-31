@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import type { Story } from '../../../types/story';
-import { StoryControls } from './StoryControls';
+import StoryControls from './StoryControls';
 import { StoryProgress } from './StoryProgress';
 
 interface StoryViewerProps {
