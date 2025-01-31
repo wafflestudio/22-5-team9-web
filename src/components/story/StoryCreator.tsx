@@ -1,23 +1,19 @@
 import { CirclePlus } from 'lucide-react';
+import { useCallback } from 'react';
 
 import { useStoryUpload } from '../../hooks/useStoryUpload';
 
 export function StoryCreator() {
   const { isUploading, uploadStory } = useStoryUpload();
 
-  const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileUpload = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
     const files = event.target.files;
     if (files == null) return;
 
-    void (async () => {
-      try {
-        await uploadStory(files);
-        window.location.reload();
-      } catch (error) {
-        console.error('Error uploading story:', error);
-      }
-    })();
-  };
+    uploadStory(files).catch((error: unknown) => {
+      console.error('Error uploading story:', error);
+    });
+  }, [uploadStory]);
 
   return (
     <div className="flex flex-col items-center">

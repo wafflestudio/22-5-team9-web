@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 import type { Story } from '../../../types/story';
 import { StoryControls } from './StoryControls';
@@ -6,24 +7,32 @@ import { StoryProgress } from './StoryProgress';
 
 interface StoryViewerProps {
   stories: Story[];
+  username: string;
   onClose: () => void;
   onDelete?: (storyId: number) => Promise<void>;
   isOwner?: boolean;
+  initialIndex: number;
 }
 
-const API_BASE_URL = 'http://3.34.185.81:8000';
+const API_BASE_URL = 'https://waffle-instaclone.kro.kr';
 
 export function StoryViewer({
   stories,
   onClose,
   onDelete,
   isOwner = false,
+  username,
 }: StoryViewerProps) {
+  const navigate = useNavigate();
   const [currentStoryIndex, setCurrentStoryIndex] = useState(0);
   const [progress, setProgress] = useState(0);
   const STORY_DURATION = 5000;
 
   useEffect(() => {
+    const currentStory = stories[currentStoryIndex];
+    if (currentStory != null) {
+      localStorage.setItem(`story-${currentStory.story_id}-viewed`, new Date().toISOString());
+    }
     const timer = setInterval(() => {
       setProgress((prev) => {
         if (prev >= STORY_DURATION) {
@@ -42,15 +51,32 @@ export function StoryViewer({
     return () => {
       clearInterval(timer);
     };
-  }, [currentStoryIndex, stories.length, onClose]);
+  }, [currentStoryIndex, stories, onClose]);
+
+  const handleDelete = async (storyId: number) => {
+    try {
+      if (onDelete != null) {
+        await onDelete(storyId);
+        void navigate('/', { replace: true });
+      }
+    } catch (error) {
+      console.error('Failed to delete story:', error);
+    }
+  };
 
   const currentStory = stories[currentStoryIndex];
   if (currentStory == null) return null;
 
   const handleNext = () => {
     if (currentStoryIndex < stories.length - 1) {
-      setCurrentStoryIndex((prev) => prev + 1);
+      setCurrentStoryIndex(prev => prev + 1);
       setProgress(0);
+      const nextStory = stories[currentStoryIndex + 1];
+      if (nextStory != null) {
+        void navigate(`/stories/${username}/${nextStory.story_id}`, { replace: true });
+      }
+    } else {
+      onClose();
     }
   };
 
@@ -92,7 +118,7 @@ export function StoryViewer({
             onClose={onClose}
             onDelete={
               onDelete != null
-                ? () => void onDelete(currentStory.story_id)
+                ? () => void handleDelete(currentStory.story_id)
                 : undefined
             }
             canGoNext={currentStoryIndex < stories.length - 1}
