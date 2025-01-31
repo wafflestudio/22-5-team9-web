@@ -119,8 +119,10 @@ const PostDetailPage = () => {
 
   return (
     <div className="flex flex-col h-screen bg-white md:bg-gray-50">
-      <MobileHeader />
-      <div className="flex-1 md:p-4 pb-16 md:pb-4 md:ml-64 overflow-y-auto">
+      <div className="fixed top-0 left-0 right-0 z-10 bg-white">
+        <MobileHeader />
+      </div>
+      <div className="flex-1 md:p-4 pt-14 pb-16 md:pb-4 md:ml-64 overflow-y-auto">
         <div className="h-full md:h-[calc(100vh-2rem)] md:max-w-5xl mx-auto">
           {loading ? (
             <div className="text-center py-4">Loading post...</div>
@@ -129,7 +131,7 @@ const PostDetailPage = () => {
               <div className="bg-white h-full md:border md:rounded-lg overflow-hidden">
                 <div className="flex flex-col md:flex-row h-full">
                   <PostImage imageUrl={post.file_url[0] as string} />
-                  <div className="md:w-[40%] md:border-l flex flex-col h-full">
+                  <div className="md:w-[40%] md:border-l flex flex-col h-full overflow-y-auto">
                     <PostHeader
                       userId={post.user_id}
                       isOwnPost={isOwnPost}
@@ -137,7 +139,7 @@ const PostDetailPage = () => {
                       post={post}
                       onEdit={handleEdit}
                     />
-                    <div className="flex-1 flex flex-col min-h-0">
+                    <div className="flex-1 flex flex-col min-h-0 overflow-y-auto">
                       <PostContent
                         userId={post.user_id}
                         postText={post.post_text}
@@ -147,14 +149,16 @@ const PostDetailPage = () => {
                         currentUserId={context?.myProfile?.user_id ?? -1}
                         onCommentDelete={handleCommentDelete}
                       />
-                      <PostActions
-                        likes={post.likes}
-                        currentUserId={context?.myProfile?.user_id ?? -1}
-                        onLikeToggle={() => void handleLikeToggle()}
-                        onAddComment={(comment) =>
-                          void handleAddComment(comment)
-                        }
-                      />
+                      <div className="sticky bottom-0 bg-white border-t">
+                        <PostActions
+                          likes={post.likes}
+                          currentUserId={context?.myProfile?.user_id ?? -1}
+                          onLikeToggle={() => void handleLikeToggle()}
+                          onAddComment={(comment) =>
+                            void handleAddComment(comment)
+                          }
+                        />
+                      </div>
                     </div>
                   </div>
                 </div>

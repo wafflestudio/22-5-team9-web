@@ -28,8 +28,8 @@ const ProfileInfo = ({
   bio,
 }: ProfileInfoProps) => {
   const [showUnfollowMenu, setShowUnfollowMenu] = useState(false);
+  const [showSettingsMenu, setShowSettingsMenu] = useState(false);
   const context = useContext(LoginContext);
-  // console.log(context?.myProfile)
 
   const handleFollow = async () => {
     const token = localStorage.getItem('access_token') as string;
@@ -120,7 +120,29 @@ const ProfileInfo = ({
                 )}
               </>
             )}
-            <Settings className="w-6 h-6" />
+            <div className="relative">
+              <Settings
+                className="w-6 h-6 cursor-pointer"
+                onClick={() => {
+                  setShowSettingsMenu(!showSettingsMenu);
+                }}
+              />
+              {showSettingsMenu && (
+                <div className="absolute top-full right-0 mt-2 w-56 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5">
+                  <div className="py-1">
+                    <button
+                      className="block w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 text-left"
+                      onClick={() => {
+                        context?.handleIsLoggedIn(false, null);
+                        setShowSettingsMenu(false);
+                      }}
+                    >
+                      Log Out
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
           </div>
           <div className="flex space-x-4 text-sm">
             <span>
