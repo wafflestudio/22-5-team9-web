@@ -56,11 +56,9 @@ const SideBar = ({ onSearchClick }: SideBarProps) => {
   return (
     <div className="hidden md:flex md:flex-col h-full px-4 py-8">
       <div className="mb-8">
-        <img
-          src="https://a.slack-edge.com/production-standard-emoji-assets/14.0/apple-small/1f9c7@2x.png"
-          alt="Logo"
-          className="w-16"
-        />
+        <span className="text-4xl font-bold font-['Dancing_Script'] bg-gradient-to-r from-[#833AB4] via-[#FD1D1D] to-[#F77737] inline-block text-transparent bg-clip-text">
+          insnugram
+        </span>
       </div>
 
       <div className="flex flex-col flex-1 space-y-2">
@@ -134,7 +132,7 @@ const SideBar = ({ onSearchClick }: SideBarProps) => {
               <button
                 className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left"
                 onClick={() => {
-                  context.handleIsLoggedIn(false, context.myProfile);
+                  context.handleIsLoggedIn(false, null);
                   setIsMenuOpen(false);
                 }}
               >

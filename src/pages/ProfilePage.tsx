@@ -18,8 +18,8 @@ const ProfilePage = () => {
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const context = useContext(LoginContext);
   const { isSearchOpen, setIsSearchOpen } = useSearch();
+  const context = useContext(LoginContext);
 
   useEffect(() => {
     const loadUserProfile = async () => {
@@ -27,12 +27,8 @@ const ProfilePage = () => {
 
       try {
         setLoading(true);
-        if (context !== null && context.myProfile?.username === username) {
-          setUserProfile(context.myProfile);
-        } else {
-          const userData = await fetchUserProfile(username);
-          setUserProfile(userData);
-        }
+        const userData = await fetchUserProfile(username);
+        setUserProfile(userData);
       } catch (err) {
         console.error('Error loading profile:', err);
         setError('Failed to load profile data');
@@ -42,7 +38,7 @@ const ProfilePage = () => {
     };
 
     void loadUserProfile();
-  }, [username, context?.myProfile, context]);
+  }, [username, context]);
 
   if (loading) {
     return (
