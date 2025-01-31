@@ -29,6 +29,7 @@ const ProfileInfo = ({
 }: ProfileInfoProps) => {
   const [showUnfollowMenu, setShowUnfollowMenu] = useState(false);
   const context = useContext(LoginContext);
+  // console.log(context?.myProfile)
 
   const handleFollow = async () => {
     const token = localStorage.getItem('access_token') as string;
@@ -36,13 +37,13 @@ const ProfileInfo = ({
       console.error('No token found');
       return;
     }
-
     const success = await followUser(token, userId);
 
     if (success) {
       const updatedProfile = await myProfile(token);
       if (updatedProfile != null) {
         context?.setMyProfile(updatedProfile);
+        localStorage.setItem('userProfile', JSON.stringify(updatedProfile));
       }
     }
   };
@@ -59,6 +60,7 @@ const ProfileInfo = ({
       const updatedProfile = await myProfile(token);
       if (updatedProfile != null) {
         context?.setMyProfile(updatedProfile);
+        localStorage.setItem('userProfile', JSON.stringify(updatedProfile));
       }
     }
     setShowUnfollowMenu(false);

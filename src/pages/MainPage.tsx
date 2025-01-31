@@ -3,6 +3,7 @@ import { useContext, useEffect, useState } from 'react';
 import { likePost, unlikePost } from '../api/like';
 import { fetchFollowingPosts } from '../api/post';
 import { LoginContext } from '../App';
+import EmptyFeed from '../components/feed/EmptyFeed';
 import Posts from '../components/feed/Posts';
 import { Stories } from '../components/feed/Stories';
 import MobileBar from '../components/layout/MobileBar';
@@ -85,6 +86,8 @@ const MainPage = () => {
           <Stories />
           {loading ? (
             <div className="text-center py-4">Loading posts...</div>
+          ) : posts.length === 0 ? (
+            <EmptyFeed />
           ) : (
             <Posts
               posts={posts}

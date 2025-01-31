@@ -34,7 +34,7 @@ const PostHeader = ({
 
   return (
     <>
-      <div className="flex items-center justify-between p-4 border-b">
+      <div className="flex items-center justify-between p-3 md:p-4 border-b">
         <div
           className="flex items-center space-x-2 cursor-pointer hover:bg-gray-50 rounded-lg transition-colors p-2"
           onClick={handleProfileClick}
@@ -46,9 +46,9 @@ const PostHeader = ({
                 : '/placeholder.svg'
             }
             alt={userInfo?.username ?? 'User'}
-            className="w-8 h-8 rounded-full"
+            className="w-7 h-7 md:w-8 md:h-8 rounded-full"
           />
-          <span className="font-semibold">
+          <span className="font-semibold text-sm md:text-base">
             {loading ? '...' : userInfo?.username}
           </span>
         </div>
