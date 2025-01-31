@@ -1,4 +1,4 @@
-import { Compass, Home, PlusSquare, User } from 'lucide-react';
+import { Compass, Home, Map, PlusSquare, User } from 'lucide-react';
 import { useContext, useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 
@@ -23,6 +23,8 @@ const MobileBar = () => {
       setActiveItem('home');
     } else if (path === '/explore') {
       setActiveItem('explore');
+    } else if (path === '/map') {
+      setActiveItem('map');
     } else if (path === `/${String(context.myProfile?.username)}`) {
       setActiveItem('profile');
     } else {
@@ -67,6 +69,14 @@ const MobileBar = () => {
           mobile
           active={activeItem === 'create'}
           onClick={handleCreateClick}
+        />
+        <NavItem
+          icon={
+            <Map size={24} strokeWidth={activeItem === 'map' ? 2.5 : 1.5} />
+          }
+          to="/map"
+          mobile
+          active={activeItem === 'map'}
         />
         <NavItem
           icon={

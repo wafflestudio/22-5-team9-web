@@ -1,5 +1,7 @@
-import { Heart, MessageCircle } from 'lucide-react';
-import { useState } from 'react';
+import { MessageCircle, Send } from 'lucide-react';
+import { useEffect, useState } from 'react';
+
+import { WaffleIcon } from '../feed/Post';
 
 interface PostActionsProps {
   likes: number[];
@@ -14,53 +16,79 @@ const PostActions = ({
   onLikeToggle,
   onAddComment,
 }: PostActionsProps) => {
-  const [newComment, setNewComment] = useState('');
+  const [comment, setComment] = useState('');
+  const [particles, setParticles] = useState<
+    Array<{ id: number; x: number; y: number }>
+  >([]);
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    onAddComment(newComment);
-    setNewComment('');
+  const createWaffleParticles = () => {
+    const newParticles = Array.from({ length: 12 }, () => ({
+      id: Math.random(),
+      x: Math.random() * 100,
+      y: Math.random() * -50,
+    }));
+    setParticles((prev) => [...prev, ...newParticles]);
+  };
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setParticles([]);
+    }, 2000);
+    return () => {
+      clearTimeout(timer);
+    };
+  }, [particles]);
+
+  const handleWaffleClick = () => {
+    onLikeToggle();
+    createWaffleParticles();
   };
 
   return (
-    <div className="border-t mt-auto bg-white">
-      <div className="p-3 md:p-4">
-        <div className="flex items-center space-x-4 mb-3">
-          <Heart
-            className={`w-6 h-6 cursor-pointer ${
-              likes.includes(currentUserId) ? 'fill-red-500 text-red-500' : ''
-            }`}
-            onClick={onLikeToggle}
-          />
-          <MessageCircle className="w-6 h-6" />
+    <div className="border-t p-4 relative">
+      {particles.map((particle) => (
+        <div
+          key={particle.id}
+          className="waffle-particle absolute pointer-events-none"
+          style={{
+            left: `${particle.x}%`,
+            top: `${particle.y}%`,
+          }}
+        >
+          🧇
         </div>
-        <p className="font-semibold text-sm md:text-base mb-2">
-          {likes.length.toLocaleString()} likes
-        </p>
+      ))}
+      <div className="flex space-x-4 mb-4">
+        <WaffleIcon
+          className={`w-6 h-6 cursor-pointer transition-colors ${
+            likes.includes(currentUserId)
+              ? 'fill-amber-500 stroke-amber-500'
+              : 'stroke-current'
+          }`}
+          onClick={handleWaffleClick}
+        />
+        <MessageCircle className="w-6 h-6" />
+        <Send className="w-6 h-6" />
       </div>
-
+      <div className="font-semibold mb-2">{likes.length} likes</div>
       <form
-        onSubmit={handleSubmit}
-        className="flex items-center px-3 md:px-4 py-2 md:py-3 border-t"
+        onSubmit={(e) => {
+          e.preventDefault();
+          if (comment.trim().length > 0) {
+            onAddComment(comment);
+            setComment('');
+          }
+        }}
       >
         <input
           type="text"
           placeholder="Add a comment..."
-          className="flex-1 border-none focus:ring-0 outline-none text-sm md:text-base"
-          value={newComment}
+          value={comment}
           onChange={(e) => {
-            setNewComment(e.target.value);
+            setComment(e.target.value);
           }}
+          className="w-full border-none focus:ring-0"
         />
-        <button
-          type="submit"
-          disabled={newComment.length === 0}
-          className={`text-blue-500 font-semibold text-sm md:text-base ${
-            newComment.length === 0 ? 'opacity-50 cursor-default' : ''
-          }`}
-        >
-          Post
-        </button>
       </form>
     </div>
   );

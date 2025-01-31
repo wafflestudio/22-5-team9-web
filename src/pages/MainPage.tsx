@@ -3,8 +3,9 @@ import { useContext, useEffect, useState } from 'react';
 import { likePost, unlikePost } from '../api/like';
 import { fetchFollowingPosts } from '../api/post';
 import { LoginContext } from '../App';
+import EmptyFeed from '../components/feed/EmptyFeed';
 import Posts from '../components/feed/Posts';
-// import { Stories } from '../components/feed/Stories';
+import { Stories } from '../components/feed/Stories';
 import MobileBar from '../components/layout/MobileBar';
 import MobileHeader from '../components/layout/MobileHeader';
 import SideBar from '../components/layout/SideBar';
@@ -82,9 +83,11 @@ const MainPage = () => {
       <div className="flex-1 p-4 pb-16 md:pb-4 md:ml-64 overflow-y-auto">
         <div className="max-w-3xl mx-auto">
           <MobileHeader />
-          {/* <Stories /> */}
+          <Stories />
           {loading ? (
             <div className="text-center py-4">Loading posts...</div>
+          ) : posts.length === 0 ? (
+            <EmptyFeed />
           ) : (
             <Posts
               posts={posts}

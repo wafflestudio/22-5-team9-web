@@ -10,11 +10,18 @@ import {
 } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 
+import {
+  getLocationFriends,
+  getMyLocation,
+  setLocationStatus,
+} from '../api/location';
+import { fetchUserProfile } from '../api/profile';
 import MobileBar from '../components/layout/MobileBar';
 import MobileHeader from '../components/layout/MobileHeader';
 import SideBar from '../components/layout/SideBar';
 import SearchModal from '../components/modals/SearchModal';
 import { useSearch } from '../hooks/useSearch';
+import type { UserProfile } from '../types/user';
 
 const Mountain = ({ className }: { className?: string }) => (
   <svg viewBox="0 0 100 50" className={className} fill="currentColor">
@@ -26,8 +33,9 @@ interface Location {
   id: string;
   name: string;
   position: { x: number; y: number };
-  users: string[];
+  users: UserProfile[];
   icon: React.ReactNode;
+  tagId: number;
 }
 
 const locations: Location[] = [
@@ -37,6 +45,7 @@ const locations: Location[] = [
     position: { x: 50, y: 10 },
     users: [],
     icon: <Building2 className="w-6 h-6" />,
+    tagId: 10,
   },
   {
     id: 'engineering',
@@ -44,6 +53,7 @@ const locations: Location[] = [
     position: { x: 55, y: 35 },
     users: [],
     icon: <School className="w-6 h-6" />,
+    tagId: 9,
   },
   {
     id: 'agriculture',
@@ -51,6 +61,7 @@ const locations: Location[] = [
     position: { x: 70, y: 55 },
     users: [],
     icon: <BookOpen className="w-6 h-6" />,
+    tagId: 8,
   },
   {
     id: 'science',
@@ -58,6 +69,7 @@ const locations: Location[] = [
     position: { x: 55, y: 50 },
     users: [],
     icon: <BookIcon className="w-6 h-6" />,
+    tagId: 7,
   },
   {
     id: 'library',
@@ -65,6 +77,7 @@ const locations: Location[] = [
     position: { x: 50, y: 60 },
     users: [],
     icon: <Library className="w-6 h-6" />,
+    tagId: 6,
   },
   {
     id: 'humanities',
@@ -72,6 +85,7 @@ const locations: Location[] = [
     position: { x: 30, y: 55 },
     users: [],
     icon: <GraduationCap className="w-6 h-6" />,
+    tagId: 5,
   },
   {
     id: 'education',
@@ -79,6 +93,7 @@ const locations: Location[] = [
     position: { x: 20, y: 75 },
     users: [],
     icon: <Users className="w-6 h-6" />,
+    tagId: 4,
   },
   {
     id: 'social',
@@ -86,6 +101,7 @@ const locations: Location[] = [
     position: { x: 40, y: 70 },
     users: [],
     icon: <Building2 className="w-6 h-6" />,
+    tagId: 3,
   },
   {
     id: 'entrance',
@@ -93,6 +109,7 @@ const locations: Location[] = [
     position: { x: 60, y: 90 },
     users: [],
     icon: <HomeIcon className="w-6 h-6" />,
+    tagId: 2,
   },
 ];
 
@@ -121,10 +138,16 @@ const LocationPopup = ({
   location,
   onClose,
   onSetMyLocation,
+  isCurrentLocation,
+  users,
+  isLoading,
 }: {
   location: Location;
   onClose: () => void;
   onSetMyLocation: () => void;
+  isCurrentLocation: boolean;
+  users: UserProfile[];
+  isLoading: boolean;
 }) => {
   const popupRef = useRef<HTMLDivElement>(null);
 
@@ -147,29 +170,44 @@ const LocationPopup = ({
   return (
     <div
       ref={popupRef}
-      className="absolute z-50 w-56 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5"
+      className="absolute z-50 w-64 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5"
     >
       <div className="py-1">
         <div className="px-4 py-2 text-sm font-bold border-b">
           {location.name}
         </div>
-        {location.users.length > 0 ? (
-          location.users.map((user) => (
-            <div key={user} className="px-4 py-2 text-sm text-gray-700">
-              {user}
-            </div>
-          ))
-        ) : (
-          <div className="px-4 py-2 text-sm text-gray-500">
-            현재 이 위치에 친구가 없습니다
-          </div>
-        )}
         <button
           className="block w-full px-4 py-2 text-sm text-left text-green-600 hover:bg-gray-100"
           onClick={onSetMyLocation}
         >
-          내 위치로 설정하기
+          {isCurrentLocation ? '위치 설정 끄기' : '내 위치로 설정하기'}
         </button>
+        <div className="px-4 py-2 border-t">
+          <div className="font-bold text-sm mb-2">현재 이 위치의 친구들</div>
+          {isLoading ? (
+            <div className="text-sm text-gray-500">로딩중...</div>
+          ) : users.length > 0 ? (
+            <div className="max-h-40 overflow-y-auto">
+              {users.map((user) => (
+                <div
+                  key={user?.user_id}
+                  className="flex items-center space-x-3 p-2 rounded-lg"
+                >
+                  <img
+                    src={`https://waffle-instaclone.kro.kr/${user?.profile_image as string}`}
+                    alt={user?.username}
+                    className="w-8 h-8 rounded-full object-cover"
+                  />
+                  <div className="flex-1">
+                    <p className="font-medium text-sm">{user?.username}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="text-sm text-gray-500">아직 친구가 없습니다</div>
+          )}
+        </div>
       </div>
     </div>
   );
@@ -179,16 +217,63 @@ const FriendMapPage = () => {
   const [selectedLocation, setSelectedLocation] = useState<Location | null>(
     null,
   );
+  const [userLocation, setUserLocation] = useState<number | null>(null);
+  const [locationUsers, setLocationUsers] = useState<UserProfile[]>([]);
+  const [isLoadingUsers, setIsLoadingUsers] = useState(false);
   const { isSearchOpen, setIsSearchOpen } = useSearch();
 
-  const handleLocationClick = (location: Location) => {
+  useEffect(() => {
+    const fetchInitialData = async () => {
+      try {
+        const myLocationTags = await getMyLocation();
+        setUserLocation(myLocationTags as number);
+      } catch (error) {
+        console.error('Error fetching initial data:', error);
+      }
+    };
+
+    void fetchInitialData();
+  }, []);
+
+  const handleLocationClick = async (location: Location) => {
     setSelectedLocation(location);
+    setIsLoadingUsers(true);
+    try {
+      const userIds = await getLocationFriends(location.tagId);
+      const userProfiles = await Promise.all(
+        userIds.map((id) => fetchUserProfile(id.toString())),
+      );
+      setLocationUsers(userProfiles);
+    } catch (error) {
+      console.error('Error fetching location users:', error);
+    } finally {
+      setIsLoadingUsers(false);
+    }
   };
 
-  const handleSetMyLocation = () => {
+  const handleSetMyLocation = async () => {
     if (selectedLocation == null) return;
-    // TODO: API call to update user location
-    setSelectedLocation(null);
+
+    try {
+      const isCurrentLocation = userLocation === selectedLocation.tagId;
+      const success = await setLocationStatus(
+        isCurrentLocation ? 1 : selectedLocation.tagId,
+      );
+
+      if (success) {
+        if (isCurrentLocation) {
+          setUserLocation(null);
+          alert('위치 설정이 해제되었습니다');
+        } else {
+          setUserLocation(selectedLocation.tagId);
+          alert(`${selectedLocation.name}으로 위치가 설정되었습니다`);
+        }
+      }
+      setSelectedLocation(null);
+    } catch (error) {
+      console.error('Error setting location:', error);
+      alert('위치 설정에 실패했습니다');
+    }
   };
 
   return (
@@ -215,7 +300,7 @@ const FriendMapPage = () => {
                   key={location.id}
                   location={location}
                   onClick={() => {
-                    handleLocationClick(location);
+                    void handleLocationClick(location);
                   }}
                 />
               ))}
@@ -226,7 +311,12 @@ const FriendMapPage = () => {
                   onClose={() => {
                     setSelectedLocation(null);
                   }}
-                  onSetMyLocation={handleSetMyLocation}
+                  onSetMyLocation={() => {
+                    void handleSetMyLocation();
+                  }}
+                  isCurrentLocation={userLocation === selectedLocation.tagId}
+                  users={locationUsers}
+                  isLoading={isLoadingUsers}
                 />
               )}
             </div>
