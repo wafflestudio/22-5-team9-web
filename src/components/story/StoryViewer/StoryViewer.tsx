@@ -29,7 +29,7 @@ export default function StoryViewer({
   onClose,
   onDelete,
   isOwner = false,
-  initialIndex
+  initialIndex,
 }: StoryViewerProps) {
   const navigate = useNavigate();
   const [currentStoryIndex, setCurrentStoryIndex] = useState(initialIndex);
@@ -39,7 +39,10 @@ export default function StoryViewer({
   useEffect(() => {
     const currentStory = stories[currentStoryIndex];
     if (currentStory != null) {
-      localStorage.setItem(`story-${currentStory.story_id}-viewed`, new Date().toISOString());
+      localStorage.setItem(
+        `story-${currentStory.story_id}-viewed`,
+        new Date().toISOString(),
+      );
     }
     const timer = setInterval(() => {
       setProgress((prev) => {
@@ -74,11 +77,13 @@ export default function StoryViewer({
 
   const handleNext = () => {
     if (currentStoryIndex < stories.length - 1) {
-      setCurrentStoryIndex(prev => prev + 1);
+      setCurrentStoryIndex((prev) => prev + 1);
       setProgress(0);
       const nextStory = stories[currentStoryIndex + 1];
       if (nextStory != null) {
-        void navigate(`/stories/${username}/${nextStory.story_id}`, { replace: true });
+        void navigate(`/stories/${username}/${nextStory.story_id}`, {
+          replace: true,
+        });
       }
     } else {
       onClose();
@@ -91,7 +96,9 @@ export default function StoryViewer({
       setProgress(0);
       const prevStory = stories[currentStoryIndex - 1];
       if (prevStory != null) {
-        void navigate(`/stories/${username}/${prevStory.story_id}`, { replace: true });
+        void navigate(`/stories/${username}/${prevStory.story_id}`, {
+          replace: true,
+        });
       }
     }
   };
@@ -134,7 +141,11 @@ export default function StoryViewer({
               onNext={handleNext}
               onPrevious={handlePrevious}
               onClose={onClose}
-              onDelete={onDelete != null ? () => void handleDelete(currentStory.story_id) : undefined}
+              onDelete={
+                onDelete != null
+                  ? () => void handleDelete(currentStory.story_id)
+                  : undefined
+              }
               canGoNext={currentStoryIndex < stories.length - 1}
               canGoPrevious={currentStoryIndex > 0}
               isOwner={isOwner}

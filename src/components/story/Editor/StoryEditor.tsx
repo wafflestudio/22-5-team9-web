@@ -6,19 +6,19 @@ import ImageProcessor from './ImageProcessor';
 const StoryEditor = () => {
   const [isProcessing, setIsProcessing] = useState(false);
   const [error, setError] = useState<string | null>(null);
-	const [isUploaded, setIsUploaded] = useState(false);
-	const [processedBlob, setProcessedBlob] = useState<Blob | null>(null);
+  const [isUploaded, setIsUploaded] = useState(false);
+  const [processedBlob, setProcessedBlob] = useState<Blob | null>(null);
   const navigate = useNavigate();
   const location = useLocation();
   const state = location.state as { file: File };
 
   const handleProcessed = useCallback((blob: Blob) => {
-		setProcessedBlob(blob);
-	}, []);
+    setProcessedBlob(blob);
+  }, []);
 
-	const handleShare = async () => {
-    if (isProcessing || isUploaded || (processedBlob == null)) return;
-    
+  const handleShare = async () => {
+    if (isProcessing || isUploaded || processedBlob == null) return;
+
     setIsProcessing(true);
     setError(null);
 
@@ -26,13 +26,16 @@ const StoryEditor = () => {
       const formData = new FormData();
       formData.append('files', processedBlob, 'story.jpg');
 
-      const response = await fetch('https://waffle-instaclone.kro.kr/api/story/', {
-        method: 'POST',
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem('access_token') ?? ''}`,
+      const response = await fetch(
+        'https://waffle-instaclone.kro.kr/api/story/',
+        {
+          method: 'POST',
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem('access_token') ?? ''}`,
+          },
+          body: formData,
         },
-        body: formData,
-      });
+      );
 
       if (!response.ok) {
         throw new Error('Failed to upload story');
@@ -41,7 +44,9 @@ const StoryEditor = () => {
       setIsUploaded(true);
       void navigate('/', { replace: true });
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'An unknown error occurred');
+      setError(
+        err instanceof Error ? err.message : 'An unknown error occurred',
+      );
     } finally {
       setIsProcessing(false);
     }
@@ -51,11 +56,8 @@ const StoryEditor = () => {
     <div className="min-h-screen bg-gray-100 p-4">
       <div className="max-w-lg mx-auto">
         <h1 className="text-2xl font-bold mb-4">Edit Story</h1>
-        
-        <ImageProcessor 
-          file={state.file} 
-          onProcessed={handleProcessed}
-        />
+
+        <ImageProcessor file={state.file} onProcessed={handleProcessed} />
 
         {isProcessing && (
           <div className="mt-4 text-center text-gray-600">
@@ -63,10 +65,8 @@ const StoryEditor = () => {
           </div>
         )}
 
-        {(error != null) && (
-          <div className="mt-4 text-center text-red-500">
-            {error}
-          </div>
+        {error != null && (
+          <div className="mt-4 text-center text-red-500">{error}</div>
         )}
 
         <div className="mt-4 flex justify-end space-x-2">
@@ -78,7 +78,7 @@ const StoryEditor = () => {
           </button>
           <button
             onClick={() => void handleShare()}
-            disabled={isProcessing || isUploaded || (processedBlob == null)}
+            disabled={isProcessing || isUploaded || processedBlob == null}
             className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
             Share Story

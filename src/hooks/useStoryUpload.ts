@@ -27,7 +27,7 @@ export function useStoryUpload() {
       );
 
       if (!response.ok) throw new Error('Failed to upload story');
-      const result = await response.json() as Story;
+      const result = (await response.json()) as Story;
       void navigate('/', { replace: true });
       return result;
     } finally {

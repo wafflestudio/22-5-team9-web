@@ -14,13 +14,13 @@ export function StoryItem({
   username,
   profileImage,
   stories,
-  onView
+  onView,
 }: StoryItemProps) {
   const navigate = useNavigate();
   const [hasUnviewedStories, setHasUnviewedStories] = useState(false);
   useEffect(() => {
     const checkUnviewed = () => {
-      const hasUnviewed = stories.some(story => {
+      const hasUnviewed = stories.some((story) => {
         const viewedAt = localStorage.getItem(`story-${story.story_id}-viewed`);
         return viewedAt == null;
       });
@@ -31,14 +31,14 @@ export function StoryItem({
   const handleClick = () => {
     if (stories.length > 0) {
       // Find first unviewed story
-      const firstUnviewed = stories.find(story => {
+      const firstUnviewed = stories.find((story) => {
         const viewedAt = localStorage.getItem(`story-${story.story_id}-viewed`);
         return viewedAt == null;
       });
 
       // If all stories are viewed, show the first story
       const storyToShow = firstUnviewed ?? stories[0];
-      
+
       if (storyToShow != null) {
         void navigate(`/stories/${username}/${storyToShow.story_id}`);
         onView();

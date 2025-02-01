@@ -8,16 +8,19 @@ export function StoryCreator() {
   const navigate = useNavigate();
   const { isUploading } = useStoryUpload();
 
-  const handleFileUpload = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
-    const files = event.target.files;
-    if (files == null) return;
+  const handleFileUpload = useCallback(
+    (event: React.ChangeEvent<HTMLInputElement>) => {
+      const files = event.target.files;
+      if (files == null) return;
 
-    if (files[0] != null) {
-      void navigate('/stories/new', { 
-        state: { file: files[0] }
-      });
-    }
-  }, [navigate]);
+      if (files[0] != null) {
+        void navigate('/stories/new', {
+          state: { file: files[0] },
+        });
+      }
+    },
+    [navigate],
+  );
 
   return (
     <div className="flex flex-col items-center">

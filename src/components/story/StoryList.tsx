@@ -9,18 +9,15 @@ import StoryViewer from './StoryViewer/StoryViewer';
 
 const API_BASE = 'https://waffle-instaclone.kro.kr';
 
-interface UserStoryData {
-  stories: Story[];
-  userProfile?: UserProfile;
-}
-
 export function StoryList() {
   const navigate = useNavigate();
   const [selectedUserId, setSelectedUserId] = useState<number | null>(null);
   const [viewingStories, setViewingStories] = useState<Story[]>([]);
   const [currentUserId, setCurrentUserId] = useState<number | null>(null);
   const [stories, setStories] = useState<Story[]>([]);
-  const [userProfiles, setUserProfiles] = useState<Record<number, UserProfile>>({});
+  const [userProfiles, setUserProfiles] = useState<Record<number, UserProfile>>(
+    {},
+  );
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -37,10 +34,10 @@ export function StoryList() {
         throw new Error('Failed to fetch user profile');
       }
 
-      const userData = await response.json() as UserProfile;
-      setUserProfiles(prev => ({
+      const userData = (await response.json()) as UserProfile;
+      setUserProfiles((prev) => ({
         ...prev,
-        [userId]: userData
+        [userId]: userData,
       }));
     } catch (err) {
       console.error(`Error fetching profile for user ${userId}:`, err);
@@ -50,36 +47,38 @@ export function StoryList() {
   // Fetch current user profile
   useEffect(() => {
     // Fetch stories and associated user profiles
-  const fetchStories = async (userId: number) => {
-    try {
-      const token = localStorage.getItem('access_token');
-      if (token == null) return;
+    const fetchStories = async (userId: number) => {
+      try {
+        const token = localStorage.getItem('access_token');
+        if (token == null) return;
 
-      const response = await fetch(`${API_BASE}/api/story/list/${userId}`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          Accept: 'application/json',
-        },
-      });
+        const response = await fetch(`${API_BASE}/api/story/list/${userId}`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            Accept: 'application/json',
+          },
+        });
 
-      if (!response.ok) {
-        const errorData = await response.json() as { detail: string };
-        throw new Error(errorData.detail || 'Failed to fetch stories');
+        if (!response.ok) {
+          const errorData = (await response.json()) as { detail: string };
+          throw new Error(errorData.detail || 'Failed to fetch stories');
+        }
+
+        const data = (await response.json()) as Story[];
+        setStories(data);
+
+        // Fetch user profiles for all unique user IDs in stories
+        const uniqueUserIds = [...new Set(data.map((story) => story.user_id))];
+        await Promise.all(uniqueUserIds.map((uid) => fetchUserProfile(uid)));
+
+        setError(null);
+      } catch (err) {
+        console.error('Story fetch error:', err);
+        setError(
+          err instanceof Error ? err.message : 'Failed to fetch stories',
+        );
       }
-
-      const data = await response.json() as Story[];
-      setStories(data);
-
-      // Fetch user profiles for all unique user IDs in stories
-      const uniqueUserIds = [...new Set(data.map(story => story.user_id))];
-      await Promise.all(uniqueUserIds.map(uid => fetchUserProfile(uid)));
-
-      setError(null);
-    } catch (err) {
-      console.error('Story fetch error:', err);
-      setError(err instanceof Error ? err.message : 'Failed to fetch stories');
-    }
-  };
+    };
     const fetchUserInfo = async () => {
       try {
         setLoading(true);
@@ -107,7 +106,7 @@ export function StoryList() {
           throw new Error('Failed to fetch user info');
         }
 
-        const userData = await response.json() as UserProfile;
+        const userData = (await response.json()) as UserProfile;
         if (userData?.user_id != null) {
           setCurrentUserId(userData.user_id);
           void fetchStories(userData.user_id);
@@ -136,7 +135,7 @@ export function StoryList() {
         throw new Error('Failed to delete story');
       }
 
-      setStories(stories.filter(story => story.story_id !== storyId));
+      setStories(stories.filter((story) => story.story_id !== storyId));
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to delete story');
       throw err;
@@ -168,7 +167,7 @@ export function StoryList() {
   return (
     <div className="flex space-x-4 overflow-x-auto pb-4 mb-8">
       <StoryCreator />
-      
+
       {loading ? (
         <div className="animate-pulse flex space-x-4">
           <div className="w-16 h-16 bg-gray-200 rounded-full"></div>
@@ -183,9 +182,15 @@ export function StoryList() {
               <StoryItem
                 key={userId}
                 username={userProfile?.username ?? 'Loading...'}
-                profileImage={userProfile?.profile_image != null ? `${API_BASE}/${userProfile.profile_image}` : undefined}
+                profileImage={
+                  userProfile?.profile_image != null
+                    ? `${API_BASE}/${userProfile.profile_image}`
+                    : undefined
+                }
                 stories={userStories}
-                onView={() => { handleViewStory(Number(userId), userStories); }}
+                onView={() => {
+                  handleViewStory(Number(userId), userStories);
+                }}
               />
             );
           })}

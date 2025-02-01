@@ -53,7 +53,7 @@ export default function StoryControls({
           <X className="w-6 h-6 text-white pointer-events-none" />
         </button>
 
-        {isOwner && (onDelete != null) && (
+        {isOwner && onDelete != null && (
           <button
             onClick={onDelete}
             className="absolute bottom-4 right-4 z-50 p-2 rounded-full bg-red-500 pointer-events-auto opacity-75 hover:opacity-100 transition-opacity"

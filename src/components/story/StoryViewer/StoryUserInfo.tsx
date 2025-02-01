@@ -2,7 +2,7 @@ const formatTimeAgo = (dateString: string): string => {
   const date = new Date(dateString);
   const now = new Date();
   const diffInSeconds = Math.floor((now.getTime() - date.getTime()) / 1000);
-  
+
   if (diffInSeconds < 60) {
     return 'just now';
   } else if (diffInSeconds < 3600) {
@@ -23,7 +23,11 @@ interface StoryUserInfoProps {
   creationDate: string;
 }
 
-const StoryUserInfo = ({ username, profileImage, creationDate }: StoryUserInfoProps) => {
+const StoryUserInfo = ({
+  username,
+  profileImage,
+  creationDate,
+}: StoryUserInfoProps) => {
   return (
     <div className="absolute top-2 left-0 right-0 z-20">
       <div className="flex items-center space-x-3 px-4 py-2">
@@ -33,9 +37,9 @@ const StoryUserInfo = ({ username, profileImage, creationDate }: StoryUserInfoPr
             alt={username}
             className="w-full h-full object-cover"
             onError={(e) => {
-							const img = e.target as HTMLImageElement;
-							img.src = '/default-profile.svg';
-						}}
+              const img = e.target as HTMLImageElement;
+              img.src = '/default-profile.svg';
+            }}
           />
         </div>
         <div className="flex items-center space-x-2">

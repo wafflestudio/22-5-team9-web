@@ -61,13 +61,25 @@ export const App = () => {
             path="/:username"
             element={auth.isLoggedIn ? <ProfilePage /> : <Navigate to="/" />}
           />
-          <Route 
-            path="/stories/:username/:storyId" 
-            element={auth.isLoggedIn ? <StoryPage /> : <LoginPage handleIsLoggedIn={auth.handleIsLoggedIn} />} 
+          <Route
+            path="/stories/:username/:storyId"
+            element={
+              auth.isLoggedIn ? (
+                <StoryPage />
+              ) : (
+                <LoginPage handleIsLoggedIn={auth.handleIsLoggedIn} />
+              )
+            }
           />
-          <Route 
-            path="/stories/new" 
-            element={auth.isLoggedIn ? <StoryEditor /> : <LoginPage handleIsLoggedIn={auth.handleIsLoggedIn} />} 
+          <Route
+            path="/stories/new"
+            element={
+              auth.isLoggedIn ? (
+                <StoryEditor />
+              ) : (
+                <LoginPage handleIsLoggedIn={auth.handleIsLoggedIn} />
+              )
+            }
           />
           <Route
             path="/accounts/edit"
