@@ -1,11 +1,13 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
+import { useExpiredStories } from '../../hooks/useExpiredStories';
 import type { Story } from '../../types/story';
 import type { UserProfile } from '../../types/user';
 import { StoryCreator } from './StoryCreator';
 import { StoryItem } from './StoryItem';
 import StoryViewer from './StoryViewer/StoryViewer';
+
 
 const API_BASE = 'https://waffle-instaclone.kro.kr';
 
@@ -23,6 +25,8 @@ export function StoryList() {
   const [userProfiles, setUserProfiles] = useState<Record<number, UserProfile>>({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
+  const activeStories = useExpiredStories(stories);
 
   // Fetch user profile for a specific user ID
   const fetchUserProfile = async (userId: number) => {
@@ -157,7 +161,7 @@ export function StoryList() {
     return <div className="text-red-500 p-4">{error}</div>;
   }
 
-  const storyGroups = stories.reduce<Record<number, Story[]>>((acc, story) => {
+  const storyGroups = activeStories.reduce<Record<number, Story[]>>((acc, story) => {
     if (acc[story.user_id] == null) {
       acc[story.user_id] = [];
     }

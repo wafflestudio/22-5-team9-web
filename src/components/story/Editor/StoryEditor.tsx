@@ -26,7 +26,12 @@ const StoryEditor = () => {
       const formData = new FormData();
       formData.append('files', processedBlob, 'story.jpg');
 
-      const response = await fetch('https://waffle-instaclone.kro.kr/api/story/', {
+      const params = new URLSearchParams({
+        expiration_delta: '24',
+        expiration_unit: 'hours'
+      });
+
+      const response = await fetch(`https://waffle-instaclone.kro.kr/api/story/?${params.toString()}`, {
         method: 'POST',
         headers: {
           Authorization: `Bearer ${localStorage.getItem('access_token') ?? ''}`,
