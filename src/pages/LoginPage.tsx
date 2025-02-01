@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 
 import { signin } from '../api/auth';
+import { myProfile } from '../api/profile';
 import GoogleAuth from '../components/auth/GoogleAuth';
 import type { UserProfile } from '../types/user';
 
@@ -31,30 +32,29 @@ const LoginPage = ({ handleIsLoggedIn }: LoginPageProps) => {
     }
   };
 
-  const handleGoogleSuccess = async (
-    accessToken: string,
-    refreshToken: string,
-  ) => {
-    // Store tokens
-    localStorage.setItem('access_token', accessToken);
-    localStorage.setItem('refresh_token', refreshToken);
-    const response = await fetch(
-      'https://waffle-instaclone.kro.kr/api/user/profile',
-      {
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-        },
-      },
-    );
-
-    if (response.ok) {
-      const userData = (await response.json()) as UserProfile;
-      handleIsLoggedIn(true, userData);
-    }
-  };
-
   const handleGoogleError = (err: string) => {
     setError(err);
+  };
+
+  const handleGoogleSuccess = async (
+    access_token: string,
+    refresh_token: string,
+  ) => {
+    try {
+      localStorage.setItem('access_token', access_token);
+      localStorage.setItem('refresh_token', refresh_token);
+      const profileResponse = await myProfile(access_token);
+      if (profileResponse == null) {
+        throw new Error('Failed to fetch user profile');
+      }
+      handleIsLoggedIn(true, profileResponse);
+    } catch (err) {
+      setError(
+        err instanceof Error
+          ? err.message
+          : 'Google 로그인 중 오류가 발생했습니다.',
+      );
+    }
   };
 
   return (
@@ -146,9 +146,9 @@ const LoginPage = ({ handleIsLoggedIn }: LoginPageProps) => {
 
             <div className="mt-6">
               <GoogleAuth
-                onSuccess={(accessToken, refreshToken) =>
-                  void handleGoogleSuccess(accessToken, refreshToken)
-                }
+                onSuccess={(access_token, refresh_token) => {
+                  void handleGoogleSuccess(access_token, refresh_token);
+                }}
                 onError={handleGoogleError}
               />
             </div>
