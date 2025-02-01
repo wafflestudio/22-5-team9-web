@@ -61,7 +61,11 @@ export function StoryList() {
 
         if (!response.ok) {
           const errorData = (await response.json()) as { detail: string };
-          throw new Error(errorData.detail !== "" ? errorData.detail : 'Failed to fetch stories');
+          throw new Error(
+            errorData.detail !== ''
+              ? errorData.detail
+              : 'Failed to fetch stories',
+          );
         }
 
         const data = (await response.json()) as Story[];
