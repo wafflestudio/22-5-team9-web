@@ -1,6 +1,7 @@
 import { useCallback, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 
+import { authenticatedFetch } from '../../../utils/auth';
 import ImageProcessor from './ImageProcessor';
 
 const StoryEditor = () => {
@@ -26,13 +27,10 @@ const StoryEditor = () => {
       const formData = new FormData();
       formData.append('files', processedBlob, 'story.jpg');
 
-      const response = await fetch(
+      const response = await authenticatedFetch(
         'https://waffle-instaclone.kro.kr/api/story/',
         {
           method: 'POST',
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem('access_token') ?? ''}`,
-          },
           body: formData,
         },
       );
