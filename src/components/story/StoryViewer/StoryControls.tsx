@@ -46,21 +46,21 @@ export default function StoryControls({
 
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 z-10 p-2 rounded-full bg-black/50 pointer-events-auto opacity-75 hover:opacity-100 transition-opacity"
+          className="absolute top-4 right-4 z-50 p-2 rounded-full bg-black/50 pointer-events-auto opacity-75 hover:opacity-100 transition-opacity"
           type="button"
           aria-label="Close story"
         >
-          <X className="w-6 h-6 text-white" />
+          <X className="w-6 h-6 text-white pointer-events-none" />
         </button>
 
         {isOwner && (onDelete != null) && (
           <button
             onClick={onDelete}
-            className="absolute bottom-4 right-4 z-10 p-2 rounded-full bg-red-500 pointer-events-auto opacity-75 hover:opacity-100 transition-opacity"
+            className="absolute bottom-4 right-4 z-50 p-2 rounded-full bg-red-500 pointer-events-auto opacity-75 hover:opacity-100 transition-opacity"
             type="button"
             aria-label="Delete story"
           >
-            <Trash2 className="w-6 h-6 text-white" />
+            <Trash2 className="w-6 h-6 text-white pointer-events-none" />
           </button>
         )}
       </div>
