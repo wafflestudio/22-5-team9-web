@@ -1,3 +1,18 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+@keyframes waffleRain {
+  0% {
+    transform: translateY(0) rotate(0deg);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(300px) rotate(360deg);
+    opacity: 0;
+  }
+}
+
+.waffle-particle {
+  animation: waffleRain 2s ease-in forwards;
+  font-size: 1.5rem;
+}
