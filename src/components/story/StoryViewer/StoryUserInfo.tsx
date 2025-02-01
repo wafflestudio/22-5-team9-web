@@ -1,5 +1,5 @@
 const formatTimeAgo = (dateString: string): string => {
-  const date = new Date(dateString);
+  const date = new Date(dateString + 'Z');
   const now = new Date();
   const diffInSeconds = Math.floor((now.getTime() - date.getTime()) / 1000);
   
