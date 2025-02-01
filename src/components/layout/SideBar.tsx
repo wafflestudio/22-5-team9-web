@@ -1,8 +1,9 @@
 import {
   Compass,
-  Heart,
   Home,
+  Map,
   Menu,
+  MessageCircle,
   PlusSquare,
   Search,
   User,
@@ -35,12 +36,16 @@ const SideBar = ({ onSearchClick }: SideBarProps) => {
       setActiveItem('home');
     } else if (path === '/explore') {
       setActiveItem('explore');
+    } else if (path === '/messages') {
+      setActiveItem('messages');
+    } else if (path === '/map') {
+      setActiveItem('map');
     } else if (path === `/${String(context.myProfile?.username)}`) {
       setActiveItem('profile');
     } else {
       setActiveItem('');
     }
-  }, [location.pathname, context.myProfile, context.myProfile?.username]);
+  }, [location.pathname, context.myProfile?.username]);
 
   const handleCreateClick = (itemName: string) => {
     setActiveItem(itemName);
@@ -50,11 +55,9 @@ const SideBar = ({ onSearchClick }: SideBarProps) => {
   return (
     <div className="hidden md:flex md:flex-col h-full px-4 py-8">
       <div className="mb-8">
-        <img
-          src="https://a.slack-edge.com/production-standard-emoji-assets/14.0/apple-small/1f9c7@2x.png"
-          alt="Logo"
-          className="w-16"
-        />
+        <span className="text-4xl font-bold font-['Dancing_Script'] bg-gradient-to-r from-[#833AB4] via-[#FD1D1D] to-[#F77737] inline-block text-transparent bg-clip-text">
+          insnugram
+        </span>
       </div>
 
       <div className="flex flex-col flex-1 space-y-2">
@@ -80,15 +83,19 @@ const SideBar = ({ onSearchClick }: SideBarProps) => {
             active={activeItem === 'explore'}
           />
         </Link>
-        <NavItem
-          icon={<Heart />}
-          label="Notifications"
-          active={activeItem === 'notifications'}
-        />
+        <Link to="/messages">
+          <NavItem
+            icon={<MessageCircle />}
+            label="Messages"
+            active={activeItem === 'messages'}
+          />
+        </Link>
+        <Link to="/map">
+          <NavItem icon={<Map />} label="Map" active={activeItem === 'map'} />
+        </Link>
         <NavItem
           icon={<PlusSquare />}
           label="Create"
-          active={activeItem === 'create'}
           onClick={() => {
             handleCreateClick('create');
           }}
@@ -116,7 +123,7 @@ const SideBar = ({ onSearchClick }: SideBarProps) => {
               <button
                 className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left"
                 onClick={() => {
-                  context.handleIsLoggedIn(false, context.myProfile);
+                  context.handleIsLoggedIn(false, null);
                   setIsMenuOpen(false);
                 }}
               >

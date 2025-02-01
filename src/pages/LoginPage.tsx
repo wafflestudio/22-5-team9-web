@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 
 import { signin } from '../api/auth';
+import GoogleAuth from '../components/auth/GoogleAuth';
 import type { UserProfile } from '../types/user';
 
 type LoginPageProps = {
@@ -30,11 +31,37 @@ const LoginPage = ({ handleIsLoggedIn }: LoginPageProps) => {
     }
   };
 
+  const handleGoogleSuccess = async (
+    accessToken: string,
+    refreshToken: string,
+  ) => {
+    // Store tokens
+    localStorage.setItem('access_token', accessToken);
+    localStorage.setItem('refresh_token', refreshToken);
+    const response = await fetch(
+      'https://waffle-instaclone.kro.kr/api/user/profile',
+      {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      },
+    );
+
+    if (response.ok) {
+      const userData = (await response.json()) as UserProfile;
+      handleIsLoggedIn(true, userData);
+    }
+  };
+
+  const handleGoogleError = (err: string) => {
+    setError(err);
+  };
+
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
       <div className="sm:mx-auto sm:w-full sm:max-w-md">
         <h1 className="text-center text-4xl font-extrabold text-red-500">
-          Instagram
+          Insnugram
         </h1>
         <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
           로그인
@@ -104,6 +131,28 @@ const LoginPage = ({ handleIsLoggedIn }: LoginPageProps) => {
               </button>
             </div>
           </form>
+
+          <div className="mt-6">
+            <div className="relative">
+              <div className="absolute inset-0 flex items-center">
+                <div className="w-full border-t border-gray-300" />
+              </div>
+              <div className="relative flex justify-center text-sm">
+                <span className="px-2 bg-white text-gray-500">
+                  Or continue with
+                </span>
+              </div>
+            </div>
+
+            <div className="mt-6">
+              <GoogleAuth
+                onSuccess={(accessToken, refreshToken) =>
+                  void handleGoogleSuccess(accessToken, refreshToken)
+                }
+                onError={handleGoogleError}
+              />
+            </div>
+          </div>
 
           <div className="mt-6">
             <div className="text-sm text-center">

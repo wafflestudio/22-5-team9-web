@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-import type { Story } from '../types/story';
+import type { Story } from '../../types/story';
 
 export function useStoryUpload() {
   const [isUploading, setIsUploading] = useState(false);
