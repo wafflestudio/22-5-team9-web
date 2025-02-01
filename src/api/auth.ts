@@ -46,7 +46,6 @@ export const signin = async (username: string, password: string) => {
     },
   );
 
-  // First check if we got a JSON response
   const contentType = response.headers.get('content-type');
   if (contentType?.includes('application/json') === false) {
     const text = await response.text();
