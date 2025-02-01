@@ -1,4 +1,4 @@
-import { StoryList } from '../story/list/StoryList';
+import { StoryList } from '../story/StoryList';
 
 export function Stories() {
   return <StoryList />;

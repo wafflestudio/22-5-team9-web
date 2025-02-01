@@ -46,28 +46,12 @@ export const signin = async (username: string, password: string) => {
     },
   );
 
-  // First check if we got a JSON response
-  const contentType = response.headers.get('content-type');
-  if (contentType?.includes('application/json') === false) {
-    const text = await response.text();
-    console.error('Non-JSON response:', text);
-    throw new Error('Server returned non-JSON response');
-  }
-
   if (response.ok) {
-    try {
-      const data = (await response.json()) as SignInResponse;
-      localStorage.setItem('access_token', data.access_token);
-      localStorage.setItem('refresh_token', data.refresh_token);
-      const profileResponse = await myProfile(data.access_token);
-      if (profileResponse === null) {
-        throw new Error('Failed to fetch user profile');
-      }
-      return profileResponse;
-    } catch (err) {
-      console.error('Error parsing JSON response:', err);
-      throw new Error('Invalid response format from server');
-    }
+    const data = (await response.json()) as SignInResponse;
+    localStorage.setItem('access_token', data.access_token);
+    localStorage.setItem('refresh_token', data.refresh_token);
+
+    return await myProfile(data.access_token);
   }
 
   if (response.status === 401) {
