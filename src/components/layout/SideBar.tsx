@@ -12,6 +12,7 @@ import { useContext, useEffect, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 
 import { LoginContext } from '../../App';
+import CreatePostModal from '../modals/CreatePostModal';
 import { NavItem } from './NavItem';
 
 interface SideBarProps {
@@ -21,7 +22,7 @@ interface SideBarProps {
 const SideBar = ({ onSearchClick }: SideBarProps) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [activeItem, setActiveItem] = useState('home');
-  const [, setIsCreateModalOpen] = useState(false);
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const location = useLocation();
 
   const context = useContext(LoginContext);
@@ -100,6 +101,14 @@ const SideBar = ({ onSearchClick }: SideBarProps) => {
             handleCreateClick('create');
           }}
         />
+        {isCreateModalOpen && (
+          <CreatePostModal
+            isOpen={isCreateModalOpen}
+            onClose={() => {
+              setIsCreateModalOpen(false);
+            }}
+          />
+        )}
         <Link to={`/${String(context.myProfile?.username)}`}>
           <NavItem
             icon={<User />}

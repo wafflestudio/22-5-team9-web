@@ -1,11 +1,9 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 
-import type { Story } from '../types/story';
+import type { Story } from '../../types/story';
 
 export function useStoryUpload() {
   const [isUploading, setIsUploading] = useState(false);
-  const navigate = useNavigate();
 
   const uploadStory = async (files: FileList): Promise<Story> => {
     setIsUploading(true);
@@ -27,9 +25,7 @@ export function useStoryUpload() {
       );
 
       if (!response.ok) throw new Error('Failed to upload story');
-      const result = (await response.json()) as Story;
-      void navigate('/', { replace: true });
-      return result;
+      return await (response.json() as Promise<Story>);
     } finally {
       setIsUploading(false);
     }
