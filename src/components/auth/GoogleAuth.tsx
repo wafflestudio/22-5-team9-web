@@ -1,13 +1,6 @@
 import { type CredentialResponse, GoogleLogin } from '@react-oauth/google';
 import React from 'react';
-
-export interface GoogleCredentialResponse {
-  credential: string;
-  clientId: string;
-  select_by: string;
-}
-
-export interface GoogleAuthResponse {
+interface GoogleAuthResponse {
   access_token: string;
   refresh_token: string;
   user: {
@@ -27,6 +20,13 @@ const GoogleAuth: React.FC<GoogleAuthProps> = ({ onSuccess, onError }) => {
   const handleGoogleSuccess = async (
     credentialResponse: CredentialResponse,
   ) => {
+    if (
+      typeof (credentialResponse as { credential?: string }).credential !==
+      'string'
+    ) {
+      onError('Google credentials are invalid or missing');
+      return;
+    }
     try {
       const response = await fetch(
         'https://waffle-instaclone.kro.kr/test/api/auth/google',
@@ -36,7 +36,8 @@ const GoogleAuth: React.FC<GoogleAuthProps> = ({ onSuccess, onError }) => {
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({
-            credential: credentialResponse.credential,
+            credential: (credentialResponse as { credential: string })
+              .credential,
           }),
         },
       );

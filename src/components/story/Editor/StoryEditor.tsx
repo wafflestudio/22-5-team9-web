@@ -32,7 +32,7 @@ const StoryEditor = () => {
         {
           method: 'POST',
           body: formData,
-        }
+        },
       );
 
       if (!response.ok) {
