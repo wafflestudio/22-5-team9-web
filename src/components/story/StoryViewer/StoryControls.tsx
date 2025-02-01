@@ -28,6 +28,7 @@ export default function StoryControls({
             ${canGoPrevious ? 'opacity-75 hover:opacity-100' : 'opacity-30 cursor-not-allowed'}`}
           disabled={!canGoPrevious}
           type="button"
+          aria-label="Previous story"
         >
           <ChevronLeft className="w-6 h-6 text-white" />
         </button>
@@ -38,14 +39,16 @@ export default function StoryControls({
             ${canGoNext ? 'opacity-75 hover:opacity-100' : 'opacity-30 cursor-not-allowed'}`}
           disabled={!canGoNext}
           type="button"
+          aria-label="Next story"
         >
           <ChevronRight className="w-6 h-6 text-white" />
         </button>
 
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 p-2 rounded-full bg-black/50 pointer-events-auto opacity-75 hover:opacity-100 transition-opacity"
+          className="absolute top-4 right-4 z-10 p-2 rounded-full bg-black/50 pointer-events-auto opacity-75 hover:opacity-100 transition-opacity"
           type="button"
+          aria-label="Close story"
         >
           <X className="w-6 h-6 text-white" />
         </button>
@@ -53,8 +56,9 @@ export default function StoryControls({
         {isOwner && (onDelete != null) && (
           <button
             onClick={onDelete}
-            className="absolute bottom-4 right-4 p-2 rounded-full bg-red-500 pointer-events-auto opacity-75 hover:opacity-100 transition-opacity"
+            className="absolute bottom-4 right-4 z-10 p-2 rounded-full bg-red-500 pointer-events-auto opacity-75 hover:opacity-100 transition-opacity"
             type="button"
+            aria-label="Delete story"
           >
             <Trash2 className="w-6 h-6 text-white" />
           </button>

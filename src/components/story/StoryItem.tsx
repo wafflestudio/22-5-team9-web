@@ -29,10 +29,20 @@ export function StoryItem({
     checkUnviewed();
   }, [stories]);
   const handleClick = () => {
-    if (stories.length > 0 && (stories[0] != null)) {
-      // Navigate to the first story
-      void navigate(`/stories/${username}/${stories[0].story_id}`);
-      onView();
+    if (stories.length > 0) {
+      // Find first unviewed story
+      const firstUnviewed = stories.find(story => {
+        const viewedAt = localStorage.getItem(`story-${story.story_id}-viewed`);
+        return viewedAt == null;
+      });
+
+      // If all stories are viewed, show the first story
+      const storyToShow = firstUnviewed ?? stories[0];
+      
+      if (storyToShow != null) {
+        void navigate(`/stories/${username}/${storyToShow.story_id}`);
+        onView();
+      }
     }
   };
 

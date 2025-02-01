@@ -7,9 +7,9 @@ export function StoryProgress({ duration, currentTime }: StoryProgressProps) {
   const progress = (currentTime / duration) * 100;
 
   return (
-    <div className="h-1 bg-gray-200 rounded">
+    <div className="h-1 bg-gray-600/30 rounded">
       <div
-        className="h-full bg-white rounded transition-all duration-100"
+        className="h-full bg-white/90 rounded transition-all duration-100"
         style={{ width: `${progress}%` }}
       />
     </div>

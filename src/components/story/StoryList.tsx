@@ -5,7 +5,7 @@ import type { Story } from '../../types/story';
 import type { UserProfile } from '../../types/user';
 import { StoryCreator } from './StoryCreator';
 import { StoryItem } from './StoryItem';
-import { StoryViewer } from './StoryViewer/StoryViewer';
+import StoryViewer from './StoryViewer/StoryViewer';
 
 const API_BASE = 'https://waffle-instaclone.kro.kr';
 

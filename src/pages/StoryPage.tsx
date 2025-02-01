@@ -2,7 +2,7 @@ import { useContext, useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 
 import { LoginContext } from '../App';
-import { StoryViewer } from '../components/story/StoryViewer/StoryViewer';
+import StoryViewer from '../components/story/StoryViewer/StoryViewer';
 import type { Story } from '../types/story';
 import type { UserProfile } from '../types/user';
 

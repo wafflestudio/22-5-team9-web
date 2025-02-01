@@ -8,6 +8,7 @@ type Color = {
 
 const ImageProcessor = ({ file, onProcessed }: { file: File | null, onProcessed: (blob: Blob) => void }) => {
   const [processedImage, setProcessedImage] = useState<string | null>(null);
+	const [hasProcessed, setHasProcessed] = useState(false);
   const canvasRef = useRef(null);
   
   const TARGET_WIDTH = 1080;
@@ -47,6 +48,7 @@ const ImageProcessor = ({ file, onProcessed }: { file: File | null, onProcessed:
 
   useEffect(() => {
 		const processImage = async (imageFile: Blob | MediaSource) => {
+			if (hasProcessed) return;
 			const img = new Image();
 			img.src = URL.createObjectURL(imageFile);
 			
@@ -104,12 +106,13 @@ const ImageProcessor = ({ file, onProcessed }: { file: File | null, onProcessed:
 			if (blob == null) return;
 			const processedUrl = URL.createObjectURL(blob);
 			setProcessedImage(processedUrl);
+			setHasProcessed(true);
 			onProcessed(blob);
 		};
-    if (file != null) {
+    if (file != null && !hasProcessed) {
       void processImage(file);
     }
-  }, [TARGET_RATIO, file, onProcessed, processedImage]);
+  }, [TARGET_RATIO, file, hasProcessed, onProcessed, processedImage]);
 
   return (
     <div className="w-full max-w-lg mx-auto">
