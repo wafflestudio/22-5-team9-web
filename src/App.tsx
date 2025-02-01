@@ -3,7 +3,6 @@ import './index.css';
 import { createContext, useState } from 'react';
 import { Navigate, Route, Routes } from 'react-router-dom';
 
-import StoryEditor from './components/story/Editor/StoryEditor';
 import { useAuth } from './hooks/useAuth';
 import ExplorePage from './pages/ExplorePage';
 import FriendMapPage from './pages/FriendMapPage';
@@ -14,7 +13,6 @@ import PostDetailPage from './pages/PostDetailPage';
 import ProfileEditPage from './pages/ProfileEditPage';
 import ProfilePage from './pages/ProfilePage';
 import RegisterPage from './pages/RegisterPage';
-import StoryPage from './pages/StoryPage';
 import type { LoginContextType } from './types/auth';
 import type { SearchContextType } from './types/search';
 
@@ -60,26 +58,6 @@ export const App = () => {
           <Route
             path="/:username"
             element={auth.isLoggedIn ? <ProfilePage /> : <Navigate to="/" />}
-          />
-          <Route
-            path="/stories/:username/:storyId"
-            element={
-              auth.isLoggedIn ? (
-                <StoryPage />
-              ) : (
-                <LoginPage handleIsLoggedIn={auth.handleIsLoggedIn} />
-              )
-            }
-          />
-          <Route
-            path="/stories/new"
-            element={
-              auth.isLoggedIn ? (
-                <StoryEditor />
-              ) : (
-                <LoginPage handleIsLoggedIn={auth.handleIsLoggedIn} />
-              )
-            }
           />
           <Route
             path="/accounts/edit"
