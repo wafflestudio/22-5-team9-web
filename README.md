@@ -82,7 +82,7 @@
 └── 📜 pypoetry.toml         # 패키지 관리
 ```
 
-## 개발진
+## 🧑🏻‍💻🧑🏻‍💻 개발진
 <div>
     <a href="https://aws.amazon.com/ec2/">
         <img src="https://custom-icon-badges.demolab.com/badge/LikeACloud7-박세준-eb4034?style=for-the-badge&logo=person-fill&logoColor=white"/>
@@ -112,7 +112,7 @@
 - story
 - 리포 구조
 
-## 배포 링크
+## 🔗 배포 링크
 <div>
     <a href="https://d3l72zsyuz0duc.cloudfront.net/"/>
         <img width="203" alt="image" src="https://github.com/user-attachments/assets/76ff852d-d2a0-493d-aace-485a981ab411" alt="Front"/>
