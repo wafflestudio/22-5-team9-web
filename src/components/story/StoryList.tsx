@@ -1,6 +1,6 @@
-import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useContext, useEffect, useState } from 'react';
 
+import { LoginContext } from '../../App';
 import type { Story } from '../../types/story';
 import type { UserProfile } from '../../types/user';
 import { StoryCreator } from './StoryCreator';
@@ -9,146 +9,129 @@ import StoryViewer from './StoryViewer/StoryViewer';
 
 const API_BASE = 'https://waffle-instaclone.kro.kr';
 
+type NonNullUserProfile = Exclude<UserProfile, null>;
+type UserStories = {
+  user: NonNullUserProfile;
+  stories: Story[];
+  latestStory: Story;
+  hasUnviewedStories: boolean;
+};
+
 export function StoryList() {
-  const navigate = useNavigate();
+  const [userStories, setUserStories] = useState<UserStories[]>([]);
   const [selectedUserId, setSelectedUserId] = useState<number | null>(null);
   const [viewingStories, setViewingStories] = useState<Story[]>([]);
-  const [currentUserId, setCurrentUserId] = useState<number | null>(null);
-  const [stories, setStories] = useState<Story[]>([]);
-  const [userProfiles, setUserProfiles] = useState<Record<number, UserProfile>>(
-    {},
-  );
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const context = useContext(LoginContext);
 
-  // Fetch user profile for a specific user ID
-  const fetchUserProfile = async (userId: number) => {
-    try {
-      const response = await fetch(`${API_BASE}/api/user/profile`, {
+  useEffect(() => {
+    const fetchStoriesForUser = async (userId: number): Promise<Story[]> => {
+      const response = await fetch(`${API_BASE}/api/story/list/${userId}`, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem('access_token') ?? ''}`,
         },
       });
+      if (!response.ok) return [];
+      return response.json() as Promise<Story[]>;
+    };
 
-      if (!response.ok) {
-        throw new Error('Failed to fetch user profile');
-      }
-
-      const userData = (await response.json()) as UserProfile;
-      setUserProfiles((prev) => ({
-        ...prev,
-        [userId]: userData,
-      }));
-    } catch (err) {
-      console.error(`Error fetching profile for user ${userId}:`, err);
-    }
-  };
-
-  // Fetch current user profile
-  useEffect(() => {
-    // Fetch stories and associated user profiles
-    const fetchStories = async (userId: number) => {
+    const fetchUserProfile = async (
+      userId: number,
+    ): Promise<UserProfile | null> => {
       try {
-        const token = localStorage.getItem('access_token');
-        if (token == null) return;
-
-        const response = await fetch(`${API_BASE}/api/story/list/${userId}`, {
+        const response = await fetch(`${API_BASE}/api/user/${userId}`, {
           headers: {
-            Authorization: `Bearer ${token}`,
-            Accept: 'application/json',
+            Authorization: `Bearer ${localStorage.getItem('access_token') ?? ''}`,
           },
         });
+        if (!response.ok) return null;
+        return (await response.json()) as UserProfile;
+      } catch (err) {
+        console.error(`Error fetching profile for user ${userId}:`, err);
+        return null;
+      }
+    };
 
-        if (!response.ok) {
-          const errorData = (await response.json()) as { detail: string };
-          throw new Error(
-            errorData.detail !== ''
-              ? errorData.detail
-              : 'Failed to fetch stories',
-          );
-        }
+    const loadAllStories = async () => {
+      try {
+        setLoading(true);
+        if (context?.myProfile == null) return;
 
-        const data = (await response.json()) as Story[];
-        setStories(data);
+        // Get all users we need to fetch (current user + following)
+        const userIds = [
+          context.myProfile.user_id,
+          ...context.myProfile.following,
+        ];
 
-        // Fetch user profiles for all unique user IDs in stories
-        const uniqueUserIds = [...new Set(data.map((story) => story.user_id))];
-        await Promise.all(uniqueUserIds.map((uid) => fetchUserProfile(uid)));
+        // Fetch stories and profiles for all users
+        const usersWithStories = await Promise.all(
+          userIds.map(async (userId) => {
+            const [stories, userProfile] = await Promise.all([
+              fetchStoriesForUser(userId),
+              fetchUserProfile(userId),
+            ]);
 
+            if (userProfile == null || stories.length === 0) return null;
+
+            // Check for unviewed stories
+            const hasUnviewedStories = stories.some((story) => {
+              const viewedAt = localStorage.getItem(
+                `story-${story.story_id}-viewed`,
+              );
+              return viewedAt == null;
+            });
+
+            // Get latest story by creation date
+            const latestStory = stories.reduce((latest, current) => {
+              return new Date(current.creation_date) >
+                new Date(latest.creation_date)
+                ? current
+                : latest;
+            }, stories[0]);
+
+            return {
+              user: userProfile,
+              stories,
+              latestStory,
+              hasUnviewedStories,
+            };
+          }),
+        );
+
+        // Filter out null results and sort
+        const validUserStories = usersWithStories
+          .filter((item): item is UserStories => item !== null)
+          .sort((a, b) => {
+            // First sort by unviewed status
+            if (a.hasUnviewedStories && !b.hasUnviewedStories) return -1;
+            if (!a.hasUnviewedStories && b.hasUnviewedStories) return 1;
+
+            // Then sort by latest story date
+            return (
+              new Date(b.latestStory.creation_date).getTime() -
+              new Date(a.latestStory.creation_date).getTime()
+            );
+          });
+
+        setUserStories(validUserStories);
         setError(null);
       } catch (err) {
-        console.error('Story fetch error:', err);
+        console.error('Error fetching stories:', err);
         setError(
           err instanceof Error ? err.message : 'Failed to fetch stories',
         );
-      }
-    };
-    const fetchUserInfo = async () => {
-      try {
-        setLoading(true);
-        const token = localStorage.getItem('access_token');
-
-        if (token == null) {
-          localStorage.removeItem('isLoggedIn');
-          void navigate('/');
-          return;
-        }
-
-        const response = await fetch(`${API_BASE}/api/user/profile`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-
-        if (!response.ok) {
-          if (response.status === 401) {
-            localStorage.removeItem('access_token');
-            localStorage.removeItem('isLoggedIn');
-            void navigate('/');
-            return;
-          }
-          throw new Error('Failed to fetch user info');
-        }
-
-        const userData = (await response.json()) as UserProfile;
-        if (userData?.user_id != null) {
-          setCurrentUserId(userData.user_id);
-          void fetchStories(userData.user_id);
-        }
-      } catch (err) {
-        setError(err instanceof Error ? err.message : 'Unknown error occurred');
-        console.error('Error fetching user info:', err);
       } finally {
         setLoading(false);
       }
     };
 
-    void fetchUserInfo();
-  }, [navigate]);
+    void loadAllStories();
+  }, [context?.myProfile]);
 
-  const deleteStory = async (storyId: number) => {
-    try {
-      const response = await fetch(`${API_BASE}/api/story/${storyId}`, {
-        method: 'DELETE',
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem('access_token') ?? ''}`,
-        },
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to delete story');
-      }
-
-      setStories(stories.filter((story) => story.story_id !== storyId));
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to delete story');
-      throw err;
-    }
-  };
-
-  const handleViewStory = (userId: number, userStories: Story[]) => {
+  const handleViewStory = (userId: number, userStoryData: UserStories) => {
     setSelectedUserId(userId);
-    setViewingStories(userStories);
+    setViewingStories(userStoryData.stories);
   };
 
   const handleCloseViewer = () => {
@@ -156,58 +139,87 @@ export function StoryList() {
     setViewingStories([]);
   };
 
-  if (error != null) {
-    return <div className="text-red-500 p-4">{error}</div>;
-  }
-
-  const storyGroups = stories.reduce<Record<number, Story[]>>((acc, story) => {
-    if (acc[story.user_id] == null) {
-      acc[story.user_id] = [];
-    }
-    acc[story.user_id]?.push(story);
-    return acc;
-  }, {});
-
-  return (
-    <div className="flex space-x-4 overflow-x-auto pb-4 mb-8">
-      <StoryCreator />
-
-      {loading ? (
+  if (loading) {
+    return (
+      <div className="flex space-x-4 overflow-x-auto pb-4 mb-8">
         <div className="animate-pulse flex space-x-4">
           <div className="w-16 h-16 bg-gray-200 rounded-full"></div>
           <div className="w-16 h-16 bg-gray-200 rounded-full"></div>
           <div className="w-16 h-16 bg-gray-200 rounded-full"></div>
         </div>
-      ) : (
-        <>
-          {Object.entries(storyGroups).map(([userId, userStories]) => {
-            const userProfile = userProfiles[Number(userId)];
-            return (
-              <StoryItem
-                key={userId}
-                username={userProfile?.username ?? 'Loading...'}
-                profileImage={
-                  userProfile?.profile_image != null
-                    ? `${API_BASE}/${userProfile.profile_image}`
-                    : undefined
-                }
-                stories={userStories}
-                onView={() => {
-                  handleViewStory(Number(userId), userStories);
-                }}
-              />
-            );
-          })}
-        </>
-      )}
+      </div>
+    );
+  }
 
-      {viewingStories.length > 0 && (
+  if (error != null) {
+    return <div className="text-red-500 p-4">{error}</div>;
+  }
+
+  return (
+    <div className="flex space-x-4 overflow-x-auto pb-4 mb-8">
+      <StoryCreator />
+
+      {userStories.map((userStoryData) => (
+        <StoryItem
+          key={userStoryData.user.user_id}
+          username={userStoryData.user.username}
+          profileImage={
+            userStoryData.user.profile_image.length > 0
+              ? `${API_BASE}/${userStoryData.user.profile_image}`
+              : undefined
+          }
+          stories={userStoryData.stories}
+          onView={() => {
+            handleViewStory(userStoryData.user.user_id, userStoryData);
+          }}
+        />
+      ))}
+
+      {viewingStories.length > 0 && selectedUserId !== null && (
         <StoryViewer
           stories={viewingStories}
-          username={userProfiles[selectedUserId ?? 0]?.username ?? ''}
+          username={
+            userStories.find((us) => us.user.user_id === selectedUserId)?.user
+              .username ?? 'Unknown'
+          }
+          profileImage={`${API_BASE}/${userStories.find((us) => us.user.user_id === selectedUserId)?.user.profile_image}`}
           onClose={handleCloseViewer}
-          onDelete={selectedUserId === currentUserId ? deleteStory : undefined}
-          isOwner={selectedUserId === currentUserId}
+          onDelete={
+            selectedUserId === context?.myProfile?.user_id
+              ? async (storyId) => {
+                  try {
+                    const response = await fetch(
+                      `${API_BASE}/api/story/${storyId}`,
+                      {
+                        method: 'DELETE',
+                        headers: {
+                          Authorization: `Bearer ${localStorage.getItem('access_token') ?? ''}`,
+                        },
+                      },
+                    );
+                    if (!response.ok) throw new Error('Failed to delete story');
+                    setUserStories((prevStories) =>
+                      prevStories
+                        .map((us) =>
+                          us.user.user_id === selectedUserId
+                            ? {
+                                ...us,
+                                stories: us.stories.filter(
+                                  (s) => s.story_id !== storyId,
+                                ),
+                              }
+                            : us,
+                        )
+                        .filter((us) => us.stories.length > 0),
+                    );
+                  } catch (err) {
+                    console.error('Failed to delete story:', err);
+                    throw err;
+                  }
+                }
+              : undefined
+          }
+          isOwner={selectedUserId === context?.myProfile?.user_id}
           initialIndex={0}
         />
       )}
