@@ -84,6 +84,7 @@ export function StoryList() {
 
             // Get latest story by creation date
             const latestStory = stories.reduce((latest, current) => {
+              if (latest == null) return current;
               return new Date(current.creation_date) >
                 new Date(latest.creation_date)
                 ? current
@@ -182,7 +183,7 @@ export function StoryList() {
             userStories.find((us) => us.user.user_id === selectedUserId)?.user
               .username ?? 'Unknown'
           }
-          profileImage={`${API_BASE}/${userStories.find((us) => us.user.user_id === selectedUserId)?.user.profile_image}`}
+          profileImage={`${API_BASE}/${String(userStories.find((us) => us.user.user_id === selectedUserId)?.user.profile_image)}`}
           onClose={handleCloseViewer}
           onDelete={
             selectedUserId === context?.myProfile?.user_id
