@@ -7,9 +7,13 @@ interface PostGridProps {
 }
 
 const PostGrid = ({ posts }: PostGridProps) => {
+  const sortedPosts = [...posts].sort((a, b) => 
+    new Date(b.creation_date).getTime() - new Date(a.creation_date).getTime()
+  );
+
   return (
     <div className="grid grid-cols-3 gap-1">
-      {posts.map((post) => (
+      {sortedPosts.map((post) => (
         <Link
           to={`/post/${post.post_id}`}
           key={post.post_id}
