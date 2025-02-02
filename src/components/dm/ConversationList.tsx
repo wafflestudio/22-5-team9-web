@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 import { useConversations } from '../../hooks/useConversations';
 import type { Conversation } from '../../types/message';
@@ -7,13 +7,15 @@ import { ConversationItem } from './ConversationItem';
 
 interface ConversationListProps {
   onSelectConversation: (userId: number) => void;
+  activeUserId?: number | null;
 }
 
 export function ConversationList({
   onSelectConversation,
+  activeUserId
 }: ConversationListProps) {
+  const navigate = useNavigate();
   const { conversations, loading, error } = useConversations();
-  const [activeUserId, setActiveUserId] = useState<number | null>(null);
 
   if (loading) {
     return (
@@ -34,8 +36,8 @@ export function ConversationList({
   }
 
   const handleConversationClick = (conversation: Conversation) => {
-    setActiveUserId(conversation.userId);
     onSelectConversation(conversation.userId);
+    void navigate(`/messages/${conversation.userId}`, { replace: true });
   };
 
   return (
