@@ -2,6 +2,7 @@ import {
   Compass,
   Heart,
   Home,
+  Map,
   Menu,
   PlusSquare,
   Search,
@@ -38,6 +39,8 @@ const SideBar = ({ onSearchClick }: SideBarProps) => {
       setActiveItem('explore');
     } else if (path === `/${String(context.myProfile?.username)}`) {
       setActiveItem('profile');
+    } else if (path === '/map') {
+      setActiveItem('map');
     } else {
       setActiveItem('');
     }
@@ -86,6 +89,9 @@ const SideBar = ({ onSearchClick }: SideBarProps) => {
           label="Notifications"
           active={activeItem === 'notifications'}
         />
+        <Link to="/map">
+          <NavItem icon={<Map />} label="Map" active={activeItem === 'map'} />
+        </Link>
         <NavItem
           icon={<PlusSquare />}
           label="Create"
