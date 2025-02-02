@@ -1,3 +1,11 @@
+import { useNavigate } from 'react-router-dom';
+
+interface StoryUserInfoProps {
+  username: string;
+  profileImage?: string;
+  creationDate: string;
+}
+
 const formatTimeAgo = (dateString: string): string => {
   const date = new Date(dateString + 'Z');
   const now = new Date();
@@ -17,17 +25,17 @@ const formatTimeAgo = (dateString: string): string => {
   }
 };
 
-interface StoryUserInfoProps {
-  username: string;
-  profileImage?: string;
-  creationDate: string;
-}
-
 const StoryUserInfo = ({
   username,
   profileImage,
   creationDate,
 }: StoryUserInfoProps) => {
+  const navigate = useNavigate();
+  const handleUsernameClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    void navigate(`/${username}`);
+  };
   return (
     <div className="absolute top-2 left-0 right-0 z-20">
       <div className="flex items-center space-x-3 px-4 py-2">
@@ -43,7 +51,12 @@ const StoryUserInfo = ({
           />
         </div>
         <div className="flex items-center space-x-2">
-          <span className="text-white font-semibold text-sm">{username}</span>
+          <button
+            onClick={handleUsernameClick}
+            className="text-white font-semibold text-sm hover:underline focus:outline-none"
+          >
+            {username}
+          </button>
           <span className="text-gray-300 text-xs">
             {formatTimeAgo(creationDate)}
           </span>

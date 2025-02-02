@@ -5,6 +5,7 @@ import { Link } from 'react-router-dom';
 import { followUser, unfollowUser } from '../../api/follow';
 import { myProfile } from '../../api/profile';
 import { LoginContext } from '../../App';
+import ProfileStoryView from './ProfileStoryView';
 
 type ProfileInfoProps = {
   userId: number;
@@ -69,12 +70,12 @@ const ProfileInfo = ({
   return (
     <div className="mb-8">
       <div className="flex items-center mb-4">
-        <img
-          src={`https://waffle-instaclone.kro.kr/${profileImage}`}
-          alt={username}
-          className="w-20 h-20 rounded-full mr-4"
+        <ProfileStoryView
+          userId={userId}
+          username={username}
+          profileImage={profileImage}
         />
-        <div className="flex-1">
+        <div className="flex-1 ml-4">
           <div className="flex items-center mb-2">
             <h1 className="text-xl font-semibold mr-4">{username}</h1>
             {username === context?.myProfile?.username ? (
