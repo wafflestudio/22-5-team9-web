@@ -8,6 +8,7 @@ import { StoryCreator } from './StoryCreator';
 import { StoryItem } from './StoryItem';
 import StoryViewer from './StoryViewer/StoryViewer';
 
+
 const API_BASE = 'https://waffle-instaclone.kro.kr';
 
 interface UserStoryGroup {
@@ -17,6 +18,7 @@ interface UserStoryGroup {
   stories: Story[];
   userProfile?: UserProfile;
 }
+
 
 export function StoryList() {
   const navigate = useNavigate();
@@ -30,6 +32,7 @@ export function StoryList() {
 
   const activeStories = useExpiredStories(stories);
 
+  // Fetch user profile for a specific user ID
   const fetchUserProfile = async (userId: number) => {
     try {
       const response = await fetch(`${API_BASE}/api/user/profile`, {
@@ -47,51 +50,63 @@ export function StoryList() {
         ...prev,
         [userId]: userData
       }));
-
-      return userData;
     } catch (err) {
       console.error(`Error fetching profile for user ${userId}:`, err);
-      return null;
     }
   };
 
-  const fetchStoriesForUser = async (userId: number) => {
+  // Fetch current user profile
+  useEffect(() => {
+    // Fetch stories and associated user profiles
+  const fetchStories = async (userId: number) => {
     try {
+      const token = localStorage.getItem('access_token');
+      if (token == null) return;
+
       const response = await fetch(`${API_BASE}/api/story/list/${userId}`, {
         headers: {
-          Authorization: `Bearer ${localStorage.getItem('access_token') ?? ''}`,
+          Authorization: `Bearer ${token}`,
           Accept: 'application/json',
         },
       });
 
       if (!response.ok) {
-        throw new Error('Failed to fetch stories');
+        const errorData = await response.json() as { detail: string };
+        throw new Error(errorData.detail || 'Failed to fetch stories');
       }
 
-      return await response.json() as Story[];
+      const data = await response.json() as Story[];
+      setStories(data);
+
+      // Fetch user profiles for all unique user IDs in stories
+      const uniqueUserIds = [...new Set(data.map(story => story.user_id))];
+      await Promise.all(uniqueUserIds.map(uid => fetchUserProfile(uid)));
+
+      setError(null);
     } catch (err) {
-      console.error(`Error fetching stories for user ${userId}:`, err);
-      return [];
+      console.error('Story fetch error:', err);
+      setError(err instanceof Error ? err.message : 'Failed to fetch stories');
     }
   };
-
-  useEffect(() => {
-    const fetchAllStories = async () => {
+    const fetchUserInfo = async () => {
       try {
         setLoading(true);
         const token = localStorage.getItem('access_token');
+
         if (token == null) {
           localStorage.removeItem('isLoggedIn');
           void navigate('/');
           return;
         }
-        // Fetch current user profile
-        const currentUserResponse = await fetch(`${API_BASE}/api/user/profile`, {
-          headers: { Authorization: `Bearer ${token}` },
+
+        const response = await fetch(`${API_BASE}/api/user/profile`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
         });
 
-        if (!currentUserResponse.ok) {
-          if (currentUserResponse.status === 401) {
+        if (!response.ok) {
+          if (response.status === 401) {
             localStorage.removeItem('access_token');
             localStorage.removeItem('isLoggedIn');
             void navigate('/');
@@ -100,35 +115,20 @@ export function StoryList() {
           throw new Error('Failed to fetch user info');
         }
 
-        const currentUser = await currentUserResponse.json() as UserProfile;
-        if ((currentUser?.user_id) == null) throw new Error('Invalid user data');
-        
-        setCurrentUserId(currentUser.user_id);
-        
-        // Fetch stories for current user and their following
-        const userIds = [currentUser.user_id, ...currentUser.following];
-        const allStories = await Promise.all(
-          userIds.map(async (userId) => {
-            const userStories = await fetchStoriesForUser(userId);
-            return userStories;
-          })
-        );
-
-        // Fetch profiles for all users with stories
-        await Promise.all(
-          userIds.map(uid => fetchUserProfile(uid))
-        );
-
-        setStories(allStories.flat());
-        setError(null);
+        const userData = await response.json() as UserProfile;
+        if (userData?.user_id != null) {
+          setCurrentUserId(userData.user_id);
+          void fetchStories(userData.user_id);
+        }
       } catch (err) {
-        setError(err instanceof Error ? err.message : 'Failed to fetch stories');
+        setError(err instanceof Error ? err.message : 'Unknown error occurred');
+        console.error('Error fetching user info:', err);
       } finally {
         setLoading(false);
       }
     };
 
-    void fetchAllStories();
+    void fetchUserInfo();
   }, [navigate]);
 
   const deleteStory = async (storyId: number) => {
@@ -151,42 +151,6 @@ export function StoryList() {
     }
   };
 
-  const organizeStories = (storiesToOrganize: Story[]): UserStoryGroup[] => {
-    const storyGroups = new Map<number, UserStoryGroup>();
-    
-    storiesToOrganize.forEach(story => {
-      const group = storyGroups.get(story.user_id) ?? {
-        userId: story.user_id,
-        hasUnviewed: false,
-        latestStoryDate: '',
-        stories: [],
-        userProfile: userProfiles[story.user_id]
-      };
-
-      const isViewed = localStorage.getItem(`story-${story.story_id}-viewed`) !== null;
-      if (!isViewed) {
-        group.hasUnviewed = true;
-      }
-
-      if ((group.latestStoryDate.length === 0) || story.creation_date > group.latestStoryDate) {
-        group.latestStoryDate = story.creation_date;
-      }
-
-      group.stories.push(story);
-      storyGroups.set(story.user_id, group);
-    });
-
-    return Array.from(storyGroups.values())
-      .sort((a, b) => {
-        // First sort by unviewed status
-        if (a.hasUnviewed !== b.hasUnviewed) {
-          return a.hasUnviewed ? -1 : 1;
-        }
-        // Then sort by latest story date
-        return b.latestStoryDate.localeCompare(a.latestStoryDate);
-      });
-  };
-
   const handleViewStory = (userId: number, userStories: Story[]) => {
     setSelectedUserId(userId);
     setViewingStories(userStories);
@@ -201,7 +165,13 @@ export function StoryList() {
     return <div className="text-red-500 p-4">{error}</div>;
   }
 
-  const organizedStories = organizeStories(activeStories);
+  const storyGroups = activeStories.reduce<Record<number, Story[]>>((acc, story) => {
+    if (acc[story.user_id] == null) {
+      acc[story.user_id] = [];
+    }
+    acc[story.user_id]?.push(story);
+    return acc;
+  }, {});
 
   return (
     <div className="flex space-x-4 overflow-x-auto pb-4 mb-8">
@@ -215,17 +185,18 @@ export function StoryList() {
         </div>
       ) : (
         <>
-          {organizedStories.map((group) => (
-            <StoryItem
-              key={group.userId}
-              username={group.userProfile?.username ?? 'Loading...'}
-              profileImage={((group.userProfile?.profile_image) != null) ? 
-                `${API_BASE}/${group.userProfile.profile_image}` : 
-                undefined}
-              stories={group.stories}
-              onView={() => { handleViewStory(group.userId, group.stories); }}
-            />
-          ))}
+          {Object.entries(storyGroups).map(([userId, userStories]) => {
+            const userProfile = userProfiles[Number(userId)];
+            return (
+              <StoryItem
+                key={userId}
+                username={userProfile?.username ?? 'Loading...'}
+                profileImage={userProfile?.profile_image != null ? `${API_BASE}/${userProfile.profile_image}` : undefined}
+                stories={userStories}
+                onView={() => { handleViewStory(Number(userId), userStories); }}
+              />
+            );
+          })}
         </>
       )}
 
@@ -233,9 +204,6 @@ export function StoryList() {
         <StoryViewer
           stories={viewingStories}
           username={userProfiles[selectedUserId ?? 0]?.username ?? ''}
-          profileImage={((userProfiles[selectedUserId ?? 0]?.profile_image) != null) ? 
-            `${API_BASE}/${userProfiles[selectedUserId ?? 0]?.profile_image}` : 
-            undefined}
           onClose={handleCloseViewer}
           onDelete={selectedUserId === currentUserId ? deleteStory : undefined}
           isOwner={selectedUserId === currentUserId}
