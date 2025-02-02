@@ -9,7 +9,11 @@ interface ProfileStoryViewProps {
   profileImage: string;
 }
 
-const ProfileStoryView = ({ userId, username, profileImage }: ProfileStoryViewProps) => {
+const ProfileStoryView = ({
+  userId,
+  username,
+  profileImage,
+}: ProfileStoryViewProps) => {
   const [stories, setStories] = useState<Story[]>([]);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
@@ -23,10 +27,10 @@ const ProfileStoryView = ({ userId, username, profileImage }: ProfileStoryViewPr
             headers: {
               Authorization: `Bearer ${localStorage.getItem('access_token') ?? ''}`,
             },
-          }
+          },
         );
         if (!response.ok) throw new Error('Failed to fetch stories');
-        const data = await response.json() as Story[];
+        const data = (await response.json()) as Story[];
         setStories(data);
       } catch (error) {
         console.error('Error fetching stories:', error);
@@ -40,20 +44,17 @@ const ProfileStoryView = ({ userId, username, profileImage }: ProfileStoryViewPr
 
   const handleClick = () => {
     const firstStory = stories[0];
-    if (stories.length > 0 && (firstStory != null)) {
+    if (stories.length > 0 && firstStory != null) {
       void navigate(`/stories/${username}/${firstStory.story_id}`);
     }
   };
 
   return (
-    <button 
-      onClick={handleClick}
-      className="relative w-20 h-20 rounded-full"
-    >
-      <div 
+    <button onClick={handleClick} className="relative w-20 h-20 rounded-full">
+      <div
         className={`w-full h-full rounded-full p-0.5 ${
-          stories.length > 0 
-            ? 'bg-gradient-to-tr from-yellow-400 to-pink-600' 
+          stories.length > 0
+            ? 'bg-gradient-to-tr from-yellow-400 to-pink-600'
             : 'bg-gray-200'
         }`}
       >

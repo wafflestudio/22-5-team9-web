@@ -7,8 +7,9 @@ interface PostGridProps {
 }
 
 const PostGrid = ({ posts }: PostGridProps) => {
-  const sortedPosts = [...posts].sort((a, b) => 
-    new Date(b.creation_date).getTime() - new Date(a.creation_date).getTime()
+  const sortedPosts = [...posts].sort(
+    (a, b) =>
+      new Date(b.creation_date).getTime() - new Date(a.creation_date).getTime(),
   );
 
   return (

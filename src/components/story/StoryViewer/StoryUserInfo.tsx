@@ -28,7 +28,7 @@ const formatTimeAgo = (dateString: string): string => {
 const StoryUserInfo = ({
   username,
   profileImage,
-  creationDate
+  creationDate,
 }: StoryUserInfoProps) => {
   const navigate = useNavigate();
   const handleUsernameClick = (e: React.MouseEvent) => {
@@ -51,7 +51,7 @@ const StoryUserInfo = ({
           />
         </div>
         <div className="flex items-center space-x-2">
-        <button
+          <button
             onClick={handleUsernameClick}
             className="text-white font-semibold text-sm hover:underline focus:outline-none"
           >
