@@ -7,7 +7,7 @@ import MobileBar from '../components/layout/MobileBar';
 import MobileHeader from '../components/layout/MobileHeader';
 import SideBar from '../components/layout/SideBar';
 import SearchModal from '../components/modals/SearchModal';
-import Highlights from '../components/profile/Highlights';
+// import Highlights from '../components/profile/Highlights';
 import ProfileInfo from '../components/profile/ProfileInfo';
 import ProfileTabs from '../components/profile/ProfileTabs';
 import { useSearch } from '../hooks/useSearch';
@@ -77,7 +77,6 @@ const ProfilePage = () => {
             fullName={userProfile.full_name}
             bio={userProfile.introduce}
           />
-          <Highlights />
           <ProfileTabs postIds={userProfile.post_ids} />
         </div>
       </div>
