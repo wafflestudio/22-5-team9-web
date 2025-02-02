@@ -29,7 +29,7 @@ const GoogleAuth: React.FC<GoogleAuthProps> = ({ onSuccess, onError }) => {
     }
     try {
       const response = await fetch(
-        'https://waffle-instaclone.kro.kr/test/api/auth/google',
+        'https://waffle-instaclone.kro.kr/auth/google',
         {
           method: 'POST',
           headers: {
